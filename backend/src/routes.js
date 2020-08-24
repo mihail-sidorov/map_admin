@@ -31,10 +31,11 @@ module.exports = function (app) {
     })
 
     app.use(function (req, res) {
-        res.status(404).render(jsonResPattern("404 not found", true));
+        res.status(404).json(jsonResPattern("404 not found", true));
     })
 
     app.use(function (err, req, res, next) {
-        res.status(500).send(jsonResPattern(err, true))
+        console.log(err)
+        res.status(500).json(jsonResPattern(err, true))
     })
 }
