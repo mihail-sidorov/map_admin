@@ -3,11 +3,11 @@ const { jsonResPattern } = require("./jsonResPattern")
 const { checkAuthAdmin, checkAuthModer, checkAuthUser, isAuth } = require("./middlewares/passport")
 
 module.exports = function (app) {
-    app.post("/login", passport.authenticate('local'), function (req, res, next) {
+    app.post("/getLogin", passport.authenticate('local'), function (req, res, next) {
         res.json(jsonResPattern(false,"OK"))
     })
 
-    app.get("/login", passport.authenticate('local'), function (req, res, next) {
+    app.get("/getAuthData", isAuth, (req, res) => {
         res.json(jsonResPattern(false,"OK"))
     })
 
