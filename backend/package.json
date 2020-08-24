@@ -1,0 +1,32 @@
+{
+  "name": "backendAdmin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "knex": "^0.21.5",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.1.0",
+    "objection": "^2.2.3",
+    "objection-password": "^2.0.0",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "session-file-store": "^1.4.0",
+    "sqlite3": "^5.0.0"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.131.0",
+    "flow-remove-types": "^2.131.0",
+    "gulp-nodemon": "^2.5.0"
+  }
+}
