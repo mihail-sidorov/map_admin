@@ -15,7 +15,7 @@ exports.passportModule = function (app) {
     })
 
     passport.use(new LocalStrategy(
-        { usernameField: 'email' },
+        { usernameField: 'login' },
         function (email, password, done) {
             checkLoginPassword(email, password).then((result) => {
                 result ? done(null, result) : done(null, false)
