@@ -8,11 +8,17 @@ module.exports = function (app) {
         res.json(jsonResPattern("OK"))
     })
 
-    app.get("/api/getAuthData", isAuth, (req, res) => {
+    app.get("/api/getAuthData", (req, res) => {
         const response={}
-        response.login=req.user.email
-        response.isAuth=true
-        response.permission=req.user.permission
+        if (req.isAuthenticated()) {
+            response.login=req.user.email
+            response.isAuth=true
+            response.permission=req.user.permission
+        } else {
+            response.login=null
+            response.isAuth=false
+            response.permission=null
+        }
         res.json(response)
     })
 
