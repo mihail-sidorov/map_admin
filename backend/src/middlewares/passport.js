@@ -32,10 +32,10 @@ exports.checkAuthAdmin = function (req, res, next) {
         if (req.user.permission[0].permission === "admin") {
             next()
         } else {
-            next("No permission")
+            next({res: "No permission",code: 403})
         }
     } else {
-        next("Unauthorized")
+        next({res: "Unauthorized",code: 401})
     }
 }
 
@@ -44,10 +44,10 @@ exports.checkAuthModer = function (req, res, next) {
         if (req.user.permission[0].permission === "moder") {
             next()
         } else {
-            next("No permission")
+            next({res: "No permission",code: 403})
         }
     } else {
-        next("Unauthorized")
+        next({res: "Unauthorized",code: 401})
     }
 }
 
@@ -55,9 +55,9 @@ exports.checkAuthUser = function (req, res, next) {
     if (req.user && req.user.permission[0].permission === "user") {
         next()
     } else if (req.user) {
-        next("No permission")
+        next({res: "No permission",code: 403})
     } else {
-        next("Unauthorized")
+        next({res: "Unauthorized",code: 401})
     }
 }
 
@@ -65,6 +65,6 @@ exports.isAuth = function (req, res, next) {
     if (req.user) {
         next()
     } else {
-        next("Unauthorized")
+        next({res: "Unauthorized",code: 401})
     }
 }

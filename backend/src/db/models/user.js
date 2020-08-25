@@ -44,7 +44,7 @@ module.exports = class User extends Password(Model) {
     }
 
     static getUserById(id) {
-        return this.query().withGraphFetched("permission").findById(id)
+        return this.query().select("*").joinRelated("permission").findById(id)
     }
 
     static checkLoginPassword(email, password) { //Проверка на присутствие в базе пары логин/пароль

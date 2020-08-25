@@ -1,6 +1,7 @@
 const passport = require("passport")
 const { jsonResPattern } = require("./jsonResPattern")
 const {  checkAuthAdmin, checkAuthModer, checkAuthUser, isAuth } = require("./middlewares/passport")
+const { response } = require("express")
 
 module.exports = function (app) {
     app.post("/api/getLogin", passport.authenticate('local'), function (req, res, next) {
@@ -8,7 +9,11 @@ module.exports = function (app) {
     })
 
     app.get("/api/getAuthData", isAuth, (req, res) => {
-        res.json(jsonResPattern("OK"))
+        const response={}
+        response.login=req.user.email
+        response.isAuth=true
+        response.permission=req.user.permission
+        res.json(response)
     })
 
     app.post("/api/logOut", isAuth, (req, res) => {
