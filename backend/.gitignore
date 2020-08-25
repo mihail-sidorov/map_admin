@@ -1,3 +1,4 @@
 node_modules
 sessions
-serverConfig.js
+./serverConfig.js
+./package-lock.json
