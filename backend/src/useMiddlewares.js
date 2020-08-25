@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser')
 const { passportModule } = require("./middlewares/passport")
 const cors = require('cors')
 const sessionConf = require("../serverConfig").session
-const { cookiePermModule } = require("./middlewares/writePermissionInCookie")
 
 module.exports = function (app) {
 

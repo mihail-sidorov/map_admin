@@ -3,15 +3,15 @@ const { jsonResPattern } = require("./jsonResPattern")
 const {  checkAuthAdmin, checkAuthModer, checkAuthUser, isAuth } = require("./middlewares/passport")
 
 module.exports = function (app) {
-    app.post("/getLogin", passport.authenticate('local'), function (req, res, next) {
-        res.json(jsonResPattern(false,"OK"))
+    app.post("/api/getLogin", passport.authenticate('local'), function (req, res, next) {
+        res.json(jsonResPattern("OK"))
     })
 
-    app.get("/getAuthData", isAuth, (req, res) => {
-        res.json(jsonResPattern(false,"OK"))
+    app.get("/api/getAuthData", isAuth, (req, res) => {
+        res.json(jsonResPattern("OK"))
     })
 
-    app.post("/logOut", isAuth, (req, res) => {
+    app.post("/api/logOut", isAuth, (req, res) => {
         req.session.destroy(() => {
             res.cookie("connect.sid", "", { expires: new Date(0) })
             res.json(jsonResPattern("OK"))
@@ -23,7 +23,7 @@ module.exports = function (app) {
         res.send(req.user)
     })
 
-    app.get("/admin/setPassword", checkAuthAdmin, (req, res) => {
+    app.get( "/admin/setPassword", checkAuthAdmin, (req, res) => {
         //console.log(req.headers);
         //console.log(req.body);
         //console.log(req.query);
@@ -36,6 +36,10 @@ module.exports = function (app) {
 
     app.use(function (err, req, res, next) {
         console.log(err)
-        res.status(500).json(jsonResPattern(err, true))
+        if (err.code) {
+            res.status(+err.code).json(jsonResPattern(err.res, true))
+        } else {
+            res.status(500).json(jsonResPattern(err, true));
+        }
     })
 }
