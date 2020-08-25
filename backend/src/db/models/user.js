@@ -58,7 +58,7 @@ module.exports = class User extends Password(Model) {
             })
     }
 
-    static addUser(email, password, permission) { //Добавить пользователя, если пользоватьель существует, то возвращает false
+    static addUser(email, password, permission = "user") { //Добавить пользователя, если пользоватьель существует, то возвращает false
         const next = (err) => { console.error(new Error(err)) } //генерирует ошибку при вызове
         const Permission = require("./permission")
         return this.transaction(async trx => { //проверяем есть ли пользователь в базе

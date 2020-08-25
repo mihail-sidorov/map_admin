@@ -18,12 +18,12 @@ module.exports = function (app) {
         })
     })
 
-    app.get("/admin/addUser", checkAuthAdmin, (req, res) => {
-
+    app.get("/api/admin/addUser", checkAuthAdmin, (req, res) => {
+        
         res.send(req.user)
     })
 
-    app.get( "/admin/setPassword", checkAuthAdmin, (req, res) => {
+    app.get( "/api/admin/setPassword", checkAuthAdmin, (req, res) => {
         //console.log(req.headers);
         //console.log(req.body);
         //console.log(req.query);
