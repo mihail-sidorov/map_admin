@@ -1,3 +1,5 @@
+import * as axios from 'axios';
+
 const SET_AUTH_DATA = 'SET_AUTH_DATA';
 
 let initialState = {
@@ -7,10 +9,13 @@ let initialState = {
 };
 
 export let login = (login, password) => {
-    return new Promise((resolve, reject) =>  {
-        setTimeout(() => {
-            resolve(true);
-        }, 1000);
+    return axios.post('http://mapadmin.karmydev.ru/api/login', {login: login, password: password, withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response;
+        }
+        else {
+            throw 'Ошибка авторизации!';
+        }
     });
 }
 
@@ -23,10 +28,8 @@ export let logout = () => {
 }
 
 export let getAuthData = () => {
-    return new Promise((resolve, reject) =>  {
-        setTimeout(() => {
-            resolve({login: 'Mihail', isAuth: true});
-        }, 1000);
+    return axios.get('http://mapadmin.karmydev.ru/api/getAuthData', {withCredentials: true}).then((response) => {
+        return response;
     });
 }
 
