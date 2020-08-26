@@ -8,7 +8,7 @@ const sessionConf = require("../serverConfig").session
 
 module.exports = function (app) {
 
-    app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+    app.use(cors({credentials: true, origin: 'http://mapadmin.karmydev.ru'}));
     app.use(express.json())
     app.use(express.urlencoded({ extended: false }))
     app.use(cookieParser())
@@ -20,8 +20,7 @@ module.exports = function (app) {
             cookie: {
                 path: '/',
                 httpOnly: true,
-                maxAge: 60 * 60 * sessionConf.maxAge,
-                domain: 'mapadmin.karmydev.ru'
+                maxAge: 60 * 60 * sessionConf.maxAge
             },
             rolling: true,
             resave: false,
