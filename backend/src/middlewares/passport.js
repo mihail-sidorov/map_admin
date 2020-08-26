@@ -18,7 +18,7 @@ exports.passportModule = function (app) {
         { usernameField: 'login' },
         function (email, password, done) {
             checkLoginPassword(email, password).then((result) => {
-                result ? done(null, result) : done({code:400, res:"bad request"}, false)
+                result ? done(null, result) : done("Unauthorized", false)
             })
         })
     )
@@ -32,10 +32,10 @@ exports.checkAuthAdmin = function (req, res, next) {
         if (req.user.permission === "admin") {
             next()
         } else {
-            next({res: "No permission",code: 403})
+            next("No permission")
         }
     } else {
-        next({res: "Unauthorized",code: 401})
+        next("Unauthorized")
     }
 }
 
@@ -44,10 +44,10 @@ exports.checkAuthModer = function (req, res, next) {
         if (req.user.permission === "moder") {
             next()
         } else {
-            next({res: "No permission",code: 403})
+            next("No permission")
         }
     } else {
-        next({res: "Unauthorized",code: 401})
+        next("Unauthorized")
     }
 }
 
@@ -55,9 +55,9 @@ exports.checkAuthUser = function (req, res, next) {
     if (req.user && req.user.permission === "user") {
         next()
     } else if (req.user) {
-        next({res: "No permission",code: 403})
+        next("No permission")
     } else {
-        next({res: "Unauthorized",code: 401})
+        next("Unauthorized")
     }
 }
 
@@ -65,6 +65,6 @@ exports.isAuth = function (req, res, next) {
     if (req.user) {
         next()
     } else {
-        next({res: "Unauthorized",code: 401})
+        next("Unauthorized")
     }
 }
