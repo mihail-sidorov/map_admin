@@ -42,12 +42,7 @@ module.exports = function (app) {
         res.status(404).json(jsonResPattern("404 not found", true));
     })
 
-    // app.use(function (err, req, res, next) {
-    //     res.json(err)
-    //     // if (err.body) {
-    //     //     res.status(200).json(jsonResPattern(err, true))
-    //     // } else {
-    //     //     res.status(200).json(jsonResPattern(err, true))
-    //     // }
-    // })
+    app.use(function (err, req, res, next) {
+        res.status(200).json(jsonResPattern(err, true))
+    })
 }
