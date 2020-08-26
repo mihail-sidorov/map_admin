@@ -20,9 +20,9 @@ module.exports = class User extends Password(Model) {
 
             properties: {
                 id: { type: "integer" },
-                email: { type: "string", minLength: 1, maxLength: 320, format: "email" },
+                email: { type: "string", minLength: 1, maxLength: 2, format: "email" },
                 password: { type: "string", minLength: 8, maxLength: 72 },
-                id_permission: { type: "integer" }
+                permission_id: { type: "integer" }
             },
         }
     }
@@ -37,7 +37,7 @@ module.exports = class User extends Password(Model) {
                 modelClass: Permission,
                 join: {
                     from: 'permissions.id',
-                    to: 'users.id_permission'
+                    to: 'users.permission_id'
                 }
             }
         }
@@ -70,12 +70,12 @@ module.exports = class User extends Password(Model) {
             if (isHasEmail) { // если есть возвращаем ошибку
                 next("this user already exists")
             } else { // если нет возвращаем результат
-                const id_permission = await Permission
+                const permission_id = await Permission
                     .query(trx)
                     .where("permission", permission)
                     .first()
                     .then(result => result ? result.id : next(`${permission} permission not found`)) //ошибка если в бд нет таких прав
-                const result = await this.query(trx).insert({ email, password, id_permission })
+                const result = await this.query(trx).insert({ email, password, permission_id })
                 return result
             }
         })

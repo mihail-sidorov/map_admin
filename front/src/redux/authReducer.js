@@ -9,7 +9,7 @@ let initialState = {
 };
 
 export let login = (login, password) => {
-    return axios.post('http://mapadmin.karmydev.ru/api/login', {login: login, password: password, withCredentials: true}).then((response) => {
+    return axios.post('http://localhost:3001/api/login', {login: login, password: password}, {withCredentials: true}).then((response) => {
         if (!response.data.isError) {
             return response;
         }
@@ -28,7 +28,7 @@ export let logout = () => {
 }
 
 export let getAuthData = () => {
-    return axios.get('http://mapadmin.karmydev.ru/api/getAuthData', {withCredentials: true}).then((response) => {
+    return axios.get('http://localhost:3001/api/getAuthData', {withCredentials: true}).then((response) => {
         return response;
     });
 }

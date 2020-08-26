@@ -19,7 +19,7 @@ module.exports = function (app) {
             store: new FileStore,
             cookie: {
                 path: '/',
-                httpOnly: true,
+                httpOnly: false,
                 maxAge: 60 * 60 * sessionConf.maxAge
             },
             rolling: true,
