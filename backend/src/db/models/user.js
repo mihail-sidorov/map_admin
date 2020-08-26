@@ -20,9 +20,9 @@ module.exports = class User extends Password(Model) {
 
             properties: {
                 id: { type: "integer" },
-                email: { type: "string", minLength: 1, maxLength: 255, format: "email" },
+                email: { type: "string", minLength: 1, maxLength: 320, format: "email" },
                 password: { type: "string", minLength: 8, maxLength: 72 },
-                permission_id: { type: "integer" }
+                id_permission: { type: "integer" }
             },
         }
     }
@@ -37,7 +37,7 @@ module.exports = class User extends Password(Model) {
                 modelClass: Permission,
                 join: {
                     from: 'permissions.id',
-                    to: 'users.permission_id'
+                    to: 'users.id_permission'
                 }
             }
         }
@@ -59,7 +59,7 @@ module.exports = class User extends Password(Model) {
     }
 
     static addUser(email, password, permission) { //Добавить пользователя, если пользоватьель существует, то возвращает false
-        const next = (err) => { console.error(new Error(err)) } //генерирует ошибку при вызове
+        function next(err) { throw err }
         const Permission = require("./permission")
         return this.transaction(async trx => { //проверяем есть ли пользователь в базе
             const isHasEmail = await this
@@ -70,12 +70,12 @@ module.exports = class User extends Password(Model) {
             if (isHasEmail) { // если есть возвращаем ошибку
                 next("this user already exists")
             } else { // если нет возвращаем результат
-                const permission_id = await Permission
+                const id_permission = await Permission
                     .query(trx)
                     .where("permission", permission)
                     .first()
                     .then(result => result ? result.id : next(`${permission} permission not found`)) //ошибка если в бд нет таких прав
-                const result = await this.query(trx).insert({ email, password, permission_id })
+                const result = await this.query(trx).insert({ email, password, id_permission })
                 return result
             }
         })

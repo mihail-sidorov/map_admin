@@ -22,7 +22,7 @@ module.exports = class Permission extends Model {
                 modelClass: User,
                 join: {
                     from: 'permissions.id',
-                    to: 'users.permission_id'
+                    to: 'users.id_permission'
                 }
             }
         }

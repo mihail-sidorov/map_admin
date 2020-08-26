@@ -8,7 +8,7 @@ const sessionConf = require("../serverConfig").session
 
 module.exports = function (app) {
 
-    app.use(cors({credentials: true, origin: "true"}))
+    app.use(cors({credentials: true, origin: true}))
     app.use(express.json())
     app.use(express.urlencoded({ extended: false }))
     app.use(cookieParser())

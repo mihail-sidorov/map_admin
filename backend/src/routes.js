@@ -30,8 +30,22 @@ module.exports = function (app) {
     })
 
     app.post("/api/admin/addUser", checkAuthAdmin, (req, res, next) => {
-        console.log(req.body.login)
-        addUser(req.body.login, req.body.password, req.body.permission, next).then(() => res.json(jsonResPattern("OK")), (err) => { next(err.data); console.dir(err.data) })
+        addUser(req.body.login, req.body.password, req.body.permission, next)
+            .then(() => res.json(jsonResPattern("OK")))
+            .catch((err) => {
+                if (typeof err === "string") {
+                    next(err)
+                } else {
+                    console.log(err)
+                    const result = []
+                    for (let key in err.data) {
+                        err.data[key].forEach(element => {
+                            result.push(element.message.replace(/['"]+/g, ''))
+                        })
+                    }
+                    next(result)
+                }
+            })
     })
 
     app.get("/api/admin/setPassword", checkAuthAdmin, (req, res) => {
