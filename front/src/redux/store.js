@@ -2,6 +2,7 @@ import {createStore, combineReducers} from 'redux';
 import pointsPageReducer from './pointsPageReducer';
 import authReducer from './authReducer';
 import {reducer as formReducer} from 'redux-form';
+import * as axios from 'axios';
 
 
 let reducers = combineReducers({
