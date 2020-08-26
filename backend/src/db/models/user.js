@@ -58,27 +58,32 @@ module.exports = class User extends Password(Model) {
             })
     }
 
-    static addUser(email, password, permission = "user") { //Добавить пользователя, если пользоватьель существует, то возвращает false
-        const next = (err) => { console.error(new Error(err)) } //генерирует ошибку при вызове
-        const Permission = require("./permission")
-        return this.transaction(async trx => { //проверяем есть ли пользователь в базе
-            const isHasEmail = await this
-                .query(trx)
-                .first()
-                .withGraphJoined("permission")
-                .where("email", email)
-            if (isHasEmail) { // если есть возвращаем ошибку
-                next("this user already exists")
-            } else { // если нет возвращаем результат
-                const id_permission = await Permission
+    static async addUser(email, password, permission, next) { //Добавить пользователя, если пользоватьель существует, то возвращает false
+        //const next = (err) => { console.error(new Error(err)) } //генерирует ошибку при вызове
+        try {
+            const Permission = require("./permission")
+            const return_result = await this.transaction(async trx => { //проверяем есть ли пользователь в базе
+                const isHasEmail = await this
                     .query(trx)
-                    .where("permission", permission)
                     .first()
-                    .then(result => result ? result.id : next(`${permission} permission not found`)) //ошибка если в бд нет таких прав
-                const result = await this.query(trx).insert({ email, password, id_permission })
-                return result
-            }
-        })
+                    .withGraphJoined("permission")
+                    .where("email", email)
+                if (isHasEmail) { // если есть возвращаем ошибку
+                    next("this user already exists")
+                } else { // если нет возвращаем результат
+                    const id_permission = await Permission
+                        .query(trx)
+                        .where("permission", permission)
+                        .first()
+                        .then(result => result ? result.id : next(`${permission} permission not found`)) //ошибка если в бд нет таких прав
+                    const result = await this.query(trx).insert({ email, password, id_permission })
+                    return result
+                }
+            })
+            return return_result
+        } catch (err) {
+            next(err)
+        }
     }
 
     static setPassword(email, password) { //сменить пароль, если пользоватьель не существует, то возвращает false, в противном случае true
