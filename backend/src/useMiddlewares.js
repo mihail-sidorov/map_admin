@@ -20,7 +20,8 @@ module.exports = function (app) {
             cookie: {
                 path: '/',
                 httpOnly: true,
-                maxAge: 60 * 60 * sessionConf.maxAge
+                maxAge: 60 * 60 * sessionConf.maxAge,
+                domain: 'mapadmin.karmydev.ru'
             },
             rolling: true,
             resave: false,
