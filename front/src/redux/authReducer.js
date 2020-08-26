@@ -3,6 +3,7 @@ const SET_AUTH_DATA = 'SET_AUTH_DATA';
 let initialState = {
     login: null,
     isAuth: false,
+    permission: null,
 };
 
 export let login = (login, password) => {
