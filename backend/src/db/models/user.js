@@ -20,7 +20,7 @@ module.exports = class User extends Password(Model) {
 
             properties: {
                 id: { type: "integer" },
-                email: { type: "string", minLength: 1, maxLength: 2, format: "email" },
+                email: { type: "string", minLength: 1, maxLength: 255, format: "email" },
                 password: { type: "string", minLength: 8, maxLength: 72 },
                 permission_id: { type: "integer" }
             },
