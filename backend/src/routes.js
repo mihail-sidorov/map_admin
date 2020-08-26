@@ -31,7 +31,7 @@ module.exports = function (app) {
 
     app.post("/api/admin/addUser", checkAuthAdmin, (req, res, next) => {
         console.log(req.body.login)
-        addUser(req.body.login, req.body.password, req.body.permission, next).then(() => res.json(jsonResPattern("OK")))
+        addUser(req.body.login, req.body.password, req.body.permission, next).then(() => res.json(jsonResPattern("OK")), (err) => { next(err.data); console.dir(err.data)})
     })
 
     app.get("/api/admin/setPassword", checkAuthAdmin, (req, res) => {
