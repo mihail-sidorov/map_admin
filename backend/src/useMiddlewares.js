@@ -8,7 +8,7 @@ const sessionConf = require("../serverConfig").session
 
 module.exports = function (app) {
 
-    app.use(cors({credentials: true, origin: 'http://localhost'}))
+    app.use(cors({credentials: true, origin: 'http://mapadmin.karmydev.ru/'}))
     app.use(express.json())
     app.use(express.urlencoded({ extended: false }))
     app.use(cookieParser())
