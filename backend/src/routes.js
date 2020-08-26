@@ -31,7 +31,7 @@ module.exports = function (app) {
 
     app.post("/api/admin/addUser", checkAuthAdmin, (req, res, next) => {
         console.log(req.body.login)
-        addUser(req.body.login, req.body.password, req.body.permission, next).then(() => res.json(jsonResPattern("OK")), (err) => { next(err.data); console.dir(err.data)})
+        addUser(req.body.login, req.body.password, req.body.permission, next).then(() => res.json(jsonResPattern("OK")), (err) => { next(err.data); console.dir(err.data) })
     })
 
     app.get("/api/admin/setPassword", checkAuthAdmin, (req, res) => {
@@ -43,6 +43,10 @@ module.exports = function (app) {
     })
 
     app.use(function (err, req, res, next) {
-        res.status(200).json(jsonResPattern(err, true))
+        if (err.body) {
+            res.status(200).json(jsonResPattern(err, true))
+        } else {
+            res.status(200).json(jsonResPattern(err, true))
+        }
     })
 }
