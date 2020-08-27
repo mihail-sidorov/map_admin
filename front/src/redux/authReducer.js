@@ -1,4 +1,5 @@
 import * as axios from 'axios';
+import serverName from '../serverName';
 
 const SET_AUTH_DATA = 'SET_AUTH_DATA';
 
@@ -9,9 +10,9 @@ let initialState = {
 };
 
 export let login = (login, password) => {
-    return axios.post('http://localhost:3001/api/login', {login: login, password: password}, {withCredentials: true}).then((response) => {
+    return axios.post(`${serverName}/api/login`, {login: login, password: password}, {withCredentials: true}).then((response) => {
         if (!response.data.isError) {
-            return response;
+            return 'OK';
         }
         else {
             throw 'Ошибка авторизации!';
@@ -20,16 +21,19 @@ export let login = (login, password) => {
 }
 
 export let logout = () => {
-    return new Promise((resolve, reject) =>  {
-        setTimeout(() => {
-            resolve(true);
-        }, 1000);
+    return axios.post(`${serverName}/api/logout`, {}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return 'OK';
+        }
+        else {
+            throw 'Ошибка разлогинивания!';
+        }
     });
 }
 
 export let getAuthData = () => {
-    return axios.get('http://localhost:3001/api/getAuthData', {withCredentials: true}).then((response) => {
-        return response;
+    return axios.get(`${serverName}/api/getAuthData`, {withCredentials: true}).then((response) => {
+        return response.data;
     });
 }
 

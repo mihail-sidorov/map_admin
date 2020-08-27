@@ -16,7 +16,10 @@ let mapDispatchToProps = (dispatch) => {
                     return getAuthData();
                 })
                 .then((data) => {
-                    dispatch(setAuthDataActionCreator({login: null, isAuth: false}));
+                    dispatch(setAuthDataActionCreator(data));
+                })
+                .catch((error) => {
+                    console.log(error);
                 });
         },
     };
