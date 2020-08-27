@@ -6,7 +6,7 @@ let makeShortPoints = (state) => {
     if (state.search !== '') {
         for (let id in state.points) {
             let pattern = new RegExp(state.search.toLowerCase());
-            if (state.points[id].city.toLowerCase().match(pattern)) {
+            if (state.points[id].title.toLowerCase().match(pattern)) {
                 searchPoints[id] = state.points[id];
             }
         }
@@ -22,7 +22,7 @@ let makeShortPoints = (state) => {
     if (Object.keys(searchPoints).length % paginationCount > 0) {
         pages++;
     }
-    if (currentPage > pages || state.addEditForm.action === 'add') {
+    if (currentPage > pages || state.addEditPointForm.action === 'add') {
         currentPage = pages;
     }
 
@@ -48,49 +48,67 @@ let initialState = {
     points: {
         1: {
             id: 1,
-            city: 'city1',
-            name: 'name1',
-            long: 'long1',
-            lat: 'lat1',
+            lng: '99991',
+            lat: '99991',
+            title: 'title1',
+            hours: 'hours1',
+            phone: 'phone1',
+            site: 'site1',
+            description: 'description1',
         },
         2: {
             id: 2,
-            city: 'city2',
-            name: 'name2',
-            long: 'long2',
-            lat: 'lat2',
+            lng: '99992',
+            lat: '99992',
+            title: 'title2',
+            hours: 'hours2',
+            phone: 'phone2',
+            site: 'site2',
+            description: 'description2',
         },
         3: {
             id: 3,
-            city: 'city11',
-            name: 'name3',
-            long: 'long3',
-            lat: 'lat3',
+            lng: '99993',
+            lat: '99993',
+            title: 'title3',
+            hours: 'hours3',
+            phone: 'phone3',
+            site: 'site3',
+            description: 'description3',
         },
         4: {
             id: 4,
-            city: 'city3',
-            name: 'name4',
-            long: 'long4',
-            lat: 'lat4',
+            lng: '99994',
+            lat: '99994',
+            title: 'title4',
+            hours: 'hours4',
+            phone: 'phone4',
+            site: 'site4',
+            description: 'description4',
         },
         5: {
             id: 5,
-            city: 'city111',
-            name: 'name5',
-            long: 'long5',
-            lat: 'lat5',
+            lng: '99995',
+            lat: '99995',
+            title: 'title5',
+            hours: 'hours5',
+            phone: 'phone5',
+            site: 'site5',
+            description: 'description5',
         },
     },
     shortPoints: {},
-    addEditForm: {
+    addEditPointForm: {
         action: null,
         point: {
             id: null,
-            city: null,
-            name: null,
-            long: null,
+            lng: null,
             lat: null,
+            title: null,
+            hours: null,
+            phone: null,
+            site: null,
+            description: null,
         },
     },
     search: '',
@@ -136,14 +154,17 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.points = {...state.points};
             delete newState.points[action.id];
 
-            newState.addEditForm = {
+            newState.addEditPointForm = {
                 action: null,
-                fields: {
+                point: {
                     id: null,
-                    city: null,
-                    name: null,
-                    long: null,
+                    lng: null,
                     lat: null,
+                    title: null,
+                    hours: null,
+                    phone: null,
+                    site: null,
+                    description: null,
                 },
             };
 

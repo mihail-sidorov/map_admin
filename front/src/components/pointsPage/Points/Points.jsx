@@ -14,6 +14,7 @@ let Points = (props) => {
 
     return (
         <div className="points">
+            <button className="points__add-point-btn">Добавить</button>
             {pointsArr}
         </div>
     );
