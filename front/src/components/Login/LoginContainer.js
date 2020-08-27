@@ -14,12 +14,10 @@ let mapDispatchToProps = (dispatch) => {
             if (data.login !== undefined && data.password !== undefined) {
                 login(data.login, data.password)
                     .then((response) => {
-                        console.log(response.data);
                         return getAuthData();
                     })
                     .then((data) => {
-                        console.log(data.data);
-                        dispatch(setAuthDataActionCreator(data.data));
+                        dispatch(setAuthDataActionCreator(data));
                     })
                     .catch((error) => {
                         console.log(error);
