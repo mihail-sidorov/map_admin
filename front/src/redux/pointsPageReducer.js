@@ -1,4 +1,4 @@
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -100,16 +100,6 @@ let initialState = {
     shortPoints: {},
     addEditPointForm: {
         action: null,
-        point: {
-            id: null,
-            lng: null,
-            lat: null,
-            title: null,
-            hours: null,
-            phone: null,
-            site: null,
-            description: null,
-        },
     },
     search: '',
     pagination: {
@@ -145,6 +135,13 @@ export let changeSearchActionCreator = (search) => {
     };
 }
 
+export let showAddEditPointFormActionCreator = (action) => {
+    return {
+        type: SHOW_ADD_EDIT_POINT_FORM,
+        action: action,
+    };
+}
+
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -156,16 +153,6 @@ let pointsPageReducer = (state = initialState, action) => {
 
             newState.addEditPointForm = {
                 action: null,
-                point: {
-                    id: null,
-                    lng: null,
-                    lat: null,
-                    title: null,
-                    hours: null,
-                    phone: null,
-                    site: null,
-                    description: null,
-                },
             };
 
             makeShortPointsResult = makeShortPoints(newState);
@@ -193,6 +180,11 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.shortPoints = makeShortPointsResult.shortPoints;
             newState.pagination.currentPage = makeShortPointsResult.currentPage;
             newState.pagination.pages = makeShortPointsResult.pages;
+
+            return newState;
+        case SHOW_ADD_EDIT_POINT_FORM:
+            newState = {...state};
+            newState.addEditPointForm.action = action.action;
 
             return newState;
         default:

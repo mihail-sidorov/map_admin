@@ -14,7 +14,10 @@ let Points = (props) => {
 
     return (
         <div className="points">
-            <button className="points__add-point-btn">Добавить</button>
+            <button className="points__add-point-btn" onClick={() => {
+                props.showAddEditPointForm('add');
+            }}>Добавить</button>
+            
             {pointsArr}
         </div>
     );
