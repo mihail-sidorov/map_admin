@@ -1,5 +1,4 @@
 import React from 'react';
-import AddEditFormContainer from '../AddEditForm/AddEditFormContainer';
 import PointContainer from './Point/PointContainer';
 
 
