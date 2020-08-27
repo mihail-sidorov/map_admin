@@ -6,3 +6,4 @@ exports.jsonResPattern = function (response, isError) {
     }
     return answer
 }
+

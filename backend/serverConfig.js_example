@@ -1,24 +1,28 @@
--module.exports = {
--    server: {
--        port: "3000"
--    },
--
--    db: {
--        client: "mysql2",
--        connection: {
--            host: "127.0.0.1",
--            user: "root",
--            password: "admin",
--            database: "test"
--        }
--    },
--
--    cors: {
--        
--    },
--
--    session: {
--        maxAge: 15, //minute
--        secret: "$2a$12$sWSdI13BJ5ipPca/f8KTF.k4eFKsUtobfWdTBoQdj9g9I8JfLmZty"
--    }
--}
+module.exports = {
+    server: {
+        port: "3000"
+    },
+
+    db: {
+        client: "mysql2",
+        connection: {
+            host: "127.0.0.1",
+            user: "root",
+            password: "admin",
+            database: "test"
+        }
+    },
+
+    cors: {
+        
+    },
+
+    yandex: {
+        apiKey="6c63b2b7-912b-40f2-a252-2cbdc56042b9"
+    },
+
+    session: {
+        maxAge: 15, //minute
+        secret: "$2a$12$sWSdI13BJ5ipPca/f8KTF.k4eFKsUtobfWdTBoQdj9g9I8JfLmZty"
+    }
+}

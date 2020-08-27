@@ -1,7 +1,6 @@
 const express = require("express")
 const session = require("express-session")
 const FileStore = require("session-file-store")(session)
-const cookieParser = require('cookie-parser')
 const { passportModule } = require("./middlewares/passport")
 const cors = require('cors')
 const sessionConf = require("../serverConfig").session
@@ -11,7 +10,6 @@ module.exports = function (app) {
     app.use(cors({credentials: true, origin: true}))
     app.use(express.json())
     app.use(express.urlencoded({ extended: false }))
-    app.use(cookieParser())
 
     app.use(
         session({
@@ -19,7 +17,7 @@ module.exports = function (app) {
             store: new FileStore,
             cookie: {
                 path: '/',
-                httpOnly: false,
+                httpOnly: true,
                 maxAge: 60 * 60 * sessionConf.maxAge
             },
             rolling: true,

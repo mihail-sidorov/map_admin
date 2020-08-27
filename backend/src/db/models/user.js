@@ -44,7 +44,7 @@ module.exports = class User extends Password(Model) {
     }
 
     static getUserById(id) {
-        return this.query().select("*").joinRelated("permission").findById(id)
+        return this.query().withGraphFetched("permission").findById(id)
     }
 
     static checkLoginPassword(email, password) { //Проверка на присутствие в базе пары логин/пароль
@@ -58,7 +58,7 @@ module.exports = class User extends Password(Model) {
             })
     }
 
-    static addUser(email, password, permission) { //Добавить пользователя, если пользоватьель существует, то возвращает false
+    static addUser(email, password, permission = "user") { //Добавить пользователя, если пользоватьель существует, то возвращает false
         function next(err) { throw err }
         const Permission = require("./permission")
         return this.transaction(async trx => { //проверяем есть ли пользователь в базе

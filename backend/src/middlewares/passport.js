@@ -11,7 +11,7 @@ exports.passportModule = function (app) {
 
     passport.deserializeUser(function (id, done) {
         //console.log("Десериализация ", id)
-        getUserById(id).then(user => done(null, user))
+        getUserById(id).then(user => {console.log(user);done(null, user)})
     })
 
     passport.use(new LocalStrategy(
@@ -29,7 +29,7 @@ exports.passportModule = function (app) {
 
 exports.checkAuthAdmin = function (req, res, next) {
     if (req.user) {
-        if (req.user.permission === "admin") {
+        if (req.user.permission[0].permission === "admin") {
             next()
         } else {
             next("No permission")
@@ -41,7 +41,7 @@ exports.checkAuthAdmin = function (req, res, next) {
 
 exports.checkAuthModer = function (req, res, next) {
     if (req.user) {
-        if (req.user.permission === "moder") {
+        if (req.user.permission[0].permission === "moder") {
             next()
         } else {
             next("No permission")
@@ -52,7 +52,7 @@ exports.checkAuthModer = function (req, res, next) {
 }
 
 exports.checkAuthUser = function (req, res, next) {
-    if (req.user && req.user.permission === "user") {
+    if (req.user && req.user.permission[0].permission === "user") {
         next()
     } else if (req.user) {
         next("No permission")
@@ -62,6 +62,7 @@ exports.checkAuthUser = function (req, res, next) {
 }
 
 exports.isAuth = function (req, res, next) {
+    //console.log(req.user)
     if (req.user) {
         next()
     } else {
