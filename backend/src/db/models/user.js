@@ -30,6 +30,7 @@ module.exports = class User extends Password(Model) {
     static get relationMappings() {
 
         const Permission = require("./permission")
+        const Shop = require("./shop")
 
         return {
             permission: {
@@ -39,12 +40,25 @@ module.exports = class User extends Password(Model) {
                     from: 'permissions.id',
                     to: 'users.permission_id'
                 }
+            },
+
+            shop: {
+                relation: Model.HasManyRelation,
+                modelClass: Shop,
+                join: {
+                    from: "users.id",
+                    to: "shops.user_id"
+                }
             }
         }
     }
 
     static getUserById(id) {
         return this.query().withGraphFetched("permission").findById(id)
+    }
+
+    static isIdValid(id) {
+        return this.query().findById(id).then(Boolean)
     }
 
     static checkLoginPassword(email, password) { //Проверка на присутствие в базе пары логин/пароль
@@ -55,6 +69,25 @@ module.exports = class User extends Password(Model) {
             .where("email", email)
             .then(user => {
                 return (user && user.verifyPassword(password)) ? user : false
+            })
+    }
+
+    static async getPointsUser(id) {
+        const Moder_status = require("./moder_status")
+        const moderStatusIdModerated = await Moder_status.getIdByIsModerated(1)
+
+        return this.query()
+            .findById(id)
+            .withGraphFetched("shop.moder_status")
+            .modifyGraph('shop', builder => builder
+                .select("id", "title", "lng", "lat", "apartment", "hours", "phone", "site", "isActive", "description")
+                .whereIn("moder_status_id", moderStatusIdModerated))
+            .first()
+            .then(res => {
+                res.shop.forEach(elem => {
+                    elem.moder_status = elem.moder_status[0].moder_status
+                })
+                return res.shop
             })
     }
 
@@ -75,8 +108,8 @@ module.exports = class User extends Password(Model) {
                     .where("permission", permission)
                     .first()
                     .then(result => result ? result.id : next(`${permission} permission not found`)) //ошибка если в бд нет таких прав
-                const result = await this.query(trx).insert({ email, password, permission_id })
-                return result
+                await this.query(trx).insert({ email, password, permission_id })
+                return "OK"
             }
         })
 

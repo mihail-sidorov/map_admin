@@ -11,7 +11,7 @@ exports.passportModule = function (app) {
 
     passport.deserializeUser(function (id, done) {
         //console.log("Десериализация ", id)
-        getUserById(id).then(user => {console.log(user);done(null, user)})
+        getUserById(id).then(user => done(null, user))
     })
 
     passport.use(new LocalStrategy(

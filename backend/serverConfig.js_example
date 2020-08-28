@@ -18,7 +18,7 @@ module.exports = {
     },
 
     yandex: {
-        apiKey="6c63b2b7-912b-40f2-a252-2cbdc56042b9"
+        apiKey: "6c63b2b7-912b-40f2-a252-2cbdc56042b9"
     },
 
     session: {

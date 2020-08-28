@@ -1,7 +1,7 @@
 const passport = require("passport")
-const { jsonResPattern } = require("./jsonResPattern")
+const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
 const { checkAuthAdmin, checkAuthModer, checkAuthUser, isAuth } = require("./middlewares/passport")
-const { addUser, addPoint } = require("./db/adminPanelApi")
+const { addUser, addPoint, getPointsUser, getPointsModer } = require("./db/adminPanelApi")
 
 module.exports = function (app) {
     app.post("/api/login", passport.authenticate('local'), function (req, res, next) {
@@ -28,24 +28,30 @@ module.exports = function (app) {
         }
         res.json(response)
     })
-    //title, lng, lat, apartment, hours, phone, site, user_description
-    app.get("/api/getPoints", isAuth, (req, res) => {
 
+    //title, lng, lat, apartment, hours, phone, site, isActiv, is
+    app.get("/api/user/getPoints", checkAuthUser, (req, res, next) => {
+        modelPromiseToRes(
+            getPointsUser(req.user.id),
+            res, next)
     })
 
     app.post("/api/user/addPoint", checkAuthUser, (req, res, next) => {
-        console.log(req.user)
-        addPoint(req.body, req.user.id) // id, title, lng, lat, apartment, hours, phone, site
-            .then(id => res.json(jsonResPattern({ id })))
-            .catch(err => next(err.toString()))
+        modelPromiseToRes(
+            addPoint(req.body, req.user.id),
+            res, next) // id, title, lng, lat, apartment, hours, phone, site, user_description
     })
 
-
+    app.get("/api/moder/getPoints", checkAuthModer, (req, res, next) => {
+        modelPromiseToRes(
+            getPointsModer(req.user.id),
+            res, next)
+    })
 
     app.post("/api/admin/addUser", checkAuthAdmin, (req, res, next) => {
-        addUser(req.body.login, req.body.password, req.body.permission)
-            .then(() => res.json(jsonResPattern("OK")))
-            .catch(err => next(err.toString()))
+        modelPromiseToRes(
+            addUser(req.body.login, req.body.password, req.body.permission),
+            res, next)
     })
 
     app.get("/api/admin/setPassword", checkAuthAdmin, (req, res) => {
