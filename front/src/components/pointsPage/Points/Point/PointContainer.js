@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import {delPointActionCreator} from '../../../../redux/pointsPageReducer';
+import {delPointActionCreator, showAddEditPointFormActionCreator} from '../../../../redux/pointsPageReducer';
 import Point from './Point';
 
 let PointContainer = (id) => {
@@ -14,6 +14,9 @@ let PointContainer = (id) => {
             delPoint: (id) => {
                 dispatch(delPointActionCreator(id));
             },
+            showAddEditPointForm: (action, id) => {
+                dispatch(showAddEditPointFormActionCreator(action, id));
+            }
         };
     }
 

@@ -17,7 +17,9 @@ let Point = (props) => {
             <span className="point__hours">{props.point.hours}</span>
             <span className="point__phone">{props.point.phone}</span>
             <span className="point__site">{props.point.site}</span>
-            <button className="point__edit-button">Редактировать</button>
+            <button className="point__edit-button" onClick={() => {
+                props.showAddEditPointForm('edit', props.point.id);
+            }}>Редактировать</button>
             <button className="point__del-button" onClick={onDelPoint}>Удалить</button>
             <div className="point__description">
                 {props.point.description}

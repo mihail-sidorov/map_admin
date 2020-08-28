@@ -1,5 +1,6 @@
 import React from 'react';
 import { Field, reduxForm } from 'redux-form';
+import { connect } from 'react-redux';
 
 let Form = (props) => {
     return (
@@ -35,7 +36,15 @@ let Form = (props) => {
 
 Form = reduxForm({
     form: 'addEditPointForm',
+    enableReinitialize: true,
 })(Form);
+
+Form = connect(
+    state => ({
+        initialValues: state.pointsPageState.addEditPointForm.point,
+    }),
+    {}
+)(Form);
 
 let AddEditPointForm = (props) => {
     return (

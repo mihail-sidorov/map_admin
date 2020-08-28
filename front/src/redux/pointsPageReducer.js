@@ -22,7 +22,7 @@ let makeShortPoints = (state) => {
     if (Object.keys(searchPoints).length % paginationCount > 0) {
         pages++;
     }
-    if (currentPage > pages || state.addEditPointForm.action === 'add') {
+    if (currentPage > pages) {
         currentPage = pages;
     }
 
@@ -100,6 +100,7 @@ let initialState = {
     shortPoints: {},
     addEditPointForm: {
         action: null,
+        point: {},
     },
     search: '',
     pagination: {
@@ -135,10 +136,11 @@ export let changeSearchActionCreator = (search) => {
     };
 }
 
-export let showAddEditPointFormActionCreator = (action) => {
+export let showAddEditPointFormActionCreator = (action, id = null) => {
     return {
         type: SHOW_ADD_EDIT_POINT_FORM,
         action: action,
+        id: id,
     };
 }
 
@@ -153,6 +155,7 @@ let pointsPageReducer = (state = initialState, action) => {
 
             newState.addEditPointForm = {
                 action: null,
+                point: {},
             };
 
             makeShortPointsResult = makeShortPoints(newState);
@@ -185,6 +188,13 @@ let pointsPageReducer = (state = initialState, action) => {
         case SHOW_ADD_EDIT_POINT_FORM:
             newState = {...state};
             newState.addEditPointForm.action = action.action;
+
+            if (action.action === null || action.action === 'add') {
+                newState.addEditPointForm.point = {};
+            }
+            else {
+                newState.addEditPointForm.point = {...newState.points[action.id]};
+            }
 
             return newState;
         default:
