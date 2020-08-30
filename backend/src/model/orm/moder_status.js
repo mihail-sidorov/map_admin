@@ -39,8 +39,4 @@ module.exports = class Moder_status extends Model {
             }
         }
     }
-
-    static getIdByIsModerated (moderStatus) {
-        return this.query().where("isModerated",moderStatus).then(res => res.map(elem =>elem.id))
-    }
 }

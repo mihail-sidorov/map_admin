@@ -1,9 +1,9 @@
 const express = require("express")
 const session = require("express-session")
 const FileStore = require("session-file-store")(session)
-const { passportModule } = require("./middlewares/passport")
+const { passportModule } = require("./passport")
 const cors = require('cors')
-const sessionConf = require("../serverConfig").session
+const sessionConf = require("../../serverConfig").session
 
 module.exports = function (app) {
 

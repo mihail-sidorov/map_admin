@@ -1,6 +1,6 @@
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
-const { checkLoginPassword, getUserById } = require("../db/adminPanelApi")
+const { checkLoginPassword, getUserById } = require("../model/adminPanelApi/others")
 
 exports.passportModule = function (app) {
 

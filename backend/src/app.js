@@ -4,7 +4,7 @@ const express = require("express")
 const app = express()
 const port = require("../serverConfig").server.port
 
-require("./useMiddlewares")(app)
+require("./middlewares/useMiddlewares")(app)
 require("./routes")(app)
 
 

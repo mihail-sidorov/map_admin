@@ -1,7 +1,9 @@
 const passport = require("passport")
 const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
 const { checkAuthAdmin, checkAuthModer, checkAuthUser, isAuth } = require("./middlewares/passport")
-const { addUser, addPoint, getPointsUser, getPointsModer } = require("./db/adminPanelApi")
+const { delPoint, addPoint, getPointsUser, editPoint } = require("./model/adminPanelApi/user")
+const { setPassword, addUser } = require("./model/adminPanelApi/admin")
+const { getPointsModer } = require("./model/adminPanelApi/moder")
 
 module.exports = function (app) {
     app.post("/api/login", passport.authenticate('local'), function (req, res, next) {
