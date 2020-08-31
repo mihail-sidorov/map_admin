@@ -2,11 +2,11 @@ const Shop = require("../orm/shop")
 const { getIdByIsModerated } = require("./utilityFn")
 
 async function getPointsModer() {
-    const isModerated = await getIdByIsModerated(0)
+    const isModerated = await getIdByIsModerated(1)
 
     return Shop
         .query()
-        .withGraphJoined("moder_status")
+        .withGraphFetched("moder_status")
         .select("id", "title", "apartment", "hours", "phone", "site", "isActive", "description", "full_city_name")
         .whereIn("moder_status_id", isModerated)
         .then(res => {
@@ -17,9 +17,19 @@ async function getPointsModer() {
         })
 }
 
-function pointRefuse(id, description) {
-    
+function setPointRefuse(pointId, description) {
+    Shop
+        .query()
+        .where("id", pointId)
+        .patch({ "description": description, "moder_status_id": getIdByModerStatus("refuse") })
+        .then(res => {
+            if (res) {
+                return "OK"
+            } else {
+                
+            }
+        })
 }
 
 exports.getPointsModer = getPointsModer
-exports.pointRefuse = pointRefuse
+exports.setPointRefuse = setPointRefuse

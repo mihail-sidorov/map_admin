@@ -1,41 +1,36 @@
 
 const Shop = require("../orm/shop")
 
-const { getIdByIsModerated, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")
+const { getPointUser, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")
 
 async function addPoint(point, id) {
     const insertField = await getPrepareForInsert(point)
-    insertField.moder_status_id = await getIdByModerStatus("add")
+    insertField.user_id = id
+    insertField.moder_status_id = await getIdByModerStatus("accept")
 
-    return Shop
+    pointId = await Shop
         .query()
         .insert(insertField)
         .then(res => res.id)
-        .then(res => ({ id: res }))
+    return getPointUser(id,pointId)
 }
 
-async function getPointsUser(id) {
-    const isModeration = await getIdByIsModerated(1)
-
-    return Shop
-        .query()
-        .withGraphJoined("moder_status")
-        .select("id", "title", "lng", "lat", "apartment", "hours", "phone", "site", "isActive", "description")
-        .whereIn("moder_status_id", isModeration)
-        .andWhere("user_id", id)
-        .then(res => {
-            res.forEach(elem => {
-                elem.moder_status = elem.moder_status[0].moder_status
-            })
-            return res
-        })
+function getPointsUser(id) {
+    return getPointUser(id)
 }
 
 function delPoint(userId, pointId) {
-    Shop
+    return Shop
         .query()
         .delete()
         .where({ "id": pointId, "user_id": userId })
+        .then(res => {
+            if (res) {
+                return res
+            } else {
+                throw "point id not found"
+            }
+        })
 }
 
 async function editPoint(userId, pointId, fields) {
@@ -43,16 +38,20 @@ async function editPoint(userId, pointId, fields) {
     let updateData = await getPrepareForInsert(fields)
 
     if (updateData.lng) {
-        updateData.moder_status_id = await getIdByModerStatus("edit")
+        updateData.moder_status_id = await getIdByModerStatus("moderated")
     } else {
         fields.description = undefined
     }
 
-    Shop.query()
+    isSuccess = await Shop
+        .query()
         .where({ "id": pointId, "user_id": userId })
-        .patch(updateData)
-
-    return "OK"
+        .patch(updateData).then(Boolean)
+    if (isSuccess) {
+        return getPointUser(userId, pointId)
+    } else {
+        throw "editing failed"
+    }
 }
 
 exports.addPoint = addPoint

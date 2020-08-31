@@ -1,7 +1,9 @@
 const User = require("../orm/user")
+const Shop = require("../orm/shop")
 const Permission = require("../orm/permission")
 const fetch = require('node-fetch')
 const Moder_status = require("../orm/moder_status")
+const apiYandex = require("../../../serverConfig").yandex.apiKey
 
 function hasEmail(email) {
     return User
@@ -33,13 +35,19 @@ function getIdByModerStatus(moderStatus) {
     return Moder_status.query().where("moder_status", moderStatus).then(res => res.map(elem => elem.id))
 }
 
-async function getPrepareForInsert(field) {
+async function getPrepareForInsert(fields) {
     const geoData = {}
-    if (+field.lat && +field.lng) {
-        geoData.lat = +field.lat
-        geoData.lng = +field.lng
+    if (+fields.lat && +fields.lng) {
+        geoData.lat = +fields.lat
+        geoData.lng = +fields.lng
         await getGeoData(geoData)
     }
+
+    switch (fields.isActive) {
+        case undefined: fields.isActive = true; break;
+        case "false": case "0": fields.isActive = false; break;
+    }
+    fields.isActive = Boolean(fields.isActive)
 
     return Object.assign({
         title: fields.title,
@@ -47,7 +55,7 @@ async function getPrepareForInsert(field) {
         hours: fields.hours,
         phone: fields.phone,
         site: fields.site,
-        isActiv: Boolean(fields.isActiv),
+        isActive: fields.isActive,
         description: fields.description,
     }, geoData)
 }
@@ -71,8 +79,24 @@ function getGeoData(point) { //должен содержать поля lat, lng
         })
 }
 
+async function getPointUser(userId,pointId) {
+    return Shop
+        .query()
+        .withGraphFetched("moder_status")
+        .skipUndefined()
+        .select("id", "title", "lng", "lat", "apartment", "hours", "phone", "site", "isActive", "description")
+        .andWhere({"user_id": userId, "id": pointId})
+        .then(res => {
+            res.forEach(elem => {
+                elem.moder_status = elem.moder_status[0].moder_status
+            })
+            return res
+        })
+}
+
 exports.hasEmail = hasEmail
 exports.getIdByPermission = getIdByPermission
 exports.getIdByIsModerated = getIdByIsModerated
 exports.getIdByModerStatus = getIdByModerStatus
 exports.getPrepareForInsert = getPrepareForInsert
+exports.getPointUser = getPointUser

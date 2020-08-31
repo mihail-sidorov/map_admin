@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Geometria', Arial, sans-serif;
+        }
+
+        .navbar-toggler-icon,
+        .navbar-dark .navbar-nav .nav-link {
+            cursor: pointer;
+        }
+
+        .nav-link.lvl1.heading {
+            font-size: 1.2em;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #b39681 !important;
+
+        }
+
+        .mainNavbar {
+            padding: 15px;
+            background-color: #432f21;
+        }
+
+        .mainNavbar__modal-content {
+            background-color: #432f21;
+            min-height: 100vh;
+        }
+
+
+        .close {
+            background-color: rgba(0, 0, 0, 0);
+            opacity: 1;
+        }
+
+        .lvl0,.lvl1,.lvl2,.navbar-toggler {
+            color:white !important;
+        }
+
+        .lvl0:hover,.lvl1:hover,.lvl2:hover,.close:hover {
+            color: #f0aa87 !important;
+            opacity: 1;
+        }
+
+        .nav-link.lvl0 {
+            padding-top: 0;
+            padding-bottom: 8;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .lvl1.heading {
+            margin-left: -10px;
+        }
+
+        .lvl1 {
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .lvl2 {
+            font-size: 0.95em;
+        }
+
+        .closeBtn {
+            margin-top: 5px;
+            text-align: right;
+            margin-bottom: -5px;
+        }
+
+        .bi-x {
+            width: 1.6em;
+            height: 1.6em;
+        }
+
+        .modal.fade.modal-right .modal-dialog {
+            transform: translate(125%, 0px);
+        }
+
+        .modal.show.modal-right .modal-dialog {
+            transform: none;
+        }
+
+        .modal-dialog {
+            max-width: 300px;
+        }
+
+        .navbar-dark {
+            color: white;
+        }
+        
+        .socNetIconGroup {
+            position: fixed;
+            bottom: 10px;
+        }
+
+        .socNetIcon {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark mainNavbar">
+
+
+        <img class="navbar-brand" alt="Karmy" src="https://thumb.tildacdn.com/tild3161-3431-4332-a364-353036336332/-/resize/80x/-/format/webp/Logo_Karmy_1.png">
+
+        <a class="navbar-toggler border-0 py-0" type="button" data-toggle="modal" data-target="#collapsibleNavbar">
+            <svg width="2em" viewBox="0 0 16 16" class="bi bi-list" fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                    d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+            </svg>
+        </a>
+
+
+        <div class="modal modal-right fade mainNavbar__modal" id="collapsibleNavbar">
+            <div class="mainNavbar__modal-dialog modal-dialog m-0 ml-auto">
+                <ul class="modal-content navbar-nav rounded-0 mainNavbar__modal-content pl-4 border-0 m-0">
+                    <li class="nav-item closeBtn">
+                        <a type="button" class="close m-0 mr-2" aria-label="Close" data-dismiss="modal">
+                            <svg style="color:white" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z" />
+                                <path fill-rule="evenodd"
+                                    d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li class="nav-item lvl0">
+                        <a class="nav-link lvl0 forDogs" data-toggle="collapse" data-target="#forDogs">Для собак</a>
+                        <ul class="navbar-nav collapse" id="forDogs">
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 heading">Сухие корма</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 starter">Starter</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 mini" data-toggle="collapse" data-target="#Mini">Mini</a>
+                                <ul class="navbar-nav collapse" id="Mini">
+                                    <li class="nav-item"><a class="nav-link lvl2 junior">Juniur</a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 adult">Adult</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 medium" data-toggle="collapse" data-target="#Medium">Medium</a>
+                                <ul class="navbar-nav collapse" id="Medium">
+                                    <li class="nav-item"><a class="nav-link lvl2 junior">Juniur</a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 adult">Adult</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 maxi" data-toggle="collapse" data-target="#Maxi">Maxi</a>
+                                <ul class="navbar-nav collapse" id="Maxi">
+                                    <li class="nav-item"><a class="nav-link lvl2 junior">Juniur</a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 adult">Adult</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 maxi specialLine" data-toggle="collapse" data-target="#specialLineDogs">Special line</a>
+                                <ul class="navbar-nav collapse" id="specialLineDogs">
+                                    <li class="nav-item"><a class="nav-link lvl2 activeMM"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 sensitiveM"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 sensitiveMM"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 hypoallergenicM"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 hypoallergenicMM"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 deliciousM"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 deliciousMM"></a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item lvl0">
+                        <a class="nav-link lvl0 forCats" data-toggle="collapse" data-target="#forCats">Для кошек</a>
+                        <ul class="navbar-nav collapse" id="forCats">
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 heading">Сухие корма</a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link lvl1 kitten">Kitten</a></li>
+                            <li class="nav-item"><a class="nav-link lvl1 adult">Adult</a></li>
+                            <li class="nav-item"><a class="nav-link lvl1 sterelized">Sterilized</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 maxi specialLine" data-toggle="collapse" data-target="#specialLineCats">Special line</a>
+                                <ul class="navbar-nav collapse" id="specialLineCats">
+                                    <li class="nav-item"><a class="nav-link lvl2 hypoallergenic"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 hairSkin"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 sensitive"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 delicious"></a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 maxi breedLine" data-toggle="collapse" data-target="#breedLineCats">Special line</a>
+                                <ul class="navbar-nav collapse" id="breedLineCats">
+                                    <li class="nav-item"><a class="nav-link lvl2 maineCoonKitten"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 maineCoonAdult"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 britishKitten"></a></li>
+                                    <li class="nav-item"><a class="nav-link lvl2 britishAduit"></a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item lvl0">
+                        <a class="nav-link lvl0 aboutFeed" data-toggle="collapse" data-target="#aboutFeed">О корме</a>
+                        <ul class="navbar-nav collapse" id="aboutFeed">
+                            <li class="nav-item">
+                                <a class="nav-link lvl1 heading">Подробно о корме</a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link lvl1 keyIngredients"></a></li>
+                            <li class="nav-item"><a class="nav-link lvl1 ourProduction"></a></li>
+                            <li class="nav-item"><a class="nav-link lvl1 ourWorth"></a></li>
+                            <li class="nav-item"><a class="nav-link lvl1 whereBuy"></a></li>
+                            <li class="nav-item"><a class="nav-link lvl1 questionsAnswers"></a></li>
+                            <li class="nav-item"><a class="nav-link lvl1 BreederAboutBreed"></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item lvl0">
+                        <a class="nav-link lvl0 breeders"></a>
+                    </li>
+                    <div class="m-4"></div>
+                    <li class="mt-auto socNetIconGroup">
+                        <a class="socNetIcon facebook" href=""> <svg style="fill:#ffffff;" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+                                y="0px" width="30px" height="30px" viewBox="0 0 48 48" enable-background="new 0 0 48 48"
+                                xml:space="preserve">
+                                <path
+                                    d="M47.761,24c0,13.121-10.638,23.76-23.758,23.76C10.877,47.76,0.239,37.121,0.239,24c0-13.124,10.638-23.76,23.764-23.76 C37.123,0.24,47.761,10.876,47.761,24 M20.033,38.85H26.2V24.01h4.163l0.539-5.242H26.2v-3.083c0-1.156,0.769-1.427,1.308-1.427 h3.318V9.168L26.258,9.15c-5.072,0-6.225,3.796-6.225,6.224v3.394H17.1v5.242h2.933V38.85z">
+                                </path>
+                            </svg> </a>
+                        <a class="socNetIcon vk" href=""> <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="30px" height="30px"
+                                viewBox="0 0 48 48" enable-background="new 0 0 48 48" xml:space="preserve">
+                                <path style="fill:#ffffff;"
+                                    d="M47.761,24c0,13.121-10.639,23.76-23.76,23.76C10.878,47.76,0.239,37.121,0.239,24c0-13.123,10.639-23.76,23.762-23.76 C37.122,0.24,47.761,10.877,47.761,24 M35.259,28.999c-2.621-2.433-2.271-2.041,0.89-6.25c1.923-2.562,2.696-4.126,2.45-4.796 c-0.227-0.639-1.64-0.469-1.64-0.469l-4.71,0.029c0,0-0.351-0.048-0.609,0.106c-0.249,0.151-0.414,0.505-0.414,0.505 s-0.742,1.982-1.734,3.669c-2.094,3.559-2.935,3.747-3.277,3.524c-0.796-0.516-0.597-2.068-0.597-3.171 c0-3.449,0.522-4.887-1.02-5.259c-0.511-0.124-0.887-0.205-2.195-0.219c-1.678-0.016-3.101,0.007-3.904,0.398 c-0.536,0.263-0.949,0.847-0.697,0.88c0.31,0.041,1.016,0.192,1.388,0.699c0.484,0.656,0.464,2.131,0.464,2.131 s0.282,4.056-0.646,4.561c-0.632,0.347-1.503-0.36-3.37-3.588c-0.958-1.652-1.68-3.481-1.68-3.481s-0.14-0.344-0.392-0.527 c-0.299-0.222-0.722-0.298-0.722-0.298l-4.469,0.018c0,0-0.674-0.003-0.919,0.289c-0.219,0.259-0.018,0.752-0.018,0.752 s3.499,8.104,7.463,12.23c3.638,3.784,7.764,3.36,7.764,3.36h1.867c0,0,0.566,0.113,0.854-0.189 c0.265-0.288,0.256-0.646,0.256-0.646s-0.034-2.512,1.129-2.883c1.15-0.36,2.624,2.429,4.188,3.497 c1.182,0.812,2.079,0.633,2.079,0.633l4.181-0.056c0,0,2.186-0.136,1.149-1.858C38.281,32.451,37.763,31.321,35.259,28.999">
+                                </path>
+                            </svg> </a>
+                        <a class="socNetIcon instagram" href=""> <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="30px" height="30px"
+                                viewBox="-455 257 48 48" enable-background="new -455 257 48 48" xml:space="preserve">
+                                <path style="fill:#ffffff;"
+                                    d="M-430.938,256.987c13.227,0,23.95,10.723,23.95,23.95c0,13.227-10.723,23.95-23.95,23.95 c-13.227,0-23.95-10.723-23.95-23.95C-454.888,267.71-444.165,256.987-430.938,256.987z M-421.407,268.713h-19.06 c-1.484,0-2.688,1.204-2.688,2.69v19.07c0,1.485,1.203,2.689,2.688,2.689h19.06c1.484,0,2.688-1.204,2.688-2.689v-19.07 C-418.72,269.917-419.923,268.713-421.407,268.713z M-430.951,276.243c2.584,0,4.678,2.096,4.678,4.681 c0,2.585-2.095,4.68-4.678,4.68c-2.584,0-4.678-2.096-4.678-4.68C-435.629,278.339-433.535,276.243-430.951,276.243z M-421.579,289.324c0,0.54-0.437,0.978-0.977,0.978h-16.779c-0.54,0-0.977-0.438-0.977-0.978V279.08h2.123 c-0.147,0.586-0.226,1.199-0.226,1.831c0,4.144,3.358,7.504,7.5,7.504c4.142,0,7.5-3.359,7.5-7.504c0-0.632-0.079-1.245-0.226-1.831 h2.061V289.324L-421.579,289.324z M-421.516,275.23c0,0.54-0.438,0.978-0.977,0.978h-2.775c-0.54,0-0.977-0.438-0.977-0.978v-2.777 c0-0.54,0.438-0.978,0.977-0.978h2.775c0.54,0,0.977,0.438,0.977,0.978V275.23z">
+                                </path>
+                            </svg> </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+        crossorigin="anonymous"></script>
+        <script>
+            $()
+            $(".forDogs").text("Для собак")
+                //Сухие корма
+                    $("#forDogs .starter").text("Starter").attr("href", "http://karmypet.ru/starter")
+                    $("#forDogs .mini").text("Mini")
+                    $("#forDogs .mini ~ ul .junior").text("Junior").attr("href", "http://karmypet.ru/miniline/minijunior")
+                    $("#forDogs .mini ~ ul .adult").text("Adult").attr("href", "http://karmypet.ru/miniline/miniadult_t")
+                    $("#forDogs .medium").text("Medium")
+                    $("#forDogs .medium ~ ul .junior").text("Junior").attr("href", "http://karmypet.ru/medium/medjunior")
+                    $("#forDogs .medium ~ ul .adult").text("Adult").attr("href", "http://karmypet.ru/mediumline_adult")
+                    $("#forDogs .maxi").text("Maxi")
+                    $("#forDogs .maxi ~ ul .junior").text("Junior").attr("href", "http://karmypet.ru/maxiline_junior")
+                    $("#forDogs .maxi ~ ul .adult").text("Adult").attr("href", "http://karmypet.ru/maxiline_adult")
+                    $("#forDogs .specialLine").text("Special line")
+                        $("#forDogs .specialLine ~ ul .activeMM").text("Active Medium&Maxi").attr("href", "http://karmypet.ru/spec/active")
+                        $("#forDogs .specialLine ~ ul .sensitiveM").text("Sensitive Mini").attr("href", "http://karmypet.ru/spec/sensitive_m")
+                        $("#forDogs .specialLine ~ ul .sensitiveMM").text("Sensitive Medium&Maxi").attr("href", "http://karmypet.ru/spec/sensitive_mm")
+                        $("#forDogs .specialLine ~ ul .hypoallergenicM").text("Hypoallergenic Mini").attr("href", "http://karmypet.ru/spec/hypo_m")
+                        $("#forDogs .specialLine ~ ul .hypoallergenicMM").text("Hypoallergenic Medium&Maxi").attr("href", "http://karmypet.ru/spec/hypo_mm")
+                        $("#forDogs .specialLine ~ ul .deliciousM").text("Delicious Mini").attr("href", "http://karmypet.ru/spec/delicious_m")
+                        $("#forDogs .specialLine ~ ul .deliciousMM").text("Delicious Medium&Maxi").attr("href", "http://karmypet.ru/spec/deliciousmm")
+            $(".forCats").text("Для кошек")
+                //Сухие корма
+                    $("#forCats .kitten").text("Kitten").attr("href", "http://karmypet.ru/kitten")
+                    $("#forCats .adult").text("Aduit").attr("href", "http://karmypet.ru/adultline")
+                    $("#forCats .sterelized").text("Sterelized").attr("href", "http://karmypet.ru/sterilized")
+                    $("#forCats .specialLine").text("Special line")
+                        $("#forCats .specialLine ~ ul .hypoallergenic").text("Hypoallergenic").attr("href", "http://karmypet.ru/specialline/hypoallergenic")
+                        $("#forCats .specialLine ~ ul .hairSkin").text("Hair&Skin").attr("href", "http://karmypet.ru/specialline/hairampskin")
+                        $("#forCats .specialLine ~ ul .sensitive").text("Sensitive").attr("href", "http://karmypet.ru/specialline/sensitive")
+                        $("#forCats .specialLine ~ ul .delicious").text("Delicious").attr("href", "http://karmypet.ru/specialline/delicious")
+                    $("#forCats .breedLine").text("Breed line")
+                        $("#forCats .breedLine ~ ul .maineCoonKitten").text("Maine Coon Kitten").attr("href", "http://karmypet.ru/breedline/maincoonkitten")
+                        $("#forCats .breedLine ~ ul .maineCoonAdult").text("Maine Coon Adult").attr("href", "http://karmypet.ru/breedline/maincoonadult")
+                        $("#forCats .breedLine ~ ul .britishKitten").text("British Kitten").attr("href", "http://karmypet.ru/breedline/britishkitten")
+                        $("#forCats .breedLine ~ ul .britishAduit").text("British Aduit").attr("href", "http://karmypet.ru/breedline/britishadult")
+                //Влажные корма
+            $(".aboutFeed").text("О корме")
+                //Подробно о корме
+                    $(".keyIngredients").text("Ключевые ингридиенты").attr("href", "")
+                    $(".ourProduction").text("Наше производство").attr("href", "")
+                    $(".ourWorth").text("Наши ценности").attr("href", "")
+                    $(".whereBuy").text("Где купить").attr("href", "http://map.karmypet.ru/")
+                    $(".questionsAnswers").text("Вопросы/ответы").attr("href", "")
+                    $(".BreederAboutBreed").text("Заводчик о породе").attr("href", "")
+            $(".breeders").text("Заводчикам").attr("href", "http://karmypet.ru/forbreeders")
+            //ссылка на фейсбук
+            $(".facebook").attr("href", "https://www.facebook.com/KarmyRu/")
+            //ссылка на ВК
+            $(".vk").attr("href", "https://vk.com/karmyru")
+            //ссылка на инстаграмм
+            $(".instagram").attr("href", "https://www.instagram.com/karmyru/?hl=ru")
+        </script>
+</body>
+
+</html>

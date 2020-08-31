@@ -9,7 +9,13 @@ function setPassword(email, password) { //сменить пароль, если 
         .first()
         .where("email", email)
         .patch({ password })
-        .then(Boolean)
+        .then(res => {
+            if (res) {
+                return "OK"
+            } else {
+                throw "fail"
+            }
+        })
 }
 
 async function addUser(email, password, permission = "user") { //Добавить пользователя, если пользоватьель существует, то возвращает false
@@ -18,6 +24,10 @@ async function addUser(email, password, permission = "user") { //Добавит�
     await User.query().insert({ email, password, permission_id })
     return "OK"
 }
+
+// function delUser(email) {
+//     User.query().delete().where("email",email)
+// }
 
 exports.setPassword = setPassword
 exports.addUser = addUser
