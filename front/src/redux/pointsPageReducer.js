@@ -1,4 +1,7 @@
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM';
+import * as axios from 'axios';
+import serverName from '../serverName';
+
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -22,7 +25,7 @@ let makeShortPoints = (state) => {
     if (Object.keys(searchPoints).length % paginationCount > 0) {
         pages++;
     }
-    if (currentPage > pages) {
+    if (currentPage > pages || state.addEditPointForm.newPoint === true) {
         currentPage = pages;
     }
 
@@ -86,21 +89,12 @@ let initialState = {
             site: 'site4',
             description: 'description4',
         },
-        5: {
-            id: 5,
-            lng: '99995',
-            lat: '99995',
-            title: 'title5',
-            hours: 'hours5',
-            phone: 'phone5',
-            site: 'site5',
-            description: 'description5',
-        },
     },
     shortPoints: {},
     addEditPointForm: {
         action: null,
         point: {},
+        newPoint: false,
     },
     search: '',
     pagination: {
@@ -115,6 +109,19 @@ initialState.shortPoints = makeShortPointsResult.shortPoints;
 initialState.pagination.currentPage = makeShortPointsResult.currentPage;
 initialState.pagination.pages = makeShortPointsResult.pages;
 
+// Запросы к API
+export let addPoint = (point) => {
+    return axios.post(`${serverName}/api/addPoint`, {lng: point.lng, lat: point.lat, title: point.title, hours: point.hours, phone: point.phone, site: point.site,  description: point.description}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response.id;
+        }
+        else {
+            throw 'Ошибка авторизации!';
+        }
+    });
+}
+
+// Создание ActionCreator
 export let delPointActionCreator = (id) => {
     return {
         type: DEL_POINT,
@@ -144,6 +151,20 @@ export let showAddEditPointFormActionCreator = (action, id = null) => {
     };
 }
 
+export let addPointActionCreator = (point) => {
+    return {
+        type: ADD_POINT,
+        point: point,
+    };
+}
+
+export let editPointActionCreator = (point) => {
+    return {
+        type: EDIT_POINT,
+        point: point,
+    };
+}
+
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -156,6 +177,7 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.addEditPointForm = {
                 action: null,
                 point: {},
+                newPoint: false,
             };
 
             makeShortPointsResult = makeShortPoints(newState);
@@ -195,6 +217,39 @@ let pointsPageReducer = (state = initialState, action) => {
             else {
                 newState.addEditPointForm.point = {...newState.points[action.id]};
             }
+
+            return newState;
+        case ADD_POINT:
+            newState = {...state};
+            newState.points = {
+                ...newState.points,
+                577867: {...action.point, id: 577867},
+            };
+
+            newState.addEditPointForm.newPoint = true;
+
+            makeShortPointsResult = makeShortPoints(newState);
+            newState.shortPoints = makeShortPointsResult.shortPoints;
+            newState.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.pagination.pages = makeShortPointsResult.pages;
+
+            newState.addEditPointForm = {
+                action: null,
+                point: {},
+                newPoint: false,
+            };
+
+            return newState;
+        case EDIT_POINT:
+            newState = {...state};
+            newState.points[action.point.id] = {...action.point};
+            newState.shortPoints[action.point.id] = newState.points[action.point.id];
+
+            newState.addEditPointForm = {
+                action: null,
+                point: {},
+                newPoint: false,
+            };
 
             return newState;
         default:

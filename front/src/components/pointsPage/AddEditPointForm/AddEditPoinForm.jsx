@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 let Form = (props) => {
     return (
-        <form className="add-edit-poin-form__form" onSubmit={props.handleSubmit}>
+        <form className="add-edit-poin-form__form" onSubmit={props.handleSubmit(values => {props.addEditPoint(values, props.action)})}>
             <div className="add-edit-poin-form__form-lng">
                 <label><Field name={'lng'} type={'text'} component={'input'} /></label>
             </div>
@@ -50,7 +50,7 @@ let AddEditPointForm = (props) => {
     return (
         props.action !== null &&
         <div className="add-edit-point-form">
-            <Form closeAddEditPointForm={props.closeAddEditPointForm} onSubmit={props.AddEditPoint} action={props.action} />
+            <Form closeAddEditPointForm={props.closeAddEditPointForm} addEditPoint={props.addEditPoint} action={props.action} />
         </div>
     );
 }
