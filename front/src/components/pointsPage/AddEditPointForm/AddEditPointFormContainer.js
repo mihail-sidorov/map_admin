@@ -30,6 +30,9 @@ let mapDispatchToProps = (dispatch) => {
                     editPoint(values)
                     .then((point) => {
                         dispatch(editPointActionCreator(point));
+                    })
+                    .catch((error) => {
+                        console.log(error);
                     });
                 }
             }

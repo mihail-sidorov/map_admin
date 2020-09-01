@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -56,60 +56,7 @@ let resetAddEditPointForm = () => {
 }
 
 let initialState = {
-    points: {
-        1: {
-            id: 1,
-            lng: '99991',
-            lat: '99991',
-            apartment: 'apartment1',
-            title: 'title1',
-            hours: 'hours1',
-            phone: 'phone1',
-            site: 'site1',
-            description: 'description1',
-            isActive: 0,
-            moder_status: 'moderated',
-        },
-        2: {
-            id: 2,
-            lng: '99992',
-            lat: '99992',
-            apartment: 'apartment2',
-            title: 'title2',
-            hours: 'hours2',
-            phone: 'phone2',
-            site: 'site2',
-            description: 'description2',
-            isActive: 0,
-            moder_status: 'moderated',
-        },
-        3: {
-            id: 3,
-            lng: '99993',
-            lat: '99993',
-            apartment: 'apartment3',
-            title: 'title3',
-            hours: 'hours3',
-            phone: 'phone3',
-            site: 'site3',
-            description: 'description3',
-            isActive: 0,
-            moder_status: 'moderated',
-        },
-        4: {
-            id: 4,
-            lng: '99994',
-            lat: '99994',
-            apartment: 'apartment4',
-            title: 'title4',
-            hours: 'hours4',
-            phone: 'phone4',
-            site: 'site4',
-            description: 'description4',
-            isActive: 0,
-            moder_status: 'moderated',
-        },
-    },
+    points: {},
     shortPoints: {},
     addEditPointForm: {
         action: null,
@@ -118,16 +65,11 @@ let initialState = {
     },
     search: '',
     pagination: {
-        count: 2,
+        count: 10,
         currentPage: 1,
         pages: 0,
     },
 };
-
-let makeShortPointsResult = makeShortPoints(initialState);
-initialState.shortPoints = makeShortPointsResult.shortPoints;
-initialState.pagination.currentPage = makeShortPointsResult.currentPage;
-initialState.pagination.pages = makeShortPointsResult.pages;
 
 // Запросы к API
 export let addPoint = (point) => {
@@ -148,6 +90,17 @@ export let editPoint = (point) => {
         }
         else {
             throw 'Не удалось отредактировать точку!';
+        }
+    });
+}
+
+export let getPoints = () => {
+    return axios.get(`${serverName}/api/user/getPoints`, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось получить точки!';
         }
     });
 }
@@ -193,6 +146,13 @@ export let editPointActionCreator = (point) => {
     return {
         type: EDIT_POINT,
         point: point,
+    };
+}
+
+export let getPointsActionCreator = (pointsArr) => {
+    return {
+        type: GET_POINTS,
+        pointsArr: pointsArr,
     };
 }
 
@@ -266,6 +226,21 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.shortPoints[action.point.id] = newState.points[action.point.id];
 
             newState.addEditPointForm = resetAddEditPointForm();
+
+            return newState;
+        case GET_POINTS:
+            let points = {};
+            action.pointsArr.forEach((point) => {
+                points[point.id] = point;
+            });
+
+            newState = {...state};
+            newState.points = points;
+
+            makeShortPointsResult = makeShortPoints(newState);
+            newState.shortPoints = makeShortPointsResult.shortPoints;
+            newState.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.pagination.pages = makeShortPointsResult.pages;
 
             return newState;
         default:

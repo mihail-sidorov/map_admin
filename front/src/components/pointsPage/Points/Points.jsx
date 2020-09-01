@@ -1,7 +1,6 @@
 import React from 'react';
 import PointContainer from './Point/PointContainer';
 
-
 let Points = (props) => {
     console.log('Points>>>');
 
@@ -23,4 +22,21 @@ let Points = (props) => {
     );
 }
 
-export default Points;
+class PointsClassComponent extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    componentDidMount() {
+        console.log('PointsClassComponent>>>');
+        this.props.getPoints();
+    }
+
+    render() {
+        return (
+            <Points {...this.props} />
+        );
+    }
+}
+
+export default PointsClassComponent;
