@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import {showAddFormActionCreator, showEditFormActionCreator, delPointActionCreator} from '../../../../redux/pointsPageReducer';
+import {delPointActionCreator, showAddEditPointFormActionCreator} from '../../../../redux/pointsPageReducer';
 import Point from './Point';
 
 let PointContainer = (id) => {
@@ -11,15 +11,12 @@ let PointContainer = (id) => {
 
     let mapDispatchToProps = (dispatch) => {
         return {
-            showAddForm: () => {
-                dispatch(showAddFormActionCreator());
-            },
-            showEditForm: (point) => {
-                dispatch(showEditFormActionCreator(point));
-            },
             delPoint: (id) => {
                 dispatch(delPointActionCreator(id));
             },
+            showAddEditPointForm: (action, id) => {
+                dispatch(showAddEditPointFormActionCreator(action, id));
+            }
         };
     }
 

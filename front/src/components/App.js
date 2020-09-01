@@ -1,7 +1,7 @@
 import React from 'react';
 import LoginContainer from './Login/LoginContainer';
 import { Route } from 'react-router-dom';
-import PointsPage from './pointsPage/PointsPage';
+import PointsPage from './PointsPage/PointsPage';
 import HeaderContainer from './Header/HeaderContainer';
 
 function App() {

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import SearchPoints from './SearchPoints';
-import {changeSearchActionCreator} from '../../../redux/pointsPageReducer';
+import {changeSearchActionCreator, showAddEditPointFormActionCreator} from '../../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -11,6 +11,7 @@ let mapStateToProps = (state) => {
 let mapDispatchToProps = (dispatch) => {
     return {
         changeSearch: (search) => {
+            dispatch(showAddEditPointFormActionCreator(null));
             dispatch(changeSearchActionCreator(search));
         },
     };

@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
-import Points from './Points';
+import PointsClassComponent from './Points';
+import { showAddEditPointFormActionCreator, getPoints, getPointsActionCreator } from '../../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -9,10 +10,21 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        
+        showAddEditPointForm: (action) => {
+            dispatch(showAddEditPointFormActionCreator(action));
+        },
+        getPoints: () => {
+            getPoints()
+            .then((pointsArr) => {
+                dispatch(getPointsActionCreator(pointsArr));
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        },
     };
 }
 
-const PointsContainer = connect(mapStateToProps, mapDispatchToProps)(Points);
+const PointsContainer = connect(mapStateToProps, mapDispatchToProps)(PointsClassComponent);
 
 export default PointsContainer;
