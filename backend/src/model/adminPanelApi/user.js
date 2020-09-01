@@ -1,7 +1,7 @@
 
 const Shop = require("../orm/shop")
 
-const { getPointUser, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")
+const { checkTimeStamp, getPointUser, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")
 
 async function addPoint(point, id) {
     const insertField = await getPrepareForInsert(point)
@@ -34,12 +34,12 @@ function delPoint(userId, pointId) {
 }
 
 async function editPoint(userId, pointId, fields) {
+    await checkTimeStamp(pointId, fields.timeStamp)
     const moderStatusRefuse = await getIdByModerStatus("refuse")
     const updateData = await getPrepareForInsert(fields)
     const { isActive, description, ...checkData } = updateData
     checkData.id = pointId
     checkData.user_id = userId
-    checkData.timeStamp = fields.timeStamp
     await Shop.query().skipUndefined().first().where(checkData).then(async (res) => {
         if (!res) {
             updateData.moder_status_id = await getIdByModerStatus("moderated")

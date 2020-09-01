@@ -1,5 +1,5 @@
 const Shop = require("../orm/shop")
-const { getIdByModerStatus, getIdByIsModerated, getPrepareForInsert } = require("./utilityFn")
+const { checkTimeStamp, getIdByModerStatus, getIdByIsModerated, getPrepareForInsert } = require("./utilityFn")
 
 async function getPointsModer() {
     const isModerated = await getIdByIsModerated(1)
@@ -57,6 +57,7 @@ async function setPointAccept(pointId) {
 }
 //full_city_name, title, apartment, hours, phone, site, description
 async function editPointModer(id, point) {
+    await checkTimeStamp(id, point.timeStamp)
     const isModerated = await getIdByIsModerated(1)
     const moderStatus = await getIdByModerStatus("accept")
     const insertData = await getPrepareForInsert(point, "moder")
@@ -64,7 +65,7 @@ async function editPointModer(id, point) {
     return await Shop
         .query()
         .whereIn("moder_status_id", isModerated)
-        .andWhere("id", id)
+        .andWhere({ "id": id })
         .patch(insertData)
         .then(res => {
             if (res) {

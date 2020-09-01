@@ -5,6 +5,21 @@ const fetch = require('node-fetch')
 const Moder_status = require("../orm/moder_status")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
+function checkTimeStamp(pointId, timeStamp) {
+    if (!point.timeStamp) throw "the field timeStamp in must not be empty"
+    return Shop
+        .query()
+        .first()
+        .where({ "id": pointId, "timeStamp": timeStamp })
+        .then(res => {
+            if (res) {
+                return true
+            } else {
+                throw "timeStamp does not match"
+            }
+        })
+}
+
 function hasEmail(email) {
     return User
         .query()
@@ -92,7 +107,7 @@ async function getPointUser(userId, pointId) {
         .query()
         .withGraphFetched("moder_status")
         .skipUndefined()
-        .select("id", "title", "lng", "lat", "apartment", "hours", "phone", "site", "isActive", "description","timeStamp")
+        .select("id", "title", "lng", "lat", "apartment", "hours", "phone", "site", "isActive", "description", "timeStamp")
         .andWhere({ "user_id": userId, "id": pointId })
         .then(res => {
             res.forEach(elem => {
@@ -108,3 +123,4 @@ exports.getIdByIsModerated = getIdByIsModerated
 exports.getIdByModerStatus = getIdByModerStatus
 exports.getPrepareForInsert = getPrepareForInsert
 exports.getPointUser = getPointUser
+exports.checkTimeStamp = checkTimeStamp
