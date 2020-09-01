@@ -18,7 +18,7 @@ module.exports = function (app) {
             cookie: {
                 path: '/',
                 httpOnly: true,
-                maxAge: 60 * 60 * sessionConf.maxAge
+                maxAge: (60000 * sessionConf.maxAge)
             },
             rolling: true,
             resave: false,

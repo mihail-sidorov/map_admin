@@ -3,7 +3,7 @@ const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
 const { checkAuthAdmin, checkAuthModer, checkAuthUser, isAuth } = require("./middlewares/passport")
 const { delPoint, addPoint, getPointsUser, editPoint } = require("./model/adminPanelApi/user")
 const { setPassword, addUser } = require("./model/adminPanelApi/admin")
-const { getPointsModer, setPointRefuse } = require("./model/adminPanelApi/moder")
+const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 
 module.exports = function (app) {
     app.post("/api/login", passport.authenticate('local'), function (req, res, next) {
@@ -63,17 +63,35 @@ module.exports = function (app) {
             res, next)
     })
 
+    app.post("/api/moder/setPointRefuse", checkAuthModer, (req, res, next) => {
+        modelPromiseToRes(
+            setPointRefuse(req.body.id, req.body.description),
+            res, next)
+    })
+
+    app.post("/api/moder/setPointAccept", checkAuthModer, (req, res, next) => {
+        modelPromiseToRes(
+            setPointAccept(req.body.id),
+            res, next)
+    })
+
+    app.post("/api/moder/editPoint/:id", checkAuthModer, (req, res, next) => {
+        modelPromiseToRes(
+            editPointModer(req.params.id,req.body),
+            res, next)
+    })
+
     app.post("/api/admin/addUser", checkAuthAdmin, (req, res, next) => {
         modelPromiseToRes(
             addUser(req.body.login, req.body.password, req.body.permission),
             res, next)
     })
 
-    // app.post("/api/admin/setPassword", checkAuthAdmin, (req, res, next) => {
-    //     modelPromiseToRes(
-    //         setPassword(req.body.login, req.body.password),
-    //         res, next)
-    // })
+    app.post("/api/admin/setPassword", checkAuthAdmin, (req, res, next) => {
+        modelPromiseToRes(
+            setPassword(req.body.login, req.body.password),
+            res, next)
+    })
 
     app.use(function (req, res) {
         res.status(404).json(jsonResPattern("404 not found", true));

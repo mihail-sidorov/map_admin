@@ -12,7 +12,7 @@ async function addPoint(point, id) {
         .query()
         .insert(insertField)
         .then(res => res.id)
-    return getPointUser(id,pointId)
+    return getPointUser(id, pointId)
 }
 
 function getPointsUser(id) {
@@ -34,14 +34,19 @@ function delPoint(userId, pointId) {
 }
 
 async function editPoint(userId, pointId, fields) {
-
-    let updateData = await getPrepareForInsert(fields)
-
-    if (updateData.lng) {
-        updateData.moder_status_id = await getIdByModerStatus("moderated")
-    } else {
-        fields.description = undefined
-    }
+    const moderStatusRefuse = await getIdByModerStatus("refuse")
+    const updateData = await getPrepareForInsert(fields)
+    const { isActive, description, ...checkData } = updateData
+    checkData.id = pointId
+    checkData.user_id = userId
+    checkData.timeStamp = fields.timeStamp
+    await Shop.query().skipUndefined().first().where(checkData).then(async (res) => {
+        if (!res) {
+            updateData.moder_status_id = await getIdByModerStatus("moderated")
+        } else if (res.description != description && res.moder_status_id == moderStatusRefuse) {
+            updateData.moder_status_id = await getIdByModerStatus("moderated")
+        }
+    })
 
     isSuccess = await Shop
         .query()
