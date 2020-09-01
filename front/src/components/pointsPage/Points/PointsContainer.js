@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import Points from './Points';
+import { showAddEditPointFormActionCreator } from '../../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -9,7 +10,9 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        
+        showAddEditPointForm: (action) => {
+            dispatch(showAddEditPointFormActionCreator(action));
+        }
     };
 }
 

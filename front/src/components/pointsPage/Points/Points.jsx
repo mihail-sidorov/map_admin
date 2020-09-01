@@ -1,5 +1,4 @@
 import React from 'react';
-import AddEditFormContainer from '../AddEditForm/AddEditFormContainer';
 import PointContainer from './Point/PointContainer';
 
 
@@ -15,6 +14,10 @@ let Points = (props) => {
 
     return (
         <div className="points">
+            <button className="points__add-point-btn" onClick={() => {
+                props.showAddEditPointForm('add');
+            }}>Добавить</button>
+            
             {pointsArr}
         </div>
     );

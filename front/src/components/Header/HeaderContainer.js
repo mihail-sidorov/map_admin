@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import Header from './Header';
 import { logout, getAuthData, setAuthDataActionCreator } from '../../redux/authReducer';
+import { showAddEditPointFormActionCreator } from '../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -11,6 +12,7 @@ let mapStateToProps = (state) => {
 let mapDispatchToProps = (dispatch) => {
     return {
         onLogout: () => {
+            dispatch(showAddEditPointFormActionCreator(null));
             logout()
                 .then(() => {
                     return getAuthData();
