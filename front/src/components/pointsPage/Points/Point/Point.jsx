@@ -9,10 +9,20 @@ let Point = (props) => {
         }
     }
 
+    let moderStatus = '';
+
+    if (props.point.moder_status === 'moderated') moderStatus = 'На модерации';
+    if (props.point.moder_status === 'refuse') moderStatus = 'Отклонено модератором';
+
     return (
         <div point-id={props.point.id} className="point">
+            <div className="point__inform">
+                <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>***
+                <span className="point__moder-status">{moderStatus}</span>
+            </div>
             <span className="point__lng">{props.point.lng}</span>
             <span className="point__lat">{props.point.lat}</span>
+            <span className="point__apartment">{props.point.apartment}</span>
             <span className="point__title">{props.point.title}</span>
             <span className="point__hours">{props.point.hours}</span>
             <span className="point__phone">{props.point.phone}</span>
@@ -24,6 +34,7 @@ let Point = (props) => {
             <div className="point__description">
                 {props.point.description}
             </div>
+            <hr />
         </div>
     );
 }

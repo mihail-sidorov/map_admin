@@ -16,6 +16,6 @@ let PointsPage = (props) => {
     );
 }
 
-//PointsPage = authHOC(PointsPage);
+PointsPage = authHOC(PointsPage);
 
 export default PointsPage;

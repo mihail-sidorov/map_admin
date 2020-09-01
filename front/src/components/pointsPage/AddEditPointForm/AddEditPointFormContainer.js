@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import AddEditPointForm from './AddEditPoinForm';
-import { showAddEditPointFormActionCreator, addPoint, addPointActionCreator, editPointActionCreator } from '../../../redux/pointsPageReducer';
+import { showAddEditPointFormActionCreator, addPoint, addPointActionCreator, editPointActionCreator, editPoint } from '../../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -15,19 +15,22 @@ let mapDispatchToProps = (dispatch) => {
         },
         addEditPoint: (values, action) => {
             console.log(values);
-            if (values.lng && values.lat && values.title && values.hours && values.phone && values.site && values.description) {
+            if (values.lng && values.lat && values.apartment && values.title && values.hours && values.phone && values.site && values.description) {
                 if (action === 'add') {
-                    // addPoint(values)
-                    // .then((id) => {
-                    //     console.log(id);
-                    // })
-                    // .catch((error) => {
-                    //     console.log(error);
-                    // });
-                    dispatch(addPointActionCreator(values));
+                    if (values.isActive === undefined) values.isActive = false;
+                    addPoint(values)
+                    .then((point) => {
+                        dispatch(addPointActionCreator(point));
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
                 }
                 if (action === 'edit') {
-                    dispatch(editPointActionCreator(values));
+                    editPoint(values)
+                    .then((point) => {
+                        dispatch(editPointActionCreator(point));
+                    });
                 }
             }
         },

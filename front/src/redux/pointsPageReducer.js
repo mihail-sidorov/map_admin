@@ -47,47 +47,67 @@ let makeShortPoints = (state) => {
     };
 }
 
+let resetAddEditPointForm = () => {
+    return {
+        action: null,
+        point: {},
+        newPoint: false,
+    };
+}
+
 let initialState = {
     points: {
         1: {
             id: 1,
             lng: '99991',
             lat: '99991',
+            apartment: 'apartment1',
             title: 'title1',
             hours: 'hours1',
             phone: 'phone1',
             site: 'site1',
             description: 'description1',
+            isActive: 0,
+            moder_status: 'moderated',
         },
         2: {
             id: 2,
             lng: '99992',
             lat: '99992',
+            apartment: 'apartment2',
             title: 'title2',
             hours: 'hours2',
             phone: 'phone2',
             site: 'site2',
             description: 'description2',
+            isActive: 0,
+            moder_status: 'moderated',
         },
         3: {
             id: 3,
             lng: '99993',
             lat: '99993',
+            apartment: 'apartment3',
             title: 'title3',
             hours: 'hours3',
             phone: 'phone3',
             site: 'site3',
             description: 'description3',
+            isActive: 0,
+            moder_status: 'moderated',
         },
         4: {
             id: 4,
             lng: '99994',
             lat: '99994',
+            apartment: 'apartment4',
             title: 'title4',
             hours: 'hours4',
             phone: 'phone4',
             site: 'site4',
             description: 'description4',
+            isActive: 0,
+            moder_status: 'moderated',
         },
     },
     shortPoints: {},
@@ -111,12 +131,23 @@ initialState.pagination.pages = makeShortPointsResult.pages;
 
 // Запросы к API
 export let addPoint = (point) => {
-    return axios.post(`${serverName}/api/addPoint`, {lng: point.lng, lat: point.lat, title: point.title, hours: point.hours, phone: point.phone, site: point.site,  description: point.description}, {withCredentials: true}).then((response) => {
+    return axios.post(`${serverName}/api/user/addPoint`, {lng: point.lng, lat: point.lat, apartment: point.apartment, title: point.title, hours: point.hours, phone: point.phone, site: point.site, description: point.description, isActive: point.isActive}, {withCredentials: true}).then((response) => {
         if (!response.data.isError) {
-            return response.data.response.id;
+            return response.data.response[0];
         }
         else {
-            throw 'Ошибка авторизации!';
+            throw 'Не удалось добавить точку!';
+        }
+    });
+}
+
+export let editPoint = (point) => {
+    return axios.post(`${serverName}/api/user/editPoint/${point.id}`, {lng: point.lng, lat: point.lat, apartment: point.apartment, title: point.title, hours: point.hours, phone: point.phone, site: point.site, description: point.description, isActive: point.isActive}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response[0];
+        }
+        else {
+            throw 'Не удалось отредактировать точку!';
         }
     });
 }
@@ -174,11 +205,7 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.points = {...state.points};
             delete newState.points[action.id];
 
-            newState.addEditPointForm = {
-                action: null,
-                point: {},
-                newPoint: false,
-            };
+            newState.addEditPointForm = resetAddEditPointForm();
 
             makeShortPointsResult = makeShortPoints(newState);
             newState.shortPoints = makeShortPointsResult.shortPoints;
@@ -221,10 +248,7 @@ let pointsPageReducer = (state = initialState, action) => {
             return newState;
         case ADD_POINT:
             newState = {...state};
-            newState.points = {
-                ...newState.points,
-                577867: {...action.point, id: 577867},
-            };
+            newState.points[action.point.id] = action.point;
 
             newState.addEditPointForm.newPoint = true;
 
@@ -233,11 +257,7 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.pagination.currentPage = makeShortPointsResult.currentPage;
             newState.pagination.pages = makeShortPointsResult.pages;
 
-            newState.addEditPointForm = {
-                action: null,
-                point: {},
-                newPoint: false,
-            };
+            newState.addEditPointForm = resetAddEditPointForm();
 
             return newState;
         case EDIT_POINT:
@@ -245,11 +265,7 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.points[action.point.id] = {...action.point};
             newState.shortPoints[action.point.id] = newState.points[action.point.id];
 
-            newState.addEditPointForm = {
-                action: null,
-                point: {},
-                newPoint: false,
-            };
+            newState.addEditPointForm = resetAddEditPointForm();
 
             return newState;
         default:
