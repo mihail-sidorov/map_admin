@@ -5,6 +5,7 @@ import { login, getAuthData, setAuthDataActionCreator } from '../../redux/authRe
 let mapStateToProps = (state) => {
     return {
         isAuth: state.authState.isAuth,
+        permission: state.authState.permission,
     };
 }
 
