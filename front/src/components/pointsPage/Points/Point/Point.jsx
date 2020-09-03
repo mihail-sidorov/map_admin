@@ -1,5 +1,22 @@
 import React from 'react';
 
+export let PointProperties = (props) => {
+    return (
+        <>
+            <span className="point__full-city-name">{props.point.full_city_name}</span>
+            <span className="point__street">{props.point.street}</span>
+            <span className="point__house">{props.point.house}</span>
+            <span className="point__apartment">{props.point.apartment}</span>
+            <span className="point__lng">{props.point.lng}</span>
+            <span className="point__lat">{props.point.lat}</span>
+            <span className="point__title">{props.point.title}</span>
+            <span className="point__hours">{props.point.hours}</span>
+            <span className="point__phone">{props.point.phone}</span>
+            <span className="point__site">{props.point.site}</span>
+        </>
+    );
+}
+
 let Point = (props) => {
     console.log('Point>>>');
 
@@ -20,13 +37,9 @@ let Point = (props) => {
                 <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>***
                 <span className="point__moder-status">{moderStatus}</span>
             </div>
-            <span className="point__lng">{props.point.lng}</span>
-            <span className="point__lat">{props.point.lat}</span>
-            <span className="point__apartment">{props.point.apartment}</span>
-            <span className="point__title">{props.point.title}</span>
-            <span className="point__hours">{props.point.hours}</span>
-            <span className="point__phone">{props.point.phone}</span>
-            <span className="point__site">{props.point.site}</span>
+            
+            <PointProperties point={props.point} />
+
             <button className="point__edit-button" onClick={() => {
                 props.showAddEditPointForm('edit', props.point.id);
             }}>Редактировать</button>

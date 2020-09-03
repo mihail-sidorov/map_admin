@@ -5,6 +5,7 @@ import { showAddEditPointFormActionCreator, getPoints, getPointsActionCreator } 
 let mapStateToProps = (state) => {
     return {
         points: state.pointsPageState.shortPoints,
+        duplicate: state.pointsPageState.duplicate,
     };
 }
 

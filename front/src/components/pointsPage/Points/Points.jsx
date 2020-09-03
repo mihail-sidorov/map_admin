@@ -1,5 +1,6 @@
 import React from 'react';
 import PointContainer from './Point/PointContainer';
+import { Redirect } from 'react-router-dom';
 
 let Points = (props) => {
     console.log('Points>>>');
@@ -23,16 +24,19 @@ let Points = (props) => {
 }
 
 class PointsClassComponent extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
-        console.log('PointsClassComponent>>>');
-        this.props.getPoints();
+        if (!this.props.duplicate.point) {
+            this.props.getPoints();
+        }
     }
 
     render() {
+        if (this.props.duplicate.point) {
+            return (
+                <Redirect to="/points/duplicate" />
+            );
+        }
+        
         return (
             <Points {...this.props} />
         );
