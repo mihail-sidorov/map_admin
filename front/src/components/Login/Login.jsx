@@ -22,7 +22,8 @@ LoginForm = reduxForm({
 
 let Login = (props) => {
     if (props.isAuth) {
-        return <Redirect to={'/points'} />
+        if (props.permission === 'admin') return <Redirect to={'/admin'} />
+        if (props.permission === 'moder' || props.permission === 'user') return <Redirect to={'/points'} />
     }
     return <LoginForm onSubmit={props.onLogin}/>
 }

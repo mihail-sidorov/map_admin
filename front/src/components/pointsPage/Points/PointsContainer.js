@@ -14,8 +14,8 @@ let mapDispatchToProps = (dispatch) => {
         showAddEditPointForm: (action) => {
             dispatch(showAddEditPointFormActionCreator(action));
         },
-        getPoints: () => {
-            getPoints()
+        getPoints: (permission) => {
+            getPoints(permission)
             .then((pointsArr) => {
                 dispatch(getPointsActionCreator(pointsArr));
             })

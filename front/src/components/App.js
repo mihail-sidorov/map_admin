@@ -1,8 +1,9 @@
 import React from 'react';
 import LoginContainer from './Login/LoginContainer';
 import { Route, Redirect, Switch } from 'react-router-dom';
-import PointsPage from './PointsPage/PointsPage';
 import HeaderContainer from './Header/HeaderContainer';
+import AdminPageContainer from './AdminPage/AdminPageContainer';
+import PointsPageContainer from './PointsPage/PointsPageContainer';
 
 function App() {
     return (
@@ -11,7 +12,8 @@ function App() {
             <Switch>
                 <Redirect exact from="/" to="/login" />
                 <Route path="/login" render={() => <LoginContainer />} />
-                <Route path="/points" render={() => <PointsPage />} />
+                <Route path="/points" render={() => <PointsPageContainer />} />
+                <Route path="/admin" render={() => <AdminPageContainer />} />
             </Switch>
         </div>
     );

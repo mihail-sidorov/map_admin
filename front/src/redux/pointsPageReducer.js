@@ -100,45 +100,45 @@ let resetAddEditPointForm = () => {
 let initialState = {
     points: {},
     duplicate: {
-        duplicateGroup: 1,
-        point: {
-            full_city_name: 'Майкоп, р. Адыгея, Россия',
-            street: 'улица Ленина',
-            house: '45',
-            apartment: '',
-            lng: 44.4444,
-            lat: 55.5555,
-            title: 'Кузя',
-            hours: 'hours',
-            phone: 'phone',
-            site: 'site',
-        },
-        points: [
-            {
-                full_city_name: 'Майкоп, р. Адыгея, Россия',
-                street: 'улица Ленина',
-                house: '45',
-                apartment: '',
-                lng: 44.4444,
-                lat: 55.5555,
-                title: 'Кузя',
-                hours: 'hours',
-                phone: 'phone',
-                site: 'site',
-            },
-            {
-                full_city_name: 'Майкоп, р. Адыгея, Россия',
-                street: 'улица Ленина',
-                house: '45',
-                apartment: '',
-                lng: 44.4444,
-                lat: 55.5555,
-                title: 'Кузя',
-                hours: 'hours',
-                phone: 'phone',
-                site: 'site',
-            },
-        ],
+        // duplicateGroup: 1,
+        // point: {
+        //     full_city_name: 'Майкоп, р. Адыгея, Россия',
+        //     street: 'улица Ленина',
+        //     house: '45',
+        //     apartment: '',
+        //     lng: 44.4444,
+        //     lat: 55.5555,
+        //     title: 'Кузя',
+        //     hours: 'hours',
+        //     phone: 'phone',
+        //     site: 'site',
+        // },
+        // points: [
+        //     {
+        //         full_city_name: 'Майкоп, р. Адыгея, Россия',
+        //         street: 'улица Ленина',
+        //         house: '45',
+        //         apartment: '',
+        //         lng: 44.4444,
+        //         lat: 55.5555,
+        //         title: 'Кузя',
+        //         hours: 'hours',
+        //         phone: 'phone',
+        //         site: 'site',
+        //     },
+        //     {
+        //         full_city_name: 'Майкоп, р. Адыгея, Россия',
+        //         street: 'улица Ленина',
+        //         house: '45',
+        //         apartment: '',
+        //         lng: 44.4444,
+        //         lat: 55.5555,
+        //         title: 'Кузя',
+        //         hours: 'hours',
+        //         phone: 'phone',
+        //         site: 'site',
+        //     },
+        // ],
     },
     shortPoints: {},
     addEditPointForm: {
@@ -148,7 +148,7 @@ let initialState = {
     },
     search: '',
     pagination: {
-        count: 10,
+        count: 5,
         currentPage: 1,
         pages: 0,
     },
@@ -156,7 +156,7 @@ let initialState = {
 
 // Запросы к API
 export let addPoint = (point) => {
-    return axios.post(`${serverName}/api/user/addPoint`, {lng: point.lng, lat: point.lat, apartment: point.apartment, title: point.title, hours: point.hours, phone: point.phone, site: point.site, description: point.description, isActive: point.isActive}, {withCredentials: true}).then((response) => {
+    return axios.post(`${serverName}/api/user/addPoint`, point, {withCredentials: true}).then((response) => {
         if (!response.data.isError) {
             return {
                 point: response.data.response[0],
@@ -174,19 +174,39 @@ export let addPoint = (point) => {
     });
 }
 
-export let editPoint = (point) => {
-    return axios.post(`${serverName}/api/user/editPoint/${point.id}`, {lng: point.lng, lat: point.lat, apartment: point.apartment, title: point.title, hours: point.hours, phone: point.phone, site: point.site, description: point.description, isActive: point.isActive}, {withCredentials: true}).then((response) => {
+export let editPoint = (point, permission) => {
+    return axios.post(`${serverName}/api/${permission}/editPoint/${point.id}`, point, {withCredentials: true}).then((response) => {
         if (!response.data.isError) {
-            return response.data.response[0];
+            if (permission === 'user') {
+                return {
+                    point: response.data.response[0],
+                };
+            }
+            if (permission === 'moder') {
+                return {
+                    id: response.data.response,
+                };
+            }
         }
         else {
+            if (response.data.response.duplicate) {
+                return {
+                    duplicate: response.data.response.duplicate,
+                }
+            }
+        }
+
+        if (permission === 'user') {
             throw 'Не удалось отредактировать точку!';
+        }
+        if (permission === 'moder') {
+            throw 'Не удалось промодерировать точку!';
         }
     });
 }
 
-export let getPoints = () => {
-    return axios.get(`${serverName}/api/user/getPoints`, {withCredentials: true}).then((response) => {
+export let getPoints = (permission) => {
+    return axios.get(`${serverName}/api/${permission}/getPoints`, {withCredentials: true}).then((response) => {
         if (!response.data.isError) {
             return response.data.response;
         }
@@ -258,10 +278,11 @@ export let getPointsActionCreator = (pointsArr) => {
     };
 }
 
-export let addDuplicateActionCreator = (duplicate) => {
+export let addDuplicateActionCreator = (duplicate, point) => {
     return {
         type: ADD_DUPLICATE,
         duplicate: duplicate,
+        point: point,
     };
 }
 
@@ -359,10 +380,12 @@ let pointsPageReducer = (state = initialState, action) => {
 
             return newState;
         case ADD_DUPLICATE:
-            return {
-                ...state,
-                duplicate: {...action.duplicate},
-            };
+            newState = {...state};
+            newState.duplicate = {...action.duplicate};
+
+            newState.addEditPointForm.point = {...action.point};
+            
+            return newState;
         case CANSEL_DUPLICATE:
             return {
                 ...state,
