@@ -7,7 +7,7 @@ async function getPointsModer() {
     return Shop
         .query()
         .withGraphFetched("moder_status")
-        .select("id", "title", "apartment", "hours", "phone", "site", "isActive", "description", "full_city_name")
+        .select("id", "title", "apartment", "hours", "phone", "site", "description", "full_city_name", "house")
         .whereIn("moder_status_id", isModerated)
         .then(res => {
             res.forEach(elem => {
@@ -46,7 +46,7 @@ async function setPointAccept(pointId) {
         .query()
         .whereIn("moder_status_id", isModerated)
         .andWhere("id", pointId)
-        .patch({ "moder_status_id": moderStatus })
+        .patch({ "moder_status_id": moderStatus , description: null})
         .then(res => {
             if (res) {
                 return pointId
@@ -57,11 +57,11 @@ async function setPointAccept(pointId) {
 }
 //full_city_name, title, apartment, hours, phone, site, description
 async function editPointModer(id, point) {
-    await checkTimeStamp(id, point.timeStamp)
     const isModerated = await getIdByIsModerated(1)
     const moderStatus = await getIdByModerStatus("accept")
     const insertData = await getPrepareForInsert(point, "moder")
     insertData.moder_status_id = moderStatus
+    insertData.description = null
     return await Shop
         .query()
         .whereIn("moder_status_id", isModerated)

@@ -1,17 +1,31 @@
 
 const Shop = require("../orm/shop")
 
-const { checkTimeStamp, getPointUser, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")
+const { getDuplicate, markDuplicate, checkTimeStamp, getPointUser, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")
 
 async function addPoint(point, id) {
     const insertField = await getPrepareForInsert(point)
+    const { points, dupIds } = await getDuplicate(point)
+
+    if (points && !point.force) {
+        const response = {
+            "outputAsIs": true,
+            "duplicate": {
+                "points": points,
+                "point": insertField
+            }
+        }
+        throw response
+    }
+
     insertField.user_id = id
     insertField.moder_status_id = await getIdByModerStatus("accept")
-
-    pointId = await Shop
+    const pointId = await Shop
         .query()
         .insert(insertField)
         .then(res => res.id)
+
+    markDuplicate(dupIds, pointId)
     return getPointUser(id, pointId)
 }
 
@@ -38,6 +52,19 @@ async function editPoint(userId, pointId, fields) {
     const moderStatusRefuse = await getIdByModerStatus("refuse")
     const updateData = await getPrepareForInsert(fields)
     const { isActive, description, ...checkData } = updateData
+    const { points, dupIds } = await getDuplicate(point,pointId)
+
+    if (points && !point.force) {
+        const response = {
+            "outputAsIs": true,
+            "duplicate": {
+                "points": points,
+                "point": insertField
+            }
+        }
+        throw response
+    }
+    
     checkData.id = pointId
     checkData.user_id = userId
     await Shop.query().skipUndefined().first().where(checkData).then(async (res) => {
@@ -48,11 +75,12 @@ async function editPoint(userId, pointId, fields) {
         }
     })
 
-    isSuccess = await Shop
+    const isSuccess = await Shop
         .query()
         .where({ "id": pointId, "user_id": userId })
         .patch(updateData).then(Boolean)
     if (isSuccess) {
+        markDuplicate(dupIds, pointId)
         return getPointUser(userId, pointId)
     } else {
         throw "editing failed"

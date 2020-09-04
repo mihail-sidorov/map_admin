@@ -6,6 +6,8 @@ const { setPassword, addUser } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 
 module.exports = function (app) {
+
+    //Интерфейс авторизации
     app.post("/api/login", passport.authenticate('local'), function (req, res, next) {
         res.json(jsonResPattern("OK"))
     })
@@ -31,32 +33,20 @@ module.exports = function (app) {
         res.json(response)
     })
 
-    //title, lng, lat, apartment, hours, phone, site, isActiv, is
-    app.get("/api/user/getPoints", checkAuthUser, (req, res, next) => {
+    //Интерфейс администратора
+    app.post("/api/admin/addUser", checkAuthAdmin, (req, res, next) => {
         modelPromiseToRes(
-            getPointsUser(req.user.id),
+            addUser(req.body.login, req.body.password, req.body.permission),
             res, next)
     })
 
-    //title, lng, lat, apartment, hours, phone, site, isActiv, is
-    app.post("/api/user/delPoint", checkAuthUser, (req, res, next) => {
+    app.post("/api/admin/setPassword", checkAuthAdmin, (req, res, next) => {
         modelPromiseToRes(
-            delPoint(req.user.id, req.body.id),
+            setPassword(req.body.login, req.body.password),
             res, next)
     })
 
-    app.post("/api/user/addPoint", checkAuthUser, (req, res, next) => {
-        modelPromiseToRes(
-            addPoint(req.body, req.user.id),
-            res, next) // id, title, lng, lat, apartment, hours, phone, site, user_description
-    })
-
-    app.post("/api/user/editPoint/:id", checkAuthUser, (req, res, next) => {
-        modelPromiseToRes(
-            editPoint(req.user.id, req.params.id, req.body),
-            res, next)
-    })
-
+    //Интерфейс модератора
     app.get("/api/moder/getPoints", checkAuthModer, (req, res, next) => {
         modelPromiseToRes(
             getPointsModer(req.user.id),
@@ -77,19 +67,31 @@ module.exports = function (app) {
 
     app.post("/api/moder/editPoint/:id", checkAuthModer, (req, res, next) => {
         modelPromiseToRes(
-            editPointModer(req.params.id,req.body),
+            editPointModer(req.params.id, req.body),
             res, next)
     })
 
-    app.post("/api/admin/addUser", checkAuthAdmin, (req, res, next) => {
+    app.get("/api/user/getPoints", checkAuthUser, (req, res, next) => {
         modelPromiseToRes(
-            addUser(req.body.login, req.body.password, req.body.permission),
+            getPointsUser(req.user.id),
             res, next)
     })
 
-    app.post("/api/admin/setPassword", checkAuthAdmin, (req, res, next) => {
+    app.post("/api/user/delPoint", checkAuthUser, (req, res, next) => {
         modelPromiseToRes(
-            setPassword(req.body.login, req.body.password),
+            delPoint(req.user.id, req.body.id),
+            res, next)
+    })
+
+    app.post("/api/user/addPoint", checkAuthUser, (req, res, next) => {
+        modelPromiseToRes(
+            addPoint(req.body, req.user.id)
+            , res, next) // id, title, lng, lat, apartment, hours, phone, site, user_description
+    })
+
+    app.post("/api/user/editPoint/:id", checkAuthUser, (req, res, next) => {
+        modelPromiseToRes(
+            editPoint(req.user.id, req.params.id, req.body),
             res, next)
     })
 

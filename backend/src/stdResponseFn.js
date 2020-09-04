@@ -10,7 +10,16 @@ function jsonResPattern (response, isError) {
 function modelPromiseToRes (modelPromise, res, next) {
     modelPromise
         .then(response => res.json(jsonResPattern(response)))
-        .catch(err => next(err.toString()))
+        .catch(err => {
+            let output
+            if (err.outputAsIs) {
+                err.outputAsIs = undefined
+                output = err
+            } else {
+                output = err.toString()
+            }
+            next(output)
+        })
 }
 
 exports.modelPromiseToRes = modelPromiseToRes

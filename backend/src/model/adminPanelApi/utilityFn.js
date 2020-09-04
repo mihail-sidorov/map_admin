@@ -3,12 +3,69 @@ const Shop = require("../orm/shop")
 const Permission = require("../orm/permission")
 const fetch = require('node-fetch')
 const Moder_status = require("../orm/moder_status")
+const { nanoid } = require("nanoid")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
+
+async function getDuplicate(point, pointId) {
+    const select = ["id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "duplicateGroup"]
+    const pointAccuratyMeter = 200
+    const pointAccuratyDegrees = 0.00000900900900900901 * pointAccuratyMeter
+    const prepareQuery = Shop.query()
+        .withGraphFetched("user")
+        .select(...select)
+
+    let duplicatePoints = await prepareQuery
+        .whereBetween("lat", [+point.lat - pointAccuratyDegrees / 2, +point.lat + pointAccuratyDegrees / 2])
+        .andWhereBetween("lng", [+point.lng - pointAccuratyDegrees / 2, +point.lng + pointAccuratyDegrees / 2])
+
+    const duplicateGroups = []
+    const duplicatePointWithoutGroups = []
+    const duplicateId = []
+
+    if (duplicatePoints[0] || (duplicatePoints.length == 1 && duplicatePoints[0].id == pointId)) {
+        duplicatePoints.forEach(elem => {
+            if (elem.duplicateGroup) {
+                duplicateGroups.push(elem.duplicateGroup)
+            } else {
+                duplicatePointWithoutGroups.push(elem)
+            }
+        })
+
+        if (duplicateGroups.length) {
+            duplicatePoints = duplicatePointWithoutGroups.concat(
+                await prepareQuery.whereIn("duplicateGroup", duplicateGroups)
+            )
+        }
+
+        duplicatePoints.forEach(elem => {
+            duplicateId.push(elem.id)
+        })
+
+        if (pointId) {
+            duplicatePoints = duplicatePoints.filter(elem => elem.id != pointId)
+        }
+
+        duplicatePoints.forEach(elem => {
+            elem.user = elem.user[0].email
+            elem.id = undefined
+            elem.duplicateGroup = undefined
+        })
+        return { "points": duplicatePoints, "dupIds": duplicateId }
+    } else {
+        return false
+    }
+}
+
+async function markDuplicate(dupIds, pointId) {
+    if (dupIds) {
+        dupIds.push(pointId)
+        await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
+    }
+}
 
 function checkTimeStamp(pointId, timeStamp) {
     if (!point.timeStamp) throw "the field timeStamp in must not be empty"
-    return Shop
-        .query()
+    return Shop.query()
         .first()
         .where({ "id": pointId, "timeStamp": timeStamp })
         .then(res => {
@@ -21,16 +78,14 @@ function checkTimeStamp(pointId, timeStamp) {
 }
 
 function hasEmail(email) {
-    return User
-        .query()
+    return User.query()
         .first()
         .where("email", email)
         .then(Boolean)
 }
 
 function getIdByPermission(permission) {
-    return Permission
-        .query()
+    return Permission.query()
         .first()
         .where("permission", permission)
         .then(result => {
@@ -53,7 +108,6 @@ function getIdByModerStatus(moderStatus) {
 async function getPrepareForInsert(fields, flag = "user") {
     const flagData = {}
     if (flag == "user") {
-
         if (+fields.lat && +fields.lng) {
             flagData.lat = +fields.lat
             flagData.lng = +fields.lng
@@ -71,6 +125,7 @@ async function getPrepareForInsert(fields, flag = "user") {
     } else if (flag == "moder") {
         flagData.street = fields.street
         flagData.house = fields.house
+        flagData.full_city_name = fields.full_city_name
     }
 
     return Object.assign({
@@ -107,8 +162,8 @@ async function getPointUser(userId, pointId) {
         .query()
         .withGraphFetched("moder_status")
         .skipUndefined()
-        .select("id", "title", "lng", "lat", "apartment", "hours", "phone", "site", "isActive", "description", "timeStamp")
-        .andWhere({ "user_id": userId, "id": pointId })
+        .where({ "user_id": userId, "id": pointId })
+        .select("id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "isActive", "description", "timeStamp")
         .then(res => {
             res.forEach(elem => {
                 elem.moder_status = elem.moder_status[0].moder_status
@@ -124,3 +179,5 @@ exports.getIdByModerStatus = getIdByModerStatus
 exports.getPrepareForInsert = getPrepareForInsert
 exports.getPointUser = getPointUser
 exports.checkTimeStamp = checkTimeStamp
+exports.getDuplicate = getDuplicate
+exports.markDuplicate = markDuplicate

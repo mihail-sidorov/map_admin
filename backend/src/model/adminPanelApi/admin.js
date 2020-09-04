@@ -2,8 +2,9 @@ const User = require("../orm/user")
 
 const { hasEmail, getIdByPermission } = require("./utilityFn")
 
-//не проверенна
+
 function setPassword(email, password) { //сменить пароль, если пользоватьель не существует, то возвращает false, в противном случае true
+    email=String(email).trim()
     return User
         .query()
         .first()
@@ -19,6 +20,7 @@ function setPassword(email, password) { //сменить пароль, если 
 }
 
 async function addUser(email, password, permission = "user") { //Добавить пользователя, если пользоватьель существует, то возвращает false
+    email=String(email).trim()
     if (await hasEmail(email)) throw "this user already exists"
     const permission_id = await getIdByPermission(permission)
     await User.query().insert({ email, password, permission_id })

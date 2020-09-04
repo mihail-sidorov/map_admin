@@ -5,13 +5,14 @@ function getUserById(id) {
 }
 
 function checkLoginPassword(email, password) { //Проверка на присутствие в базе пары логин/пароль
+    email=String(email).trim()
     return User
         .query()
         .withGraphFetched("permission")
         .first()
         .where("email", email)
-        .then(user => {
-            return (user && user.verifyPassword(password)) ? user : false
+        .then(async user => {
+            return (user && await user.verifyPassword(password)) ? user : false
         })
 }
 
