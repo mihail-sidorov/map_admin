@@ -12,9 +12,9 @@ let PointsPage = (props) => {
     return (
         <div className="points-page">
             <Route exact path="/points" render={() => <SearchPointsContainer />} />
-            <Route exact path="/points" render={() => <PointsContainer />} />
-            <Route exact path="/points/duplicate" render={() => <DuplicateContainer />} />
-            <Route exact path="/points" render={() => <AddEditPointFormContainer />} />
+            <Route exact path="/points" render={() => <PointsContainer permission={props.permission} />} />
+            <Route exact path="/points/duplicate" render={() => <DuplicateContainer permission={props.permission} />} />
+            <Route exact path="/points" render={() => <AddEditPointFormContainer permission={props.permission} />} />
             <Route exact path="/points" render={() => <PaginationContainer />} />
         </div>
     );

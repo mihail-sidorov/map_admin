@@ -9,14 +9,21 @@ let Points = (props) => {
 
     for (let id in props.points) {
         let Point = PointContainer(id);
-        pointsArr.push(<Point key={id}/>);
+        pointsArr.push(<Point key={id} permission={props.permission} />);
+    }
+
+    let addPointBtn = [];
+    if (props.permission === 'user') {
+        addPointBtn.push(
+            <button className="points__add-point-btn" onClick={() => {
+                props.showAddEditPointForm('add');
+            }} key={1}>Добавить</button>
+        );
     }
 
     return (
         <div className="points">
-            <button className="points__add-point-btn" onClick={() => {
-                props.showAddEditPointForm('add');
-            }}>Добавить</button>
+            {addPointBtn}
             
             {pointsArr}
         </div>
@@ -26,7 +33,7 @@ let Points = (props) => {
 class PointsClassComponent extends React.Component {
     componentDidMount() {
         if (!this.props.duplicate.point) {
-            this.props.getPoints();
+            this.props.getPoints(this.props.permission);
         }
     }
 
