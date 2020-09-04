@@ -67,8 +67,8 @@ module.exports = function (app) {
 
     app.post("/api/moder/editPoint/:id", checkAuthModer, (req, res, next) => {
         modelPromiseToRes(
-            editPointModer(req.params.id, req.body),
-            res, next)
+            editPointModer(req.params.id, req.body)
+            , res, next)
     })
 
     app.get("/api/user/getPoints", checkAuthUser, (req, res, next) => {
@@ -91,8 +91,8 @@ module.exports = function (app) {
 
     app.post("/api/user/editPoint/:id", checkAuthUser, (req, res, next) => {
         modelPromiseToRes(
-            editPoint(req.user.id, req.params.id, req.body),
-            res, next)
+            editPoint(req.user.id, req.params.id, req.body)
+            , res, next)
     })
 
     app.use(function (req, res) {

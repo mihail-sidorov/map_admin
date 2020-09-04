@@ -7,7 +7,7 @@ async function getPointsModer() {
     return Shop
         .query()
         .withGraphFetched("moder_status")
-        .select("id", "title", "apartment", "hours", "phone", "site", "description", "full_city_name", "house")
+        .select("id", "title", "apartment", "hours", "phone", "site", "description", "full_city_name", "house", "street")
         .whereIn("moder_status_id", isModerated)
         .then(res => {
             res.forEach(elem => {

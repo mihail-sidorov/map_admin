@@ -21,8 +21,7 @@ async function getDuplicate(point, pointId) {
     const duplicateGroups = []
     const duplicatePointWithoutGroups = []
     const duplicateId = []
-
-    if (duplicatePoints[0] || (duplicatePoints.length == 1 && duplicatePoints[0].id == pointId)) {
+    if (duplicatePoints[0] && !(duplicatePoints.length == 1 && duplicatePoints[0].id == pointId)) {
         duplicatePoints.forEach(elem => {
             if (elem.duplicateGroup) {
                 duplicateGroups.push(elem.duplicateGroup)
@@ -60,11 +59,13 @@ async function markDuplicate(dupIds, pointId) {
     if (dupIds) {
         dupIds.push(pointId)
         await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
+    } else if (pointId) {
+
     }
 }
 
 function checkTimeStamp(pointId, timeStamp) {
-    if (!point.timeStamp) throw "the field timeStamp in must not be empty"
+    if (!timeStamp) throw "the field timeStamp in must not be empty"
     return Shop.query()
         .first()
         .where({ "id": pointId, "timeStamp": timeStamp })

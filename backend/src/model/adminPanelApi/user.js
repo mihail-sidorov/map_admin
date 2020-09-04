@@ -19,7 +19,7 @@ async function addPoint(point, id) {
     }
 
     insertField.user_id = id
-    insertField.moder_status_id = await getIdByModerStatus("accept")
+    insertField.moder_status_id = await getIdByModerStatus("moderated")
     const pointId = await Shop
         .query()
         .insert(insertField)
@@ -47,10 +47,10 @@ function delPoint(userId, pointId) {
         })
 }
 
-async function editPoint(userId, pointId, fields) {
-    await checkTimeStamp(pointId, fields.timeStamp)
+async function editPoint(userId, pointId, point) {
+    await checkTimeStamp(pointId, point.timeStamp)
     const moderStatusRefuse = await getIdByModerStatus("refuse")
-    const updateData = await getPrepareForInsert(fields)
+    const updateData = await getPrepareForInsert(point)
     const { isActive, description, ...checkData } = updateData
     const { points, dupIds } = await getDuplicate(point,pointId)
 
@@ -59,12 +59,12 @@ async function editPoint(userId, pointId, fields) {
             "outputAsIs": true,
             "duplicate": {
                 "points": points,
-                "point": insertField
+                "point": updateData
             }
         }
         throw response
     }
-    
+
     checkData.id = pointId
     checkData.user_id = userId
     await Shop.query().skipUndefined().first().where(checkData).then(async (res) => {
