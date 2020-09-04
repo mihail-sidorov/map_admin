@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import AddEditPointForm from './AddEditPoinForm';
-import { showAddEditPointFormActionCreator, addPoint, addPointActionCreator, editPointActionCreator, editPoint } from '../../../redux/pointsPageReducer';
+import { showAddEditPointFormActionCreator, addPoint, addPointActionCreator, editPointActionCreator, editPoint, addDuplicateActionCreator } from '../../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -19,8 +19,13 @@ let mapDispatchToProps = (dispatch) => {
                 if (action === 'add') {
                     if (values.isActive === undefined) values.isActive = false;
                     addPoint(values)
-                    .then((point) => {
-                        dispatch(addPointActionCreator(point));
+                    .then((response) => {
+                        if (response.point) {
+                            dispatch(addPointActionCreator(response.point));
+                        }
+                        if (response.duplicate) {
+                            dispatch(addDuplicateActionCreator(response.duplicate));
+                        }
                     })
                     .catch((error) => {
                         console.log(error);

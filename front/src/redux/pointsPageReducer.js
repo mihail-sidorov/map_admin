@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -9,7 +9,49 @@ let makeShortPoints = (state) => {
     if (state.search !== '') {
         for (let id in state.points) {
             let pattern = new RegExp(state.search.toLowerCase());
-            if (state.points[id].title.toLowerCase().match(pattern)) {
+            let full_city_name, street, house, apartment, lng, lat, title, hours, phone, site;
+
+
+            for (let property in state.points[id]) {
+                switch (property) {
+                    case 'full_city_name':
+                        full_city_name = state.points[id][property];
+                        break;
+                    case 'street':
+                        street = state.points[id][property];
+                        break;
+                    case 'house':
+                        house = state.points[id][property];
+                        break;
+                    case 'apartment':
+                        apartment = state.points[id][property];
+                        break;
+                    case 'lng':
+                        lng = state.points[id][property];
+                        break;
+                    case 'lat':
+                        lat = state.points[id][property];
+                        break;
+                    case 'title':
+                        title = state.points[id][property];
+                        break;
+                    case 'hours':
+                        hours = state.points[id][property];
+                        break;
+                    case 'phone':
+                        phone = state.points[id][property];
+                        break;
+                    case 'site':
+                        site = state.points[id][property];
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            let searchStr = full_city_name + street + house + apartment + lng + lat + title + hours + phone + site;
+
+            if (searchStr.toLowerCase().match(pattern)) {
                 searchPoints[id] = state.points[id];
             }
         }
@@ -57,6 +99,47 @@ let resetAddEditPointForm = () => {
 
 let initialState = {
     points: {},
+    duplicate: {
+        duplicateGroup: 1,
+        point: {
+            full_city_name: 'Майкоп, р. Адыгея, Россия',
+            street: 'улица Ленина',
+            house: '45',
+            apartment: '',
+            lng: 44.4444,
+            lat: 55.5555,
+            title: 'Кузя',
+            hours: 'hours',
+            phone: 'phone',
+            site: 'site',
+        },
+        points: [
+            {
+                full_city_name: 'Майкоп, р. Адыгея, Россия',
+                street: 'улица Ленина',
+                house: '45',
+                apartment: '',
+                lng: 44.4444,
+                lat: 55.5555,
+                title: 'Кузя',
+                hours: 'hours',
+                phone: 'phone',
+                site: 'site',
+            },
+            {
+                full_city_name: 'Майкоп, р. Адыгея, Россия',
+                street: 'улица Ленина',
+                house: '45',
+                apartment: '',
+                lng: 44.4444,
+                lat: 55.5555,
+                title: 'Кузя',
+                hours: 'hours',
+                phone: 'phone',
+                site: 'site',
+            },
+        ],
+    },
     shortPoints: {},
     addEditPointForm: {
         action: null,
@@ -75,11 +158,19 @@ let initialState = {
 export let addPoint = (point) => {
     return axios.post(`${serverName}/api/user/addPoint`, {lng: point.lng, lat: point.lat, apartment: point.apartment, title: point.title, hours: point.hours, phone: point.phone, site: point.site, description: point.description, isActive: point.isActive}, {withCredentials: true}).then((response) => {
         if (!response.data.isError) {
-            return response.data.response[0];
+            return {
+                point: response.data.response[0],
+            };
         }
         else {
-            throw 'Не удалось добавить точку!';
+            if (response.data.response.duplicate) {
+                return {
+                    duplicate: response.data.response.duplicate,
+                }
+            }
         }
+
+        throw 'Не удалось добавить точку!';
     });
 }
 
@@ -101,6 +192,17 @@ export let getPoints = () => {
         }
         else {
             throw 'Не удалось получить точки!';
+        }
+    });
+}
+
+export let delPoint = (id) => {
+    return axios.post(`${serverName}/api/user/delPoint`, {id: id}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return id;
+        }
+        else {
+            throw 'Не удалось удалить точку!';
         }
     });
 }
@@ -153,6 +255,19 @@ export let getPointsActionCreator = (pointsArr) => {
     return {
         type: GET_POINTS,
         pointsArr: pointsArr,
+    };
+}
+
+export let addDuplicateActionCreator = (duplicate) => {
+    return {
+        type: ADD_DUPLICATE,
+        duplicate: duplicate,
+    };
+}
+
+export let canselDuplicateActionCreator = () => {
+    return {
+        type: CANSEL_DUPLICATE,
     };
 }
 
@@ -243,6 +358,16 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.pagination.pages = makeShortPointsResult.pages;
 
             return newState;
+        case ADD_DUPLICATE:
+            return {
+                ...state,
+                duplicate: {...action.duplicate},
+            };
+        case CANSEL_DUPLICATE:
+            return {
+                ...state,
+                duplicate: {},
+            };
         default:
             return state;
     }
