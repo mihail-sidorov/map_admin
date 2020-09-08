@@ -227,6 +227,17 @@ export let delPoint = (id) => {
     });
 }
 
+export let refusePoint = (data) => {
+    return axios.post(`${serverName}/api/moder/setPointRefuse`, data, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось отклонить точку!';
+        }
+    });
+}
+
 // Создание ActionCreator
 export let delPointActionCreator = (id) => {
     return {
