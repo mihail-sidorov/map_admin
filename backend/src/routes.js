@@ -2,7 +2,7 @@ const passport = require("passport")
 const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
 const { checkAuth, isAuth } = require("./middlewares/passport")
 const { delPoint, addPoint, getPointsUser, editPoint } = require("./model/adminPanelApi/user")
-const { addUser, editUser, getUsers } = require("./model/adminPanelApi/admin")
+const { addUser, editUser, getUsers, getPermission } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 
 module.exports = function (app) {
@@ -52,6 +52,11 @@ module.exports = function (app) {
             res, next)
     })
 
+    app.get("/api/admin/getPermission", checkAuth("admin"), (req, res, next) => {
+        modelPromiseToRes(
+            getPermission(),
+            res, next)
+    })
     //Интерфейс модератора
     app.get("/api/moder/getPoints", checkAuth("moder"), (req, res, next) => {
         modelPromiseToRes(
