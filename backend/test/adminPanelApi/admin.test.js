@@ -1,4 +1,14 @@
-const { addUser, editUser } = require("./model/adminPanelApi/admin")
+'use strict'
+const { addUser, editUser, getUsers } = require("../../src/model/adminPanelApi/admin")
 
+test("Получение списка пользователей", async () => {
 
-test("Тестировние ") 
+    const user={
+        id:expect.any(Number),
+        email:expect.any(String),
+        permission: expect.stringMatching(/admin|moder|user/)
+    }
+    const users = await getUsers()
+    expect(users).toContainEqual(user)
+
+})

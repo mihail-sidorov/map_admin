@@ -1,3 +1,4 @@
+'use strict'
 const { checkAuth, passportModule } = require("../src/middlewares/passport")
 
 test("Функция проверки авторизации checkAuth", () => {

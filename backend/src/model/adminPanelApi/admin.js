@@ -31,9 +31,22 @@ async function addUser(email, password, permission = "user") { //Добавит�
     return "OK"
 }
 
+function getUsers() {
+    return User.query()
+        .withGraphFetched("permission")
+        .select("id","email")
+        .then(res => {
+            res.forEach( elem => {
+                elem.permission=elem.permission[0].permission
+            })
+            return res
+        })
+}
+
 // function delUser(email) {
 //     User.query().delete().where("email",email)
 // }
 
 exports.editUser = editUser
 exports.addUser = addUser
+exports.getUsers = getUsers
