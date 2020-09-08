@@ -1,6 +1,6 @@
 const User = require("../orm/user")
 
-const { hasEmail, getIdByPermission, editUser } = require("./utilityFn")
+const { hasEmail, getIdByPermission} = require("./utilityFn")
 
 
 function editUser(userId, email, password) { //сменить пароль, если пользоватьель не существует, то возвращает false, в противном случае true
