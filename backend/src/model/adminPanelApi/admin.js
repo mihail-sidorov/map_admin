@@ -1,6 +1,6 @@
 const User = require("../orm/user")
 
-const { hasEmail, getIdByPermission } = require("./utilityFn")
+const { hasEmail, getIdByPermission, editUser } = require("./utilityFn")
 
 
 function editUser(userId, email, password) { //сменить пароль, если пользоватьель не существует, то возвращает false, в противном случае true
@@ -35,5 +35,5 @@ async function addUser(email, password, permission = "user") { //Добавит�
 //     User.query().delete().where("email",email)
 // }
 
-exports.setPassword = setPassword
+exports.editUser = editUser
 exports.addUser = addUser

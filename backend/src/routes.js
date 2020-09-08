@@ -2,7 +2,7 @@ const passport = require("passport")
 const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
 const { checkAuth, isAuth } = require("./middlewares/passport")
 const { delPoint, addPoint, getPointsUser, editPoint } = require("./model/adminPanelApi/user")
-const { setPassword, addUser } = require("./model/adminPanelApi/admin")
+const { setPassword, addUser, editUser } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 
 module.exports = function (app) {
