@@ -1,5 +1,8 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
+import UsersContainer from './Users/UsersContainer';
+import PaginationContainer from './Pagination/PaginationContainer';
+import SearchAdminContainer from './SearchAdmin/SearchAdminContainer';
 
 let AdminPage = (props) => {
     if (props.permission !== 'admin') {
@@ -10,7 +13,9 @@ let AdminPage = (props) => {
 
     return (
         <div className="admin-page">
-            Страница суперадмина
+            <SearchAdminContainer />
+            <UsersContainer />
+            <PaginationContainer />
         </div>
     );
 }

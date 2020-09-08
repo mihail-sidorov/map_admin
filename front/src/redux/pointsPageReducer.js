@@ -99,47 +99,7 @@ let resetAddEditPointForm = () => {
 
 let initialState = {
     points: {},
-    duplicate: {
-        // duplicateGroup: 1,
-        // point: {
-        //     full_city_name: 'Майкоп, р. Адыгея, Россия',
-        //     street: 'улица Ленина',
-        //     house: '45',
-        //     apartment: '',
-        //     lng: 44.4444,
-        //     lat: 55.5555,
-        //     title: 'Кузя',
-        //     hours: 'hours',
-        //     phone: 'phone',
-        //     site: 'site',
-        // },
-        // points: [
-        //     {
-        //         full_city_name: 'Майкоп, р. Адыгея, Россия',
-        //         street: 'улица Ленина',
-        //         house: '45',
-        //         apartment: '',
-        //         lng: 44.4444,
-        //         lat: 55.5555,
-        //         title: 'Кузя',
-        //         hours: 'hours',
-        //         phone: 'phone',
-        //         site: 'site',
-        //     },
-        //     {
-        //         full_city_name: 'Майкоп, р. Адыгея, Россия',
-        //         street: 'улица Ленина',
-        //         house: '45',
-        //         apartment: '',
-        //         lng: 44.4444,
-        //         lat: 55.5555,
-        //         title: 'Кузя',
-        //         hours: 'hours',
-        //         phone: 'phone',
-        //         site: 'site',
-        //     },
-        // ],
-    },
+    duplicate: {},
     shortPoints: {},
     addEditPointForm: {
         action: null,
