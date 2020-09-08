@@ -1,4 +1,7 @@
-const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN';
+import * as axios from 'axios';
+import serverName from "../serverName";
+
+const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS';
 
 let makeShortUsers = (state) => {
     let searchUsers = {}, shortUsers = {};
@@ -63,28 +66,7 @@ let makeShortUsers = (state) => {
 }
 
 let initialState = {
-    users: {
-        1: {
-            id: 1,
-            email: 'mail@mail1.ru',
-            permission: 'user',
-        },
-        2: {
-            id: 2,
-            email: 'mail@mail2.ru',
-            permission: 'user',
-        },
-        3: {
-            id: 3,
-            email: 'mail@mail3.ru',
-            permission: 'moder',
-        },
-        4: {
-            id: 4,
-            email: 'mail@mail4.ru',
-            permission: 'moder',
-        },
-    },
+    users: {},
     shortUsers: {},
     search: '',
     pagination: {
@@ -98,10 +80,17 @@ let initialState = {
     },
 };
 
-let makeShortUsersResult = makeShortUsers(initialState);
-initialState.shortUsers = makeShortUsersResult.shortUsers;
-initialState.pagination.currentPage = makeShortUsersResult.currentPage;
-initialState.pagination.pages = makeShortUsersResult.pages;
+// Запросы к API
+export let getUsers = () => {
+    return axios.get(`${serverName}/api/admin/getUsers`, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось получить пользователей!';
+        }
+    });
+}
 
 // Создание ActionCreator
 export let changePageAdminActionCreator = (page) => ({
@@ -112,6 +101,11 @@ export let changePageAdminActionCreator = (page) => ({
 export let changeSearchAdminActionCreator = (value) => ({
     type: CHANGE_SEARCH_ADMIN,
     value: value,
+})
+
+export let getUsersActionCreator = (usersArr) => ({
+    type: GET_USERS,
+    usersArr: usersArr,
 })
 
 let adminPageReducer = (state = initialState, action) => {
@@ -132,6 +126,21 @@ let adminPageReducer = (state = initialState, action) => {
             newState = {...state};
             newState.search = action.value;
             newState.pagination.currentPage = 1;
+
+            makeShortUsersResult = makeShortUsers(newState);
+            newState.shortUsers = makeShortUsersResult.shortUsers;
+            newState.pagination.currentPage = makeShortUsersResult.currentPage;
+            newState.pagination.pages = makeShortUsersResult.pages;
+
+            return newState;
+        case GET_USERS:
+            let users = {};
+            action.usersArr.forEach((user) => {
+                users[user.id] = user;
+            });
+
+            newState = {...state};
+            newState.users = users;
 
             makeShortUsersResult = makeShortUsers(newState);
             newState.shortUsers = makeShortUsersResult.shortUsers;

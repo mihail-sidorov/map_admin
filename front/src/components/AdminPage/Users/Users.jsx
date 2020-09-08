@@ -1,6 +1,18 @@
 import React from 'react';
 import UserContainer from './User/UserContainer';
 
+let UsersRequest = class extends React.Component {
+    componentDidMount() {
+        this.props.getUsers();
+    }
+
+    render() {
+        return (
+            <Users {...this.props} />
+        );
+    }
+}
+
 let Users = (props) => {
     let addUserBtn = [];
     addUserBtn.push(<button className="users__add-user-btn" key={1}>Добавить</button>);
@@ -21,4 +33,4 @@ let Users = (props) => {
     );
 }
 
-export default Users;
+export default UsersRequest;
