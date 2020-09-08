@@ -3,13 +3,17 @@ const User = require("../orm/user")
 const { hasEmail, getIdByPermission } = require("./utilityFn")
 
 
-function setPassword(email, password) { //сменить пароль, если пользоватьель не существует, то возвращает false, в противном случае true
+function editUser(userId, email, password) { //сменить пароль, если пользоватьель не существует, то возвращает false, в противном случае true
     email=String(email).trim()
+    if (password === "") {
+        password = undefined
+    } 
+
     return User
         .query()
+        .findById(userId)
         .first()
-        .where("email", email)
-        .patch({ password })
+        .patch({ email, password })
         .then(res => {
             if (res) {
                 return "OK"

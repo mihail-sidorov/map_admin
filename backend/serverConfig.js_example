@@ -9,20 +9,23 @@ module.exports = {
             host: "127.0.0.1",
             user: "root",
             password: "admin",
-            database: "test"
+            database: "test",
+            dateStrings: true
         }
     },
 
     cors: {
-        
-    },
+        credentials: true,
+        origin: true
+    }
+    ,
 
     yandex: {
         apiKey: "6c63b2b7-912b-40f2-a252-2cbdc56042b9"
     },
 
     session: {
-        maxAge: 15, //minute
+        maxAge: 150000, //minute
         secret: "$2a$12$sWSdI13BJ5ipPca/f8KTF.k4eFKsUtobfWdTBoQdj9g9I8JfLmZty"
     }
 }
