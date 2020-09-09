@@ -17,11 +17,6 @@ function getEmail() {
     return email
 }
 
-const user = {
-    id: expect.any(Number),
-    email: expect.any(String),
-    permission: expect.stringMatching(/admin|moder|user/)
-}
 
 test("Получение списка пользователей", async () => {
     const users = await getUsers()
@@ -35,42 +30,47 @@ test("Получение данных из таблицы permissions", async ()
 })
 
 test("Добавление пользователя", async () => {
-    let emailTrim, email, addUserRes
-    emailTrim = getEmail()
+    let addUserRes
+    const emailTrim = getEmail()
     const permissions = await getPermission()
-    email = "  " + emailTrim + "   "
-    addUserRes = await addUser(email, "testtest")
+    const email = "  " + emailTrim + "   "
 
+    addUserRes = addUser(email, "testtest")
+    await expect(addUserRes).rejects.toEqual('permission_id must be integer')
 
+    addUserRes = addUser(email, "testtest", 2222233232)
+    await expect(addUserRes).rejects.toEqual('permission with this id not found')
+
+    addUserRes = await addUser(email, "testtest", permissions[0].id)
+    await expect(addUserRes).toMatchSchema(getUsersModel)
+    const getUser = await User.query().findById(addUserRes[0].id).first()
+    expect(getUser.id).toBe(addUserRes[0].id)
+
+    addUserRes = addUser(email, "testtest", permissions[0].id)
+    await expect(addUserRes).rejects.toEqual('this user already exists')
 })
 
-test("Добавление пользователя", async () => {
-    let emailTrim, email, addUserRes
-    emailTrim = getEmail()
-    email = "  " + emailTrim + "   "
-    addUserRes = await addUser(email, "testtest")
-    expect(addUserRes).toEqual([user])
-    expect(addUserRes[0].permission).toBe("user")
-    expect(addUserRes[0].email).toBe(emailTrim)
+test("Редактирование пользователя", async () => {
+    let userAfterEdit,userBeforeEdit
+    const emailTrim = getEmail()
+    const permissions = await getPermission()
+    const addEmail = "  " + emailTrim + "   "
 
-    emailTrim = getEmail()
-    email = "  " + emailTrim + "   "
-    expect(addUser(email, "testtest", 122321323)).rejects.toEqual('permission with this id not found')
+    const addUserRes = await addUser(addEmail, "testtest", permissions[0].id)
 
-    emailTrim = getEmail()
-    email = "  " + emailTrim + "   "
-    addUserRes = await addUser(email, "testtest")
-    expect(addUser(email, "testtest", "notHasPermission")).rejects.toEqual('this user already exists')
+    userBeforeEdit = await User.query().findById(addUserRes[0].id).first()
+    expect(await editUser(addUserRes[0].id, undefined, "password")).toMatchSchema(getUsersModel)
+    userAfterEdit = await User.query().findById(addUserRes[0].id).first()
+    const { password, ...userAfterEditPassword } = userAfterEdit
+    expect(userBeforeEdit).toMatchObject(userAfterEditPassword)
+    expect(userBeforeEdit.password).not.toBe(password)
 
-    for (let key of ["user", "moder", "admin"]) {
-        emailTrim = getEmail()
-        email = "  " + emailTrim + "   "
-        addUserRes = await addUser(email, "testtest", key)
-        expect(addUserRes).toEqual([user])
-        expect(addUserRes[0].permission).toBe(key)
-        expect(addUserRes[0].email).toBe(emailTrim)
-    }
+    userBeforeEdit = userAfterEdit
+    expect(await editUser(addUserRes[0].id, getEmail(), undefined)).toMatchSchema(getUsersModel)
+    userAfterEdit = await User.query().findById(addUserRes[0].id).first()
+    const { email, ...userAfterEditEmail } = userAfterEdit
+    expect(userBeforeEdit).toMatchObject(userAfterEditEmail)
+    expect(userBeforeEdit.email).not.toBe(email)
 })
-
 
 afterAll(delTestUser)

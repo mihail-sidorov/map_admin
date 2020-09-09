@@ -1,10 +1,11 @@
 'use strict'
 const passport = require("passport")
 const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
-const { checkAuth} = require("./middlewares/passport")
+const { checkAuth } = require("./middlewares/passport")
 const { delPoint, addPoint, getPointsUser, editPoint } = require("./model/adminPanelApi/user")
 const { addUser, editUser, getUsers, getPermission } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
+const { hasUserId } = require("./model/adminPanelApi/utilityFn")
 
 module.exports = function (app) {
 
@@ -57,6 +58,26 @@ module.exports = function (app) {
         modelPromiseToRes(
             getPermission(),
             res, next)
+    })
+
+    app.post("/api/admin/loginAs", checkAuth("admin"), async (req, res, next) => {
+        req.session.adminId = req.user.id
+        const userId = parseInt(req.body.id)
+        if (!await hasUserId(userId)) next("this userId not found")
+        req.session.passport.user = userId
+        req.user.id = userId
+        res.json(jsonResPattern("OK"))
+    })
+
+    app.post("/api/admin/returnToAdmin", checkAuth("all"), (req, res, next) => {
+        if (req.session.adminId) {
+            req.session.passport.user = req.session.adminId
+            req.user.id = req.session.adminId
+            req.session.adminId=undefined
+            res.json(jsonResPattern("OK"))
+        } else {
+            next("fail")
+        }
     })
     //Интерфейс модератора
     app.get("/api/moder/getPoints", checkAuth("moder"), (req, res, next) => {

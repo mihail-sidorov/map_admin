@@ -20,5 +20,6 @@
       "id",
       "permission"
     ]
-  }
+  },
+  "description": "Таблица ролей"
 }

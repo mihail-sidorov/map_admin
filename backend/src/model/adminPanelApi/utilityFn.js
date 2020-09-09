@@ -79,8 +79,15 @@ function checkTimeStamp(pointId, timeStamp) {
         })
 }
 
-function hasEmail(email) {
-    return User.query()
+async function hasUserId(userId) {
+    return await User.query()
+        .first()
+        .findById(userId)
+        .then(Boolean)
+}
+
+async function hasEmail(email) {
+    return await User.query()
         .first()
         .where("email", email)
         .then(Boolean)
@@ -173,7 +180,7 @@ async function getPointUser(userId, pointId) {
             return res
         })
 }
-
+exports.hasUserId = hasUserId
 exports.hasEmail = hasEmail
 exports.getIdByPermission = getIdByPermission
 exports.getIdByIsModerated = getIdByIsModerated

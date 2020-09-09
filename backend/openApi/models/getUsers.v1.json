@@ -27,5 +27,6 @@
       "email",
       "permission"
     ]
-  }
+  },
+  "description": "Список пользователей"
 }

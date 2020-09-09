@@ -1,0 +1,428 @@
+openapi: 3.0.0
+servers:
+  - description: mapadmin
+    url: 'http://localhost:3000/api'
+info:
+  description: mapadmin API
+  version: 1.0.0
+  title: mapadmin API
+  contact: {}
+  license: {}
+tags:
+  - name: Авторизация
+    description: Интерфейс авторизации
+  - name: admin
+    description: Интерфейс администратора
+  - name: moder
+    description: Интерфейс модератора
+  - name: user
+    description: Интерфейс пользователя
+paths:
+  /login:
+    post:
+      tags:
+        - Авторизация
+      summary: Запрос авторизации
+      operationId: login
+      requestBody:
+        description: |
+          Отправляем данные для авторизации
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - login
+                - password
+              properties:
+                login:
+                  type: string
+                  format: email
+                  maxLength: 320
+                password:
+                  type: string
+                  minimum: 8
+                  maximum: 72
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stdResJson'
+              examples:
+                Успешный вход:
+                  value:
+                    isError: false
+                    response: OK
+                Неверный логин или пароль:
+                  value:
+                    isError: true
+                    response: Unauthorized
+        '400':
+          description: Если какой то параметр не будет отправлен
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Bad Request
+  /logout:
+    post:
+      tags:
+        - Авторизация
+      summary: Выход из аккаунта
+      operationId: logout
+      description: |
+        Выход из аккаунта
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stdResJson'
+              examples:
+                Успешный выход:
+                  value:
+                    isError: false
+                    response: OK
+                Не авторизован:
+                  value:
+                    isError: true
+                    response: Unauthorized
+  /getAuthData:
+    get:
+      tags:
+        - Авторизация
+      summary: Получение данных авторизации
+      operationId: getAuthData
+      description: |
+        Получение информации о текущем авторизованном пользователе
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  login:
+                    type: string
+                  isAuth:
+                    type: boolean
+                  permission:
+                    type: string
+              examples:
+                Авторизация выполнена:
+                  value:
+                    login: user@user.user
+                    isAuth: true
+                    permission: user
+                Не авторизован:
+                  value:
+                    login: null
+                    isAuth: false
+                    permission: null
+  /admin/addUser:
+    post:
+      tags:
+        - admin
+      summary: Добовление пользователей
+      operationId: addUser
+      description: |
+        Добавление пользователей с различными правами
+      requestBody:
+        description: |
+          Отправляем логин, пароль и права, если права не заполнены по умолчанию прова установятся в user
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maximum: 320
+                password:
+                  type: string
+                  minimum: 8
+                  maximum: 72
+                permission:
+                  type: string
+                  enum:
+                    - user
+                    - moder
+                    - admin
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stdResJson'
+              examples:
+                Пользователь добавлен:
+                  description: response возвращает поля добавленного пользователя
+                  value:
+                    isError: false
+                    response:
+                      - id: 1
+                        email: user@user.com
+                        permission: user
+                Такой пользователь уже есть:
+                  value:
+                    isError: true
+                    response: this user already exists
+                Запрос не из под администратора:
+                  value:
+                    isError: true
+                    response: No permission
+                Не авторизован:
+                  value:
+                    isError: true
+                    response: Unauthorized
+                Поле пароль не отправленно:
+                  value:
+                    isError: true
+                    response: 'ValidationError: password: is a required property'
+                Поле пароль слишком короткое:
+                  value:
+                    isError: true
+                    response: 'ValidationError: password: should NOT be shorter than 8 characters'
+                Неверный формат email:
+                  value:
+                    isError: true
+                    response: 'ValidationError: email: should match format "email"'
+                Нет добовляемых прав:
+                  value:
+                    isError: true
+                    response: '%not correct permission% permission not found'
+  /admin/editUser:
+    post:
+      tags:
+        - admin
+      summary: Изменение логина и пароля
+      operationId: editUser
+      description: |
+        Изменение логина и пароля, если пароль пустая строка или пароль не отправлен, то пароль не будет изменен
+      requestBody:
+        description: |
+          Отправляем логин и пароль
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                email:
+                  type: string
+                  format: email
+                  maximum: 320
+                password:
+                  type: string
+                  minimum: 8
+                  maximum: 72
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stdResJson'
+              examples:
+                Пароль изменен:
+                  description: response возвращает поля отредактированного пользователя
+                  value:
+                    isError: false
+                    response:
+                      - id: 1
+                        email: user@user.com
+                        permission: user
+                Запрос не из под администратора:
+                  value:
+                    isError: true
+                    response: No permission
+                Не авторизован:
+                  value:
+                    isError: true
+                    response: Unauthorized
+                Поле пароль не отправленно:
+                  value:
+                    isError: true
+                    response: 'ValidationError: password: is a required property'
+                Поле пароль слишком короткое:
+                  value:
+                    isError: true
+                    response: 'ValidationError: password: should NOT be shorter than 8 characters'
+                Неверный формат email:
+                  value:
+                    isError: true
+                    response: 'ValidationError: email: should match format "email"'
+                Остальные ошибки:
+                  value:
+                    isError: true
+                    response: fail
+  /admin/getUsers:
+    get:
+      tags:
+        - admin
+      summary: Получить данные всех пользователей
+      operationId: getUsers
+      description: |
+        Получить данные всех пользователей
+      responses:
+        '200':
+          description: В случае успеха передает список пользователей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                    description: ''
+                  response:
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/getUsers.v1.json
+                required:
+                  - isError
+                  - response
+              examples: {}
+  /admin/getPermission:
+    get:
+      tags:
+        - admin
+      summary: Получить данные всех прав
+      operationId: getPermission
+      description: |
+        Получить данные всех пользователей
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - isError
+                  - response
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        permission:
+                          type: string
+                          enum:
+                            - user
+                            - moder
+                            - admin
+                      required:
+                        - id
+                        - permission
+              examples:
+                Пример:
+                  value:
+                    isError: false
+                    response:
+                      - id: 1
+                        permission: admin
+                      - id: 2
+                        permission: moder
+                      - id: 3
+                        permission: user
+  /moder/getPoints:
+    get:
+      tags:
+        - moder
+      summary: Получение точек
+      operationId: getPoints
+      description: |
+        Получение точек для модератора, выводятся точки с флагом isModerated=1 из связанной таблицы
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    full_city_name:
+                      type: string
+                    house:
+                      type: string
+components:
+  schemas:
+    stdResJson:
+      type: object
+      required:
+        - isError
+        - response
+      properties:
+        isError:
+          type: boolean
+          example: false
+        response:
+          example: OK
+    getPointSchema:
+      type: array
+      items:
+        type: object
+        properties:
+          full_city_name:
+            type: string
+          house:
+            type: string
+    InventoryItem:
+      type: object
+      required:
+        - id
+        - name
+        - manufacturer
+        - releaseDate
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        name:
+          type: string
+          example: Widget Adapter
+        releaseDate:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        manufacturer:
+          $ref: '#/components/schemas/Manufacturer'
+    Manufacturer:
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: ACME Corporation
+        homePage:
+          type: string
+          format: url
+          example: 'https://www.acme-corp.com'
+        phone:
+          type: string
+          example: 408-867-5309
+      type: object

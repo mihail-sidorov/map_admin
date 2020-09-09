@@ -5,8 +5,8 @@ const { hasEmail, getIdByPermission } = require("./utilityFn")
 const Permission = require("../orm/permission")
 
 
-function editUser(userId, email, password) { //сменить пароль, если пользоватьель не существует, то возвращает false, в противном случае true
-    email = String(email).trim()
+function editUser(userId, email, password) {
+    email = (typeof(email) == "string") ? email.trim() : undefined
     if (password === "") {
         password = undefined
     }
@@ -25,14 +25,15 @@ function editUser(userId, email, password) { //сменить пароль, ес
         })
 }
 
-async function addUser(email, password, permission_id) { //Добавить пользователя, если пользоватьель существует, то возвращает false
+async function addUser(email, password, permission_id) { 
     permission_id = Number(permission_id)
-    
+
     if (!Number.isInteger(permission_id)) {
         throw "permission_id must be integer"
     }
 
-    email = String(email).trim()
+    email = (typeof(email) == "string") ? email.trim() : undefined
+    
     if (!await Permission.query().findById(permission_id).first().then(Boolean)) {
         throw "permission with this id not found"
     }
