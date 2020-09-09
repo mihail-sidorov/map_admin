@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_CURRENT_PAGE_POINTS = 'RESET_CURRENT_PAGE_POINTS';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -99,47 +99,7 @@ let resetAddEditPointForm = () => {
 
 let initialState = {
     points: {},
-    duplicate: {
-        // duplicateGroup: 1,
-        // point: {
-        //     full_city_name: 'Майкоп, р. Адыгея, Россия',
-        //     street: 'улица Ленина',
-        //     house: '45',
-        //     apartment: '',
-        //     lng: 44.4444,
-        //     lat: 55.5555,
-        //     title: 'Кузя',
-        //     hours: 'hours',
-        //     phone: 'phone',
-        //     site: 'site',
-        // },
-        // points: [
-        //     {
-        //         full_city_name: 'Майкоп, р. Адыгея, Россия',
-        //         street: 'улица Ленина',
-        //         house: '45',
-        //         apartment: '',
-        //         lng: 44.4444,
-        //         lat: 55.5555,
-        //         title: 'Кузя',
-        //         hours: 'hours',
-        //         phone: 'phone',
-        //         site: 'site',
-        //     },
-        //     {
-        //         full_city_name: 'Майкоп, р. Адыгея, Россия',
-        //         street: 'улица Ленина',
-        //         house: '45',
-        //         apartment: '',
-        //         lng: 44.4444,
-        //         lat: 55.5555,
-        //         title: 'Кузя',
-        //         hours: 'hours',
-        //         phone: 'phone',
-        //         site: 'site',
-        //     },
-        // ],
-    },
+    duplicate: {},
     shortPoints: {},
     addEditPointForm: {
         action: null,
@@ -148,7 +108,7 @@ let initialState = {
     },
     search: '',
     pagination: {
-        count: 5,
+        count: 2,
         currentPage: 1,
         pages: 0,
     },
@@ -227,6 +187,17 @@ export let delPoint = (id) => {
     });
 }
 
+export let refusePoint = (data) => {
+    return axios.post(`${serverName}/api/moder/setPointRefuse`, data, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось отклонить точку!';
+        }
+    });
+}
+
 // Создание ActionCreator
 export let delPointActionCreator = (id) => {
     return {
@@ -291,6 +262,10 @@ export let canselDuplicateActionCreator = () => {
         type: CANSEL_DUPLICATE,
     };
 }
+
+export let resetCurrentPagePointsActionCreator = () => ({
+    type: RESET_CURRENT_PAGE_POINTS,
+})
 
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
@@ -390,6 +365,14 @@ let pointsPageReducer = (state = initialState, action) => {
             return {
                 ...state,
                 duplicate: {},
+            };
+        case RESET_CURRENT_PAGE_POINTS:
+            return {
+                ...state,
+                pagination: {
+                    ...state.pagination,
+                    currentPage: 1,
+                },
             };
         default:
             return state;
