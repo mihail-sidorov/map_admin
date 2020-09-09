@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_CURRENT_PAGE_POINTS = 'RESET_CURRENT_PAGE_POINTS';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -108,7 +108,7 @@ let initialState = {
     },
     search: '',
     pagination: {
-        count: 5,
+        count: 2,
         currentPage: 1,
         pages: 0,
     },
@@ -263,6 +263,10 @@ export let canselDuplicateActionCreator = () => {
     };
 }
 
+export let resetCurrentPagePointsActionCreator = () => ({
+    type: RESET_CURRENT_PAGE_POINTS,
+})
+
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -361,6 +365,14 @@ let pointsPageReducer = (state = initialState, action) => {
             return {
                 ...state,
                 duplicate: {},
+            };
+        case RESET_CURRENT_PAGE_POINTS:
+            return {
+                ...state,
+                pagination: {
+                    ...state.pagination,
+                    currentPage: 1,
+                },
             };
         default:
             return state;
