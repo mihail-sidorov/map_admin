@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import EditUserForm from './EditUserForm';
 import { closeEditUserFormActionCreator, editUser, editUserActionCreator } from '../../../redux/adminPageReducer';
+import { changeHeaderLoginActionCreator } from '../../../redux/authReducer';
 
 let EditUserFormContainer = connect(
     state => ({
@@ -14,6 +15,9 @@ let EditUserFormContainer = connect(
             if (values.email) {
                 editUser(values)
                     .then((user) => {
+                        if (window.store.getState().authState.login === window.store.getState().adminPageState.users[user.id].email) {
+                            dispatch(changeHeaderLoginActionCreator(user.email));
+                        }
                         dispatch(closeEditUserFormActionCreator());
                         dispatch(editUserActionCreator(user));
                     })
