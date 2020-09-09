@@ -69,6 +69,13 @@ let Point = (props) => {
         delPointBtn.push(<button className="point__del-button" onClick={onDelPoint} key={1}>Удалить</button>);
     }
 
+    let refuseBtn = [];
+    if (props.permission === 'moder') {
+        refuseBtn.push(<button className="point__refuse-btn" key={1} onClick={() => {
+            props.onRefusePoint(props.point.id, prompt('Введите комментарий для пользователя', ''));
+        }}>Отклонить</button>);
+    }
+
     return (
         <div point-id={props.point.id} className="point">
             {pointInform}
@@ -78,6 +85,8 @@ let Point = (props) => {
             <button className="point__edit-button" onClick={() => {
                 props.showAddEditPointForm('edit', props.point.id);
             }}>{props.permission === 'user' ? 'Редактировать' : 'Утвердить'}</button>
+
+            {refuseBtn}
 
             {delPointBtn}
 

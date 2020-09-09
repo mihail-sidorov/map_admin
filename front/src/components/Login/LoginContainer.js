@@ -1,6 +1,8 @@
 import {connect} from 'react-redux';
 import Login from './Login';
 import { login, getAuthData, setAuthDataActionCreator } from '../../redux/authReducer';
+import { resetCurrentPageAdminActionCreator } from '../../redux/adminPageReducer';
+import { resetCurrentPagePointsActionCreator } from '../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -19,6 +21,8 @@ let mapDispatchToProps = (dispatch) => {
                     })
                     .then((data) => {
                         dispatch(setAuthDataActionCreator(data));
+                        dispatch(resetCurrentPageAdminActionCreator());
+                        dispatch(resetCurrentPagePointsActionCreator());
                     })
                     .catch((error) => {
                         console.log(error);
