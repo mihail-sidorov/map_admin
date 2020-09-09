@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import UsersRequest from './Users';
-import { getUsers, getUsersActionCreator } from '../../../redux/adminPageReducer';
+import { getUsers, getUsersActionCreator, openAddUserFormActionCreator } from '../../../redux/adminPageReducer';
 
 let UsersContainer = connect(
     state => ({
@@ -15,6 +15,9 @@ let UsersContainer = connect(
                 .catch((error) => {
                     console.log(error);
                 });
+        },
+        onOpenAddUserForm: () => {
+            dispatch(openAddUserFormActionCreator());
         },
     })
 )(UsersRequest);

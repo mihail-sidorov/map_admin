@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import SearchAdmin from './SearchAdmin';
-import { changeSearchAdminActionCreator } from '../../../redux/adminPageReducer';
+import { changeSearchAdminActionCreator, closeAddUserFormActionCreator } from '../../../redux/adminPageReducer';
 
 let SearchAdminContainer = connect(
     state => ({
@@ -8,6 +8,7 @@ let SearchAdminContainer = connect(
     }),
     dispatch => ({
         onChangeSearch: (value) => {
+            dispatch(closeAddUserFormActionCreator());
             dispatch(changeSearchAdminActionCreator(value));
         },
     })

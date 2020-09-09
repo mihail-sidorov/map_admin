@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Pagination from '../../PointsPage/Pagination/Pagination';
-import { changePageAdminActionCreator } from '../../../redux/adminPageReducer';
+import { changePageAdminActionCreator, closeAddUserFormActionCreator } from '../../../redux/adminPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -12,6 +12,7 @@ let mapStateToProps = (state) => {
 let mapDispatchToProps = (dispatch) => {
     return {
         changePage: (page) => {
+            dispatch(closeAddUserFormActionCreator());
             dispatch(changePageAdminActionCreator(page));
         },
     };

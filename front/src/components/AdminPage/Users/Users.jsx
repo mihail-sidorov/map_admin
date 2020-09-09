@@ -15,7 +15,9 @@ let UsersRequest = class extends React.Component {
 
 let Users = (props) => {
     let addUserBtn = [];
-    addUserBtn.push(<button className="users__add-user-btn" key={1}>Добавить</button>);
+    addUserBtn.push(<button className="users__add-user-btn" key={1} onClick={() => {
+        props.onOpenAddUserForm();
+    }}>Добавить</button>);
 
     let usersArr = [];
 

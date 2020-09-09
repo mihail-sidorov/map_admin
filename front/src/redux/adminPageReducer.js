@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from "../serverName";
 
-const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS';
+const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER';
 
 let makeShortUsers = (state) => {
     let searchUsers = {}, shortUsers = {};
@@ -77,6 +77,7 @@ let initialState = {
     addUserForm: {
         open: false,
         newUser: false,
+        permissions: [],
     },
 };
 
@@ -88,6 +89,28 @@ export let getUsers = () => {
         }
         else {
             throw 'Не удалось получить пользователей!';
+        }
+    });
+}
+
+export let getPermissions = () => {
+    return axios.get(`${serverName}/api/admin/getPermission`, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось получить роли!';
+        }
+    });
+}
+
+export let addUser = (data) => {
+    return axios.post(`${serverName}/api/admin/addUser`, data, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response[0];
+        }
+        else {
+            throw 'Не удалось добавить пользователя!';
         }
     });
 }
@@ -106,6 +129,24 @@ export let changeSearchAdminActionCreator = (value) => ({
 export let getUsersActionCreator = (usersArr) => ({
     type: GET_USERS,
     usersArr: usersArr,
+})
+
+export let openAddUserFormActionCreator = () => ({
+    type: OPEN_ADD_USER_FORM,
+})
+
+export let closeAddUserFormActionCreator = () => ({
+    type: CLOSE_ADD_USER_FORM,
+})
+
+export let setPermissionsActionCreator = (permissionsArr) => ({
+    type: SET_PERMISSIONS,
+    permissionsArr: permissionsArr,
+})
+
+export let addUserActionCreator = (user) => ({
+    type: ADD_USER,
+    user: user,
 })
 
 let adminPageReducer = (state = initialState, action) => {
@@ -146,6 +187,45 @@ let adminPageReducer = (state = initialState, action) => {
             newState.shortUsers = makeShortUsersResult.shortUsers;
             newState.pagination.currentPage = makeShortUsersResult.currentPage;
             newState.pagination.pages = makeShortUsersResult.pages;
+
+            return newState;
+        case OPEN_ADD_USER_FORM:
+            return {
+                ...state,
+                addUserForm: {
+                    ...state.addUserForm,
+                    open: true,
+                },
+            };
+        case CLOSE_ADD_USER_FORM:
+            return {
+                ...state,
+                addUserForm: {
+                    ...state.addUserForm,
+                    open: false,
+                },
+            };
+        case SET_PERMISSIONS:
+            return {
+                ...state,
+                addUserForm: {
+                    ...state.addUserForm,
+                    permissions: action.permissionsArr,
+                },
+            };
+        case ADD_USER:
+            newState = {...state};
+            newState.users = {...newState.users};
+            newState.users[action.user.id] = action.user;
+            
+            newState.addUserForm.newUser = true;
+            
+            makeShortUsersResult = makeShortUsers(newState);
+            newState.shortUsers = makeShortUsersResult.shortUsers;
+            newState.pagination.currentPage = makeShortUsersResult.currentPage;
+            newState.pagination.pages = makeShortUsersResult.pages;
+
+            newState.addUserForm.newUser = false;
 
             return newState;
         default:
