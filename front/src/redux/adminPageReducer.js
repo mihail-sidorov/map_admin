@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from "../serverName";
 
-const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER';
+const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER';
 
 let makeShortUsers = (state) => {
     let searchUsers = {}, shortUsers = {};
@@ -79,6 +79,10 @@ let initialState = {
         newUser: false,
         permissions: [],
     },
+    editUserForm: {
+        open: false,
+        user: {},
+    },
 };
 
 // Запросы к API
@@ -115,6 +119,17 @@ export let addUser = (data) => {
     });
 }
 
+export let editUser = (data) => {
+    return axios.post(`${serverName}/api/admin/editUser`, data, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response[0];
+        }
+        else {
+            throw 'Не удалось отредактировать пользователя!';
+        }
+    });
+}
+
 // Создание ActionCreator
 export let changePageAdminActionCreator = (page) => ({
     type: CHANGE_PAGE_ADMIN,
@@ -146,6 +161,20 @@ export let setPermissionsActionCreator = (permissionsArr) => ({
 
 export let addUserActionCreator = (user) => ({
     type: ADD_USER,
+    user: user,
+})
+
+export let openEditUserFormActionCreator = (id) => ({
+    type: OPEN_EDIT_USER_FORM,
+    id: id,
+})
+
+export let closeEditUserFormActionCreator = () => ({
+    type: CLOSE_EDIT_USER_FORM,
+})
+
+export let editUserActionCreator = (user) => ({
+    type: EDIT_USER,
     user: user,
 })
 
@@ -226,6 +255,29 @@ let adminPageReducer = (state = initialState, action) => {
             newState.pagination.pages = makeShortUsersResult.pages;
 
             newState.addUserForm.newUser = false;
+
+            return newState;
+        case OPEN_EDIT_USER_FORM:
+            return {
+                ...state,
+                editUserForm: {
+                    ...state.editUserForm,
+                    open: true,
+                    user: state.users[action.id],
+                },
+            };
+        case CLOSE_EDIT_USER_FORM:
+            return {
+                ...state,
+                editUserForm: {
+                    ...state.editUserForm,
+                    open: false,
+                },
+            };
+        case EDIT_USER:
+            newState = {...state};
+            newState.users[action.user.id] = action.user;
+            newState.shortUsers[action.user.id] = action.user;
 
             return newState;
         default:

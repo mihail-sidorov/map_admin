@@ -4,6 +4,7 @@ import UsersContainer from './Users/UsersContainer';
 import PaginationContainer from './Pagination/PaginationContainer';
 import SearchAdminContainer from './SearchAdmin/SearchAdminContainer';
 import AddUserFormContainer from './AddUserForm/AddUserFormContainer';
+import EditUserFormContainer from './EditUserForm/EditUserFormContainer';
 
 let AdminPage = (props) => {
     if (props.permission !== 'admin') {
@@ -18,6 +19,7 @@ let AdminPage = (props) => {
             <UsersContainer />
             <PaginationContainer />
             <AddUserFormContainer />
+            <EditUserFormContainer />
         </div>
     );
 }

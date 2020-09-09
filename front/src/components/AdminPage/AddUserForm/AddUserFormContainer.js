@@ -14,6 +14,8 @@ let AddUserFormContainer = connect(
             if (values.email && values.password && values.permission) {
                 values.permission_id = values.permission;
 
+                console.log(values);
+
                 addUser(values)
                     .then((user) => {
                         dispatch(closeAddUserFormActionCreator());
