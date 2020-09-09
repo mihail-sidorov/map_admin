@@ -1,4 +1,4 @@
-
+'use strict'
 const Shop = require("../orm/shop")
 
 const { getDuplicate, markDuplicate, checkTimeStamp, getPointUser, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")

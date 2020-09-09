@@ -1,6 +1,7 @@
+'use strict'
 const passport = require("passport")
 const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
-const { checkAuth, isAuth } = require("./middlewares/passport")
+const { checkAuth} = require("./middlewares/passport")
 const { delPoint, addPoint, getPointsUser, editPoint } = require("./model/adminPanelApi/user")
 const { addUser, editUser, getUsers, getPermission } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
@@ -36,7 +37,7 @@ module.exports = function (app) {
     //Интерфейс администратора
     app.post("/api/admin/addUser", checkAuth("admin"), (req, res, next) => {
         modelPromiseToRes(
-            addUser(req.body.email, req.body.password, req.body.permission),
+            addUser(req.body.email, req.body.password, req.body.permission_id),
             res, next)
     })
 

@@ -1,3 +1,4 @@
+'use strict'
 const User = require("../orm/user")
 const Shop = require("../orm/shop")
 const Permission = require("../orm/permission")
@@ -60,7 +61,7 @@ async function markDuplicate(dupIds, pointId) {
         dupIds.push(pointId)
         await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
     } else if (pointId) {
-
+        await Shop.query().findById(pointId).patch({ "duplicateGroup": null })
     }
 }
 

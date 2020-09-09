@@ -30,9 +30,11 @@
     "sqlite3": "^5.0.0"
   },
   "devDependencies": {
+    "eslint": "^7.8.1",
     "flow-bin": "^0.131.0",
     "flow-remove-types": "^2.131.0",
     "gulp-nodemon": "^2.5.0",
-    "jest": "^26.4.2"
+    "jest": "^26.4.2",
+    "jest-json-schema": "^2.1.0"
   }
 }

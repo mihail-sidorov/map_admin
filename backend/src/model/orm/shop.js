@@ -1,7 +1,6 @@
+'use strict'
 const Knex = require("knex")
 const dbConfig = require("../../../serverConfig").db
-const apiYandex = require("../../../serverConfig").yandex.apiKey
-const fetch = require('node-fetch')
 
 const { Model } = require("objection")
 

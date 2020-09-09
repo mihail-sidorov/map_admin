@@ -1,3 +1,4 @@
+'use strict'
 const User = require("../orm/user")
 
 function getUserById(id) {

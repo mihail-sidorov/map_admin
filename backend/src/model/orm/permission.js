@@ -1,3 +1,4 @@
+'use strict'
 const Knex = require("knex")
 const dbConfig = require("../../../serverConfig").db
 

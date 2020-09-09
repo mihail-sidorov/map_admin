@@ -46,7 +46,7 @@ async function setPointAccept(pointId) {
         .query()
         .whereIn("moder_status_id", isModerated)
         .andWhere("id", pointId)
-        .patch({ "moder_status_id": moderStatus , description: null})
+        .patch({ "moder_status_id": moderStatus, description: null })
         .then(res => {
             if (res) {
                 return pointId
@@ -56,6 +56,7 @@ async function setPointAccept(pointId) {
         })
 }
 //full_city_name, title, apartment, hours, phone, site, description
+'use strict'
 async function editPointModer(id, point) {
     const isModerated = await getIdByIsModerated(1)
     const moderStatus = await getIdByModerStatus("accept")

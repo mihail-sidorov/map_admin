@@ -1,3 +1,4 @@
+'use strict'
 function jsonResPattern (response, isError) {
     const answer = {};
     answer.isError = Boolean(isError)

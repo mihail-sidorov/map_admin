@@ -1,0 +1,31 @@
+{
+  "type": "array",
+  "title": "getUsers",
+  "uniqueItems": false,
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "email": {
+        "type": "string",
+        "maxLength": 320,
+        "format": "email"
+      },
+      "permission": {
+        "type": "string",
+        "enum": [
+          "user",
+          "moder",
+          "admin"
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "email",
+      "permission"
+    ]
+  }
+}

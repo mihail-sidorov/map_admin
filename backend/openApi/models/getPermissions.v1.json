@@ -1,0 +1,24 @@
+{
+  "title": "getPermissions",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "permission": {
+        "type": "string",
+        "enum": [
+          "moder",
+          "user",
+          "admin"
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "permission"
+    ]
+  }
+}
