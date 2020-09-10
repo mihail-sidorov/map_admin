@@ -11,6 +11,7 @@ module.exports = function (app) {
 
     //Интерфейс авторизации
     app.post("/api/login", passport.authenticate('local'), function (req, res, next) {
+        req.session.adminId=undefined
         res.json(jsonResPattern("OK"))
     })
 
@@ -27,10 +28,12 @@ module.exports = function (app) {
             response.login = req.user.email
             response.isAuth = true
             response.permission = req.user.permission[0].permission
+            response.loginS = req.session.adminId ? true : false
         } else {
             response.login = null
             response.isAuth = false
             response.permission = null
+            response.loginS = false
         }
         res.json(response)
     })
@@ -62,18 +65,21 @@ module.exports = function (app) {
 
     app.post("/api/admin/loginAs", checkAuth("admin"), async (req, res, next) => {
         req.session.adminId = req.user.id
-        const userId = parseInt(req.body.id)
-        if (!await hasUserId(userId)) next("this userId not found")
-        req.session.passport.user = userId
-        req.user.id = userId
-        res.json(jsonResPattern("OK"))
+        const userId = Number(req.body.id)
+        if (!Number.isInteger(userId) || !await hasUserId(userId)) {
+            next("this userId not found")
+        } else {
+            req.session.passport.user = userId
+            req.user.id = userId
+            res.json(jsonResPattern("OK"))
+        }
     })
 
     app.post("/api/admin/returnToAdmin", checkAuth("all"), (req, res, next) => {
         if (req.session.adminId) {
             req.session.passport.user = req.session.adminId
             req.user.id = req.session.adminId
-            req.session.adminId=undefined
+            req.session.adminId = undefined
             res.json(jsonResPattern("OK"))
         } else {
             next("fail")

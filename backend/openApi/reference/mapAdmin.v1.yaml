@@ -3,7 +3,13 @@ servers:
   - description: mapadmin
     url: 'http://localhost:3000/api'
 info:
-  description: mapadmin API
+  description: |-
+    Все запросы кроме getAuthData, возвращают стандартный ответ вида
+    {
+      "isError":boolean,
+      "response": string or object or array
+    },
+    В случае ошибки isError будет true, в response будет описание ошибки. Соответственно, в случае успеха isError будет false
   version: 1.0.0
   title: mapadmin API
   contact: {}
@@ -50,7 +56,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/stdResJson'
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type: string
+                required:
+                  - isError
+                  - response
               examples:
                 Успешный вход:
                   value:
@@ -63,10 +77,11 @@ paths:
         '400':
           description: Если какой то параметр не будет отправлен
           content:
-            text/plain:
+            application/json:
               schema:
                 type: string
                 example: Bad Request
+      description: Вход в аккаунт
   /logout:
     post:
       tags:
@@ -81,7 +96,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/stdResJson'
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type: string
+                required:
+                  - isError
+                  - response
               examples:
                 Успешный выход:
                   value:
@@ -113,6 +136,10 @@ paths:
                     type: boolean
                   permission:
                     type: string
+                required:
+                  - login
+                  - isAuth
+                  - permission
               examples:
                 Авторизация выполнена:
                   value:
@@ -134,15 +161,12 @@ paths:
         Добавление пользователей с различными правами
       requestBody:
         description: |
-          Отправляем логин, пароль и права, если права не заполнены по умолчанию прова установятся в user
+          Отправляем логин, пароль и id прав
         required: true
         content:
           application/x-www-form-urlencoded:
             schema:
               type: object
-              required:
-                - email
-                - password
               properties:
                 email:
                   type: string
@@ -152,19 +176,29 @@ paths:
                   type: string
                   minimum: 8
                   maximum: 72
-                permission:
-                  type: string
-                  enum:
-                    - user
-                    - moder
-                    - admin
+                permission_id:
+                  type: integer
+              required:
+                - email
+                - password
+                - permission_id
       responses:
         '200':
-          description: Ответ
+          description: Возвращает данные добавленного пользователя
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/stdResJson'
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/getUsers.v1.json
+                required:
+                  - isError
+                  - response
               examples:
                 Пользователь добавлен:
                   description: response возвращает поля добавленного пользователя
@@ -198,18 +232,21 @@ paths:
                   value:
                     isError: true
                     response: 'ValidationError: email: should match format "email"'
-                Нет добовляемых прав:
+                Данного permission_id нет в базе:
                   value:
                     isError: true
-                    response: '%not correct permission% permission not found'
+                    response: permission with this id not found
+                'permission_id пустое, либо не является числом':
+                  value:
+                    isError: true
+                    response: permission_id must be integer
   /admin/editUser:
     post:
       tags:
         - admin
       summary: Изменение логина и пароля
       operationId: editUser
-      description: |
-        Изменение логина и пароля, если пароль пустая строка или пароль не отправлен, то пароль не будет изменен
+      description: "Изменение логина(email) и пароля, если пароль пустая строка или пароль не отправлен, аналогично и с логином. \n"
       requestBody:
         description: |
           Отправляем логин и пароль
@@ -233,11 +270,18 @@ paths:
                   maximum: 72
       responses:
         '200':
-          description: Ответ
+          description: Возвращает данные отредактированного пользователя
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/stdResJson'
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/getUsers.v1.json
               examples:
                 Пароль изменен:
                   description: response возвращает поля отредактированного пользователя
@@ -305,7 +349,7 @@ paths:
       summary: Получить данные всех прав
       operationId: getPermission
       description: |
-        Получить данные всех пользователей
+        Получить права и соответствующие им id
       responses:
         '200':
           description: Ответ
@@ -313,28 +357,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required:
-                  - isError
-                  - response
                 properties:
                   isError:
                     type: boolean
                   response:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        permission:
-                          type: string
-                          enum:
-                            - user
-                            - moder
-                            - admin
-                      required:
-                        - id
-                        - permission
+                    $ref: ../models/getPermissions.v1.json
+                required:
+                  - isError
+                  - response
               examples:
                 Пример:
                   value:
@@ -360,69 +390,190 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    full_city_name:
-                      type: string
-                    house:
-                      type: string
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    $ref: ../models/getPointsModer.v1.json
+              examples:
+                Пример:
+                  value:
+                    isError: false
+                    response:
+                      - id: 1224
+                        title: Зоомир
+                        apartment: null
+                        hours: 'Пн-Пт: 8.00-20.00; Сб-Вс: 8.00-19.00'
+                        phone: 8-962-763-11-02
+                        site: 'https://karmy.su'
+                        description: ''
+                        full_city_name: 'Майкоп, Республика Адыгея, Россия'
+                        house: 524А
+                        street: Пионерская улица
+                        moder_status: moderated
+  /admin/loginAs:
+    post:
+      summary: Зайти под другим пользователем
+      tags:
+        - admin
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type: string
+              examples:
+                Пример:
+                  value:
+                    isError: false
+                    response: OK
+        '':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type: string
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response: OK
+                Нет такого id:
+                  value:
+                    isError: true
+                    response: this userId not found
+          description: Ответ
+      operationId: get-admin-loginAs
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type:
+                    - string
+                    - integer
+            examples: {}
+        description: Отправлем id пользователя под которого мы хотим зайти
+      description: 'Заходим под другим пользователем, система будет идентифицировать как другого пользователя до того как не будет выполнен запрос returnToAdmin'
+  /admin/returnToAdmin:
+    post:
+      summary: Вернуться под администратора
+      tags:
+        - admin
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type: string
+                required:
+                  - isError
+                  - response
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response: OK
+                Неудача:
+                  value:
+                    isError: true
+                    response: fail
+      operationId: get-admin-returnToAdmin
+      description: 'Работает в связке с loginAs, возвращает права администратора'
+  /user/addPoint:
+    post:
+      summary: Добавление точки в базу данных
+      operationId: post-user-addPoint
+      responses:
+        '200':
+          description: 'При успехе вернет данные добавленной точки, при дубликате, данные дубликатов.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/getPointsUser.v1.json
+                      - type: object
+                required:
+                  - isError
+                  - response
+              examples:
+                Успешно:
+                  value:
+                    isError: false
+                    response:
+                      - id: 1223
+                        full_city_name: 'Майкоп, Республика Адыгея, Россия'
+                        street: улица Карла Маркса
+                        house: '23'
+                        title: Зоомир
+                        lng: 44.6117
+                        lat: 40.0888
+                        apartment: '77'
+                        hours: 'Пн-Пт: 9.00-20.00; Сб-Вс: 8.00-19.00'
+                        phone: '656565'
+                        site: 'https://karmy.su'
+                        isActive: 1
+                        description: ''
+                        timeStamp: '2020-09-04 17:41:24'
+                        moder_status: accept
+      tags:
+        - user
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                lng:
+                  type: number
+                lat:
+                  type: number
+                title:
+                  type: string
+                apartment:
+                  type: string
+                hours:
+                  type: string
+                phone:
+                  type: string
+                site:
+                  type: string
+                description:
+                  type: string
+                force:
+                  type: boolean
+                isActive:
+                  type: boolean
+              required:
+                - lng
+                - lat
+      description: 'Добавляет точку в базу данных, статус выставляется moder_status выставляется в moderated, для дальнейшего одобрения модератором. Пока статус не выставится в accept точке не будет отображаться на карте. При добавлении точки с похожими координаторами (точка не дальше 200 метров от имеющейся), будет возвращена ошибка. Для того чтоб все равно добавить точку нужно выставить поле force в запросе в true. Все точки подходящие под критерий в базе будут помечены как возможные дубликаты и присвоены к одной группе. В дальнейшем если точка будет близкой хотя бы к одной из группы, как дубликаты будут выданы все точки группы.'
 components:
-  schemas:
-    stdResJson:
-      type: object
-      required:
-        - isError
-        - response
-      properties:
-        isError:
-          type: boolean
-          example: false
-        response:
-          example: OK
-    getPointSchema:
-      type: array
-      items:
-        type: object
-        properties:
-          full_city_name:
-            type: string
-          house:
-            type: string
-    InventoryItem:
-      type: object
-      required:
-        - id
-        - name
-        - manufacturer
-        - releaseDate
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        name:
-          type: string
-          example: Widget Adapter
-        releaseDate:
-          type: string
-          format: date-time
-          example: '2016-08-29T09:12:33.001Z'
-        manufacturer:
-          $ref: '#/components/schemas/Manufacturer'
-    Manufacturer:
-      required:
-        - name
-      properties:
-        name:
-          type: string
-          example: ACME Corporation
-        homePage:
-          type: string
-          format: url
-          example: 'https://www.acme-corp.com'
-        phone:
-          type: string
-          example: 408-867-5309
-      type: object
+  schemas: {}

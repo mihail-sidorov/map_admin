@@ -28,5 +28,6 @@
       "permission"
     ]
   },
-  "description": "Список пользователей"
+  "description": "Список пользователей",
+  "x-examples": {}
 }

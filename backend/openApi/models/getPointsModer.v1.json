@@ -1,0 +1,103 @@
+{
+  "title": "getPointsModer",
+  "type": "array",
+  "description": "Возврат точек для роли модератор",
+  "x-examples": {
+    "Пример": [
+      {
+        "id": 1224,
+        "title": "Зоомир",
+        "apartment": null,
+        "hours": "Пн-Пт: 8.00-20.00; Сб-Вс: 8.00-19.00",
+        "phone": "8-962-763-11-02",
+        "site": "https://karmy.su",
+        "description": "",
+        "full_city_name": "Майкоп, Республика Адыгея, Россия",
+        "house": "524А",
+        "street": "Пионерская улица",
+        "moder_status": "moderated"
+      }
+    ]
+  },
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "title": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "apartment": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "hours": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "phone": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "site": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "full_city_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "house": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "street": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "moder_status": {
+        "type": "string",
+        "enum": [
+          "moderated"
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "title",
+      "apartment",
+      "hours",
+      "phone",
+      "site",
+      "description",
+      "full_city_name",
+      "house",
+      "street",
+      "moder_status"
+    ]
+  }
+}

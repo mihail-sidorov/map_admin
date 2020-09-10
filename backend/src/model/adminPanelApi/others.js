@@ -1,12 +1,13 @@
 'use strict'
 const User = require("../orm/user")
 
-function getUserById(id) {
+async function getUserById(id) {
     return User.query().withGraphFetched("permission").findById(id)
 }
 
-function checkLoginPassword(email, password) { //Проверка на присутствие в базе пары логин/пароль
-    email=String(email).trim()
+async function checkLoginPassword(email, password) { //Проверка на присутствие в базе пары логин/пароль
+    email = (typeof(email) == "string") ? email.trim() : undefined
+    if (!email || !password) throw "email and password must not be empty"
     return User
         .query()
         .withGraphFetched("permission")

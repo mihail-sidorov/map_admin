@@ -21,5 +21,21 @@
       "permission"
     ]
   },
-  "description": "Таблица ролей"
+  "description": "Таблица ролей",
+  "x-examples": {
+    "Пример": [
+      {
+        "id": 1,
+        "permission": "admin"
+      },
+      {
+        "id": 2,
+        "permission": "moder"
+      },
+      {
+        "id": 3,
+        "permission": "user"
+      }
+    ]
+  }
 }

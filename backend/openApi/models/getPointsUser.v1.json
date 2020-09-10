@@ -1,0 +1,102 @@
+{
+  "title": "getPointsUser",
+  "type": "array",
+  "description": "Возврат точек для роли пользователь",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "full_city_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "street": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "house": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "title": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "lng": {
+        "type": "number"
+      },
+      "lat": {
+        "type": "number"
+      },
+      "apartment": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "hours": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "phone": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "site": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "isActive": {
+        "type": [
+          "integer",
+          "boolean"
+        ]
+      },
+      "description": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "timeStamp": {
+        "type": "string"
+      },
+      "moder_status": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "full_city_name",
+      "street",
+      "house",
+      "title",
+      "lng",
+      "lat",
+      "apartment",
+      "hours",
+      "phone",
+      "site",
+      "isActive",
+      "description",
+      "timeStamp",
+      "moder_status"
+    ]
+  }
+}
