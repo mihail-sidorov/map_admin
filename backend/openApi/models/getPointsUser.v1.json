@@ -9,10 +9,7 @@
         "type": "integer"
       },
       "full_city_name": {
-        "type": [
-          "string",
-          "null"
-        ]
+        "type": "string"
       },
       "street": {
         "type": [

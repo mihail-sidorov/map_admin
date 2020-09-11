@@ -8,6 +8,8 @@ const { nanoid } = require("nanoid")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
 async function getDuplicate(point, pointId) {
+    if (!(+point.lat && +point.lng)) return false
+
     const select = ["id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "duplicateGroup"]
     const pointAccuratyMeter = 200
     const pointAccuratyDegrees = 0.00000900900900900901 * pointAccuratyMeter
@@ -16,8 +18,8 @@ async function getDuplicate(point, pointId) {
         .select(...select)
 
     let duplicatePoints = await prepareQuery
-        .whereBetween("lat", [+point.lat - pointAccuratyDegrees / 2, +point.lat + pointAccuratyDegrees / 2])
-        .andWhereBetween("lng", [+point.lng - pointAccuratyDegrees / 2, +point.lng + pointAccuratyDegrees / 2])
+        .whereBetween("lat", [+point.lat - pointAccuratyDegrees, +point.lat + pointAccuratyDegrees])
+        .andWhereBetween("lng", [+point.lng - pointAccuratyDegrees, +point.lng + pointAccuratyDegrees])
 
     const duplicateGroups = []
     const duplicatePointWithoutGroups = []
@@ -46,9 +48,13 @@ async function getDuplicate(point, pointId) {
         }
 
         duplicatePoints.forEach(elem => {
-            elem.user = elem.user[0].email
-            elem.id = undefined
-            elem.duplicateGroup = undefined
+            if (elem.user[0]) {
+                elem.user = elem.user[0].email
+                elem.id = undefined
+                elem.duplicateGroup = undefined
+            } else {
+                Shop.query().findById(elem.id).delete().then(res => res) //удаляем точки у которых нет владельца
+            }
         })
         return { "points": duplicatePoints, "dupIds": duplicateId }
     } else {
@@ -124,12 +130,10 @@ async function getPrepareForInsert(fields, flag = "user") {
         }
 
         switch (fields.isActive) {
-            case "true": case "1": case 1: fields.isActive = true; break;
-            case "false": case "0": case 0: fields.isActive = false; break;
-            case null: case "null": case "": fields.isActive = undefined; break;
+            case "true": case "1": case 1: case true: flagData.isActive = true; break;
+            case "false": case "0": case 0: case false: flagData.isActive = false; break;
+            case null: case "null": case "": flagData.isActive = undefined; break;
         }
-
-        flagData.isActive = fields.isActive
 
     } else if (flag == "moder") {
         flagData.street = fields.street
@@ -150,7 +154,13 @@ async function getPrepareForInsert(fields, flag = "user") {
 function getGeoData(point) { //должен содержать поля lat, lng; модифецирует обьект добовляя full_city_name, city, street, house
     return fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${apiYandex}&geocode=${point.lat},${point.lng}&format=json&kind=house&results=1`)
         .then(res => res.json())
-        .then(res => res.response.GeoObjectCollection.featureMember[0].GeoObject)
+        .then(res => {
+            if (!res.response.GeoObjectCollection.featureMember[0]) {
+                throw "failed to get geodata"
+            } else {
+                return res.response.GeoObjectCollection.featureMember[0].GeoObject
+            }
+        })
         .then(geoObject => {
             point.full_city_name = geoObject.description
             point.city = geoObject.description.split(",")[0]

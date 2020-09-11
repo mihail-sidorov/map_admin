@@ -4,8 +4,10 @@ const Shop = require("../orm/shop")
 const { getDuplicate, markDuplicate, checkTimeStamp, getPointUser, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")
 
 async function addPoint(point, id) {
+    if (!(+point.lat && +point.lng)) throw "lat and lng must not be empty"
+
     const insertField = await getPrepareForInsert(point)
-    const { points, dupIds } = await getDuplicate(point)
+    const { points, dupIds } = await getDuplicate(insertField)
 
     if (points && !point.force) {
         const response = {

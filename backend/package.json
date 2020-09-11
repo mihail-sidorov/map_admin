@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "jest --detectOpenHandles --runInBand",
+    "test": "jest",
     "docs": "cd docs && npx redoc-cli bundle ../openApi/reference/mapAdmin.v1.yaml"
   },
   "jest": {

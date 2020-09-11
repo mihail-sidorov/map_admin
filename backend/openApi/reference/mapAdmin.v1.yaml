@@ -519,7 +519,7 @@ paths:
                     oneOf:
                       - type: string
                       - $ref: ../models/getPointsUser.v1.json
-                      - type: object
+                      - $ref: ../models/duplicate.v1.json
                 required:
                   - isError
                   - response
@@ -543,6 +543,45 @@ paths:
                         description: ''
                         timeStamp: '2020-09-04 17:41:24'
                         moder_status: accept
+                Дубликат:
+                  value:
+                    isError: true
+                    response:
+                      duplicate:
+                        points:
+                          - full_city_name: 'Майкоп, Республика Адыгея, Россия'
+                            street: Заводская улица
+                            house: '55'
+                            title: магазин
+                            lng: 44.598073
+                            lat: 40.123267
+                            apartment: null
+                            hours: sadasdasdasdasdas
+                            phone: '24323423434'
+                            site: qwewqewqe
+                            user: user@user.user
+                          - full_city_name: 'Майкоп, Республика Адыгея, Россия'
+                            street: Заводская улица
+                            house: '55'
+                            title: магазин
+                            lng: 44.598073
+                            lat: 40.123267
+                            apartment: null
+                            hours: sadasdasdasdasdas
+                            phone: '24323423434'
+                            site: qwewqewqe
+                            user: user@user.user
+                        point:
+                          title: магазин
+                          hours: sadasdasdasdasdas
+                          phone: '24323423434'
+                          site: qwewqewqe
+                          lat: 40.123267
+                          lng: 44.598073
+                          full_city_name: 'Майкоп, Республика Адыгея, Россия'
+                          city: Майкоп
+                          street: Заводская улица
+                          house: '55'
       tags:
         - user
       requestBody:
@@ -569,6 +608,7 @@ paths:
                   type: string
                 force:
                   type: boolean
+                  description: 'при true добавит точку в любом случае, даже если есть дубликат'
                 isActive:
                   type: boolean
               required:

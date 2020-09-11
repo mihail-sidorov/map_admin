@@ -7,29 +7,42 @@ const getUsersModel = require("../openApi/models/getUsers.v1.json")
 const getPermissionsModel = require("../openApi/models/getPermissions.v1.json")
 const getPointsModerModel = require("../openApi/models/getPointsModer.v1.json")
 const getPointsUserModel = require("../openApi/models/getPointsUser.v1.json")
+const duplicateModel = require("../openApi/models/duplicate.v1.json")
 const { checkLoginPassword, getUserById } = require("../src/model/adminPanelApi/others")
 const { getPointsModer } = require("../src/model/adminPanelApi/moder")
 const { addPoint, getPointsUser } = require("../src/model/adminPanelApi/user")
 const Shop = require("../src/model/orm/shop")
-const { getIdByPermission } = require("../src/model/adminPanelApi/utilityFn")
+const { getIdByPermission, getPrepareForInsert } = require("../src/model/adminPanelApi/utilityFn")
 
 expect.extend(matchers)
 
-function delTestUser() {
+function delTestUser() { //удаление всех тестовых пользователей
     return User.query().delete().where('email', 'like', "%nanoid.nanoid")
 }
 
-function delTestPoint() {
+function delTestPoint() { //удаление всех тестовых юзеров
     return Shop.query().delete().where('title', 'like', "%nanoidtestnanoid555")
 }
 
-function getEmail() {
+function getEmail() { // получение тестового емейла
     const email = nanoid() + "@nanoid.nanoid"
     return email
 }
 
-function getTitle() {
-    return nanoid()+"nanoidtestnanoid555"
+function getTitle() { //получение тестового имени
+    return nanoid() + "nanoidtestnanoid555"
+}
+
+async function addTestUser(onlyValueGen = false, permission = "user") { //добавление тестового пользователя
+    const permission_id = await getIdByPermission(permission)
+    const emailTrim = getEmail() // генерируем рандомный емейл
+    const email = "  " + emailTrim + "   " //добавляем пробелы емейлу с обоих концов
+    let userId, addUserRes
+    if (!onlyValueGen) {
+        addUserRes = await addUser(email, "testtest", permission_id) // добавляем пользователя с полученными правами
+        userId = addUserRes[0].id
+    }
+    return { emailTrim, email, permission_id, addUserRes, userId }
 }
 
 //admin interface
@@ -46,9 +59,7 @@ test("Получение данных из таблицы permissions", async ()
 
 test("Добавление пользователя", async () => {
     let addUserRes
-    const emailTrim = getEmail()
-    const permissions = await getPermission()
-    const email = "  " + emailTrim + "   "
+    let { email, permission_id } = await addTestUser(true)
 
     addUserRes = addUser(email, "testtest")
     await expect(addUserRes).rejects.toEqual('permission_id must be integer')
@@ -56,32 +67,28 @@ test("Добавление пользователя", async () => {
     addUserRes = addUser(email, "testtest", 2222233232)
     await expect(addUserRes).rejects.toEqual('permission with this id not found')
 
-    addUserRes = await addUser(email, "testtest", permissions[0].id)
+    addUserRes = await addUser(email, "testtest", permission_id)
     await expect(addUserRes).toMatchSchema(getUsersModel)
     const getUser = await User.query().findById(addUserRes[0].id).first()
     expect(getUser.id).toBe(addUserRes[0].id)
 
-    addUserRes = addUser(email, "testtest", permissions[0].id)
+    addUserRes = addUser(email, "testtest", permission_id)
     await expect(addUserRes).rejects.toEqual('this user already exists')
 })
 
 test("Редактирование пользователя", async () => {
     let userAfterEdit, userBeforeEdit
-    const emailTrim = getEmail()
-    const permissions = await getPermission()
-    const addEmail = "  " + emailTrim + "   "
+    const { addUserRes } = await addTestUser()
 
-    const addUserRes = await addUser(addEmail, "testtest", permissions[0].id)
-
-    userBeforeEdit = await User.query().findById(addUserRes[0].id).first()
-    expect(await editUser(addUserRes[0].id, undefined, "password")).toMatchSchema(getUsersModel)
-    userAfterEdit = await User.query().findById(addUserRes[0].id).first()
+    userBeforeEdit = await User.query().findById(addUserRes[0].id).first() //получаем с базы данные пользователя до редактирования
+    expect(await editUser(addUserRes[0].id, undefined, "password")).toMatchSchema(getUsersModel) //меням пароль и сравниваем ответ с json схемой
+    userAfterEdit = await User.query().findById(addUserRes[0].id).first()//получаем с базы данные пользователя после редактирования
     const { password, ...userAfterEditPassword } = userAfterEdit
-    expect(userBeforeEdit).toMatchObject(userAfterEditPassword)
-    expect(userBeforeEdit.password).not.toBe(password)
+    expect(userBeforeEdit).toMatchObject(userAfterEditPassword) //проверяем соответствие всех полей кроме пароля
+    expect(userBeforeEdit.password).not.toBe(password) //проверяем что пароль изменен
 
     userBeforeEdit = userAfterEdit
-    expect(await editUser(addUserRes[0].id, getEmail(), undefined)).toMatchSchema(getUsersModel)
+    expect(await editUser(addUserRes[0].id, getEmail(), undefined)).toMatchSchema(getUsersModel)//меняем логин
     userAfterEdit = await User.query().findById(addUserRes[0].id).first()
     const { email, ...userAfterEditEmail } = userAfterEdit
     expect(userBeforeEdit).toMatchObject(userAfterEditEmail)
@@ -89,31 +96,21 @@ test("Редактирование пользователя", async () => {
 })
 
 //authorization interface
-test("Тест авторизации", async () => {
-    const emailTrim = getEmail()
-    const permissions = await getPermission()
-    const email = "  " + emailTrim + "   "
-    const permissions_id = permissions[0].id
 
-    const addUserRes = await addUser(email, "testtest", permissions_id)
-    const userId = addUserRes[0].id
-    expect(await checkLoginPassword(email, "testtest")).toMatchObject({ id: userId })
-    expect(await checkLoginPassword(email, "testtest1")).toBe(false)
-    expect(await checkLoginPassword(email + "1", "testtest")).toBe(false)
-    await expect(checkLoginPassword(undefined, "testtest")).rejects.toEqual("email and password must not be empty")
-    await expect(checkLoginPassword(email)).rejects.toEqual("email and password must not be empty")
-    await expect(checkLoginPassword()).rejects.toEqual("email and password must not be empty")
+test("Тест авторизации", async () => {
+    const { email, userId } = await addTestUser()
+
+    expect(await checkLoginPassword(email, "testtest")).toMatchObject({ id: userId }) //верный логин пароль
+    expect(await checkLoginPassword(email, "testtest1")).toBe(false)//неверный пароль
+    expect(await checkLoginPassword(email + "1", "testtest")).toBe(false)//неверный логин
+    await expect(checkLoginPassword(undefined, "testtest")).rejects.toEqual("email and password must not be empty") // пустой логин
+    await expect(checkLoginPassword(email)).rejects.toEqual("email and password must not be empty") //пустой пароль
+    await expect(checkLoginPassword()).rejects.toEqual("email and password must not be empty")//пустой логин и пароль
 })
 
 test("Получение данных пользователя для записи в req.user по id", async () => {
-    const emailTrim = getEmail() // генерируем рандомный емейл
-    const email = "  " + emailTrim + "   " //добовляем пробелы емейлу с обоих концов
-    const permissions = await getPermission() // Получаем список всех прав
-    const permission_id = permissions[0].id // Получаем Ид перых прав в базе
-
-    const addUserRes = await addUser(email, "testtest", permission_id) //добовляем пользователя с полученными правами
-    const userId = addUserRes[0].id //получаем ид пользователя
-    const getUserByIdData = await getUserById(userId)//Тест функции
+    const { emailTrim, permission_id, userId } = await addTestUser()
+    const getUserByIdData = await getUserById(userId)//Тест функции получения данных пользователя по id
     expect(getUserByIdData)//
         .toMatchObject({
             id: userId,
@@ -127,30 +124,108 @@ test("Получение данных пользователя для запис
 
 //user interface
 
-test("Добавить точку", async () => {
-    const permission = await getIdByPermission("user") //получаем ид для прав пользователя
-    const addUserRes = await addUser(getEmail(), "testtest", permission) // добовляем тестового пользователя для точки
-    const userId = addUserRes[0].id
-    let testTitle = getTitle() // генерируем случайное имя, по которому потом тестовые точки будут удалятся
-    let addPointData = await addPoint({ lng: 54.407203, lat: 24.016567, title: testTitle },userId) //добавление точки
-    let addPointAfterData = await Shop.query().where({lng: 54.407203, lat: 24.016567}) //получение добавленной точки из базы
-    expect(addPointData).toMatchObject([{ lng: 54.407203, lat: 24.016567, title: testTitle, moder_status: "moderated" }]) // проверка что addPoint выдал ту точку которую мы добавляли
-    expect(addPointData).toMatchSchema(getPointsUserModel) //соответствие вывода Json схеме
+test("Добавление точки в том числе тест дубликатов", async () => {
+    const { userId } = await addTestUser(false, "user")
 
-    expect(addPointAfterData.length).toBe(1) //проверка что добавилась одна точка
-    const {moder_status, ...addPointDataWhithoutModerStatus} = addPointData[0]
-    expect(addPointAfterData[0]).toMatchObject(addPointDataWhithoutModerStatus) //Проверка что addPoint выдал те данные которые добавились в базу
+    async function testPoint(pointData) {
+        pointData.title = getTitle() // генерируем случайное имя, по которому потом тестовые точки будут удалятся
+        let addPointData = await addPoint(pointData, userId) //добавление точки только с полученными даными
+        let pointFromDb = await Shop.query().where({ lng: pointData.lng, lat: pointData.lat }) //получение добавленной точки из базы
+        pointFromDb[0].isActive = Boolean(pointFromDb[0].isActive) //преобразуем в булеан из за того что mysql хранит булевый тип в инт
+        addPointData[0].isActive = Boolean(addPointData[0].isActive) //преобразуем в булеан из за того что mysql хранит булевый тип в инт
+        expect(addPointData).toMatchObject([{ moder_status: "moderated" }]) // проверка на поля добовляемые системой
+        expect(addPointData).toMatchSchema(getPointsUserModel) //соответствие вывода Json схеме
+        if (!pointData.force) {
+            expect(pointFromDb.length).toBe(1) //проверка что добавилась одна точка
+            //Проверяем функцию делающую копию объекта для вставки вырезающую лишние поля
+            delete (addPointData[0].moder_status) //этого поля нет в базе оно в связанной таблице
+            expect(pointFromDb).toMatchObject(addPointData) // проверка что точка в базе соответствует возврашенной точке addPoint
+        }
 
-    
+        const pointDataAfterPrepare = await getPrepareForInsert(pointData)
+        for (let key in pointDataAfterPrepare) {
+            if (pointDataAfterPrepare[key] === undefined) {
+                pointDataAfterPrepare[key] = null
+            }
+        }
 
+        expect(pointFromDb).toContainEqual(expect.objectContaining(pointDataAfterPrepare)) //сравниваем точку в базе с данными добавленными нами
+        const pointId = pointFromDb[0].id
+        return pointId
+    }
 
+    await testPoint({ lng: 54.407203, lat: 24.016567 }) //добавление точки только с минимальными даными
+
+    const pointId = await testPoint({
+        lng: 55.920652,
+        lat: 23.303075,
+        apartment: "apartment",
+        hours: "hours",
+        phone: "phone",
+        site: "site",
+        description: "description",
+        isActive: true
+    })
+
+    await testPoint({
+        lng: 50.866683,
+        lat: 20.634994,
+        apartment: "apartment",
+        hours: "hours",
+        phone: "phone",
+        site: "site",
+        description: "description",
+        isActive: false,
+        //лишние поля
+        id: pointId,
+        moder_status: "accept",
+        user_id: userId
+    })
+
+    let addPointData = addPoint({ lng: 54.407203, title: getTitle() }, userId) //добавление токи без необходимых данных
+    await expect(addPointData).rejects.toEqual("lat and lng must not be empty")
+
+    addPointData = addPoint({ lng: "54.407203test", lat: "23.303075a", title: getTitle() }, userId) //строковые поля вместо числовых в координатах
+    await expect(addPointData).rejects.toEqual("lat and lng must not be empty")
+
+    addPointData = addPoint({ lng: 10, lat: 10, title: getTitle() }, userId) //строковые поля вместо числовых в координатах
+    await expect(addPointData).rejects.toEqual("failed to get geodata")
+
+    //добавляем дубликат
+    await testPoint({ lng: 54.407203, lat: 24.016567, force: true }) //принудительное добавление дубликата
+
+    addPointData = addPoint({ lng: 54.407203, lat: 24.016567, title: getTitle() }, userId) //минимальные данные
+    await expect(addPointData).rejects.toMatchSchema(duplicateModel)
+
+    addPointData = addPoint({ lng: 54.408203, lat: 24.017567, title: getTitle() }, userId) //удаление ~150 метров
+    await expect(addPointData).rejects.toMatchSchema(duplicateModel)
+
+    addPointData = addPoint({ //максимальные данные с лишними полями
+        title: getTitle(),
+        lng: 50.866683,
+        lat: 20.634994,
+        apartment: "apartment",
+        hours: "hours",
+        phone: "phone",
+        site: "site",
+        description: "description",
+        isActive: false,
+        //лишние поля
+        id: pointId,
+        moder_status: "accept",
+        user_id: userId
+    }, userId)
+
+    await expect(addPointData).rejects.toMatchSchema(duplicateModel)
 })
 
+test("Редактирование точек", () => {
+
+})
 test("Получение точек модератором", async () => {
     const resGetPointsModer = await getPointsModer()
     expect(resGetPointsModer).toMatchSchema(getPointsModerModel)
 })
 
-
-afterAll(delTestUser)
 afterAll(delTestPoint)
+afterAll(delTestUser)
