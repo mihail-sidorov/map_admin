@@ -133,9 +133,15 @@ test("Добавить точку", async () => {
     const userId = addUserRes[0].id
     let testTitle = getTitle()
     let addPointData = await addPoint({ lng: 54.407203, lat: 24.016567, title: testTitle },userId)
-    expect(addPointData).toMatchObject([{moder_status: 'moderated'}])
+    expect(addPointData[0].moder_status).toBe("moderated")
+    let getPointsUserDataAfterAdd = await Shop.query().where({lng: 54.407203, lat: 24.016567})
+    console.log(addPointData,getPointsUserDataAfterAdd)
+    expect(getPointsUserDataAfterAdd).toMatchObject(addPointData)
     expect(addPointData).toMatchSchema(getPointsUserModel)
-    console.log(addPointData)
+    expect(getPointsUserDataAfterAdd.length).toBe(1)
+    expect(getPointsUserDataAfterAdd[0]).toMatchObject({ lng: 54.407203, lat: 24.016567, title: testTitle, moder_status: 'moderated' })
+
+
 })
 
 test("Получение точек модератором", async () => {

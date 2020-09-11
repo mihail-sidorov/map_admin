@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1599731913960" clover="3.2.0">
-  <project timestamp="1599731913960" name="All files">
-    <metrics statements="192" coveredstatements="97" conditionals="79" coveredconditionals="30" methods="57" coveredmethods="19" elements="328" coveredelements="146" complexity="0" loc="192" ncloc="192" packages="4" files="9" classes="9"/>
+<coverage generated="1599804210600" clover="3.2.0">
+  <project timestamp="1599804210600" name="All files">
+    <metrics statements="270" coveredstatements="173" conditionals="105" coveredconditionals="46" methods="73" coveredmethods="47" elements="448" coveredelements="266" complexity="0" loc="270" ncloc="270" packages="4" files="11" classes="11"/>
     <package name="backend">
       <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="serverConfig.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\serverConfig.js">
@@ -36,7 +36,7 @@
       </file>
     </package>
     <package name="backend.src.model.adminPanelApi">
-      <metrics statements="128" coveredstatements="53" conditionals="68" coveredconditionals="21" methods="37" coveredmethods="12"/>
+      <metrics statements="206" coveredstatements="122" conditionals="94" coveredconditionals="37" methods="53" coveredmethods="35"/>
       <file name="admin.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\adminPanelApi\admin.js">
         <metrics statements="29" coveredstatements="27" conditionals="14" coveredconditionals="11" methods="8" coveredmethods="8"/>
         <line num="2" count="1" type="stmt"/>
@@ -49,25 +49,64 @@
         <line num="20" count="2" type="cond" truecount="1" falsecount="1"/>
         <line num="21" count="2" type="stmt"/>
         <line num="23" count="0" type="stmt"/>
-        <line num="29" count="7" type="stmt"/>
-        <line num="31" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="8" type="stmt"/>
+        <line num="31" count="8" type="cond" truecount="2" falsecount="0"/>
         <line num="32" count="1" type="stmt"/>
-        <line num="35" count="6" type="cond" truecount="1" falsecount="1"/>
-        <line num="37" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="35" count="7" type="cond" truecount="1" falsecount="1"/>
+        <line num="37" count="7" type="cond" truecount="2" falsecount="0"/>
         <line num="38" count="1" type="stmt"/>
-        <line num="41" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="41" count="6" type="cond" truecount="2" falsecount="0"/>
         <line num="42" count="1" type="stmt"/>
-        <line num="45" count="4" type="stmt"/>
-        <line num="46" count="4" type="stmt"/>
-        <line num="50" count="7" type="stmt"/>
-        <line num="56" count="7" type="stmt"/>
-        <line num="57" count="24" type="stmt"/>
-        <line num="59" count="7" type="stmt"/>
+        <line num="45" count="5" type="stmt"/>
+        <line num="46" count="5" type="stmt"/>
+        <line num="50" count="8" type="stmt"/>
+        <line num="56" count="8" type="stmt"/>
+        <line num="57" count="25" type="stmt"/>
+        <line num="59" count="8" type="stmt"/>
         <line num="64" count="5" type="stmt"/>
         <line num="71" count="1" type="stmt"/>
         <line num="72" count="1" type="stmt"/>
         <line num="73" count="1" type="stmt"/>
         <line num="74" count="1" type="stmt"/>
+      </file>
+      <file name="moder.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\adminPanelApi\moder.js">
+        <metrics statements="36" coveredstatements="12" conditionals="8" coveredconditionals="0" methods="9" coveredmethods="3"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="14" count="4" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="24" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="34" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="51" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="59" count="1" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="64" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="72" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="73" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="80" count="1" type="stmt"/>
+        <line num="81" count="1" type="stmt"/>
+        <line num="82" count="1" type="stmt"/>
+        <line num="83" count="1" type="stmt"/>
       </file>
       <file name="others.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\adminPanelApi\others.js">
         <metrics statements="8" coveredstatements="8" conditionals="10" coveredconditionals="10" methods="3" coveredmethods="3"/>
@@ -80,8 +119,53 @@
         <line num="21" count="2" type="stmt"/>
         <line num="22" count="2" type="stmt"/>
       </file>
+      <file name="user.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\adminPanelApi\user.js">
+        <metrics statements="42" coveredstatements="15" conditionals="18" coveredconditionals="2" methods="7" coveredmethods="2"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="10" count="1" type="cond" truecount="2" falsecount="2"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="42" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="57" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="58" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="71" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="73" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="82" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
+        <line num="90" count="1" type="stmt"/>
+        <line num="91" count="1" type="stmt"/>
+        <line num="92" count="1" type="stmt"/>
+        <line num="93" count="1" type="stmt"/>
+      </file>
       <file name="utilityFn.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\adminPanelApi\utilityFn.js">
-        <metrics statements="91" coveredstatements="18" conditionals="44" coveredconditionals="0" methods="26" coveredmethods="1"/>
+        <metrics statements="91" coveredstatements="60" conditionals="44" coveredconditionals="14" methods="26" coveredmethods="19"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -89,15 +173,15 @@
         <line num="6" count="1" type="stmt"/>
         <line num="7" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="25" count="0" type="cond" truecount="0" falsecount="6"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="25" count="1" type="cond" truecount="2" falsecount="4"/>
         <line num="26" count="0" type="stmt"/>
         <line num="27" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="28" count="0" type="stmt"/>
@@ -113,56 +197,56 @@
         <line num="50" count="0" type="stmt"/>
         <line num="51" count="0" type="stmt"/>
         <line num="53" count="0" type="stmt"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="60" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="60" count="1" type="cond" truecount="1" falsecount="1"/>
         <line num="61" count="0" type="stmt"/>
         <line num="62" count="0" type="stmt"/>
-        <line num="63" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="64" count="0" type="stmt"/>
+        <line num="63" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="64" count="1" type="stmt"/>
         <line num="69" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="70" count="0" type="stmt"/>
         <line num="74" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="75" count="0" type="stmt"/>
         <line num="77" count="0" type="stmt"/>
         <line num="83" count="0" type="stmt"/>
-        <line num="90" count="5" type="stmt"/>
-        <line num="97" count="0" type="stmt"/>
-        <line num="101" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="102" count="0" type="stmt"/>
+        <line num="90" count="6" type="stmt"/>
+        <line num="97" count="1" type="stmt"/>
+        <line num="101" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="102" count="1" type="stmt"/>
         <line num="104" count="0" type="stmt"/>
-        <line num="110" count="0" type="stmt"/>
-        <line num="114" count="0" type="stmt"/>
-        <line num="118" count="0" type="stmt"/>
-        <line num="119" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="120" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="121" count="0" type="stmt"/>
-        <line num="122" count="0" type="stmt"/>
-        <line num="123" count="0" type="stmt"/>
-        <line num="126" count="0" type="cond" truecount="0" falsecount="9"/>
+        <line num="110" count="1" type="stmt"/>
+        <line num="114" count="1" type="stmt"/>
+        <line num="118" count="1" type="stmt"/>
+        <line num="119" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="120" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="121" count="1" type="stmt"/>
+        <line num="122" count="1" type="stmt"/>
+        <line num="123" count="1" type="stmt"/>
+        <line num="126" count="1" type="cond" truecount="0" falsecount="9"/>
         <line num="127" count="0" type="stmt"/>
         <line num="128" count="0" type="stmt"/>
         <line num="129" count="0" type="stmt"/>
-        <line num="132" count="0" type="stmt"/>
+        <line num="132" count="1" type="stmt"/>
         <line num="134" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="135" count="0" type="stmt"/>
         <line num="136" count="0" type="stmt"/>
         <line num="137" count="0" type="stmt"/>
-        <line num="140" count="0" type="stmt"/>
-        <line num="151" count="0" type="stmt"/>
-        <line num="152" count="0" type="stmt"/>
-        <line num="153" count="0" type="stmt"/>
-        <line num="155" count="0" type="stmt"/>
-        <line num="156" count="0" type="stmt"/>
-        <line num="157" count="0" type="stmt"/>
-        <line num="158" count="0" type="stmt"/>
-        <line num="159" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="160" count="0" type="stmt"/>
-        <line num="162" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="163" count="0" type="stmt"/>
-        <line num="170" count="0" type="stmt"/>
-        <line num="177" count="0" type="stmt"/>
-        <line num="178" count="0" type="stmt"/>
-        <line num="180" count="0" type="stmt"/>
+        <line num="140" count="1" type="stmt"/>
+        <line num="151" count="1" type="stmt"/>
+        <line num="152" count="1" type="stmt"/>
+        <line num="153" count="1" type="stmt"/>
+        <line num="155" count="1" type="stmt"/>
+        <line num="156" count="1" type="stmt"/>
+        <line num="157" count="1" type="stmt"/>
+        <line num="158" count="1" type="stmt"/>
+        <line num="159" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="160" count="1" type="stmt"/>
+        <line num="162" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="163" count="1" type="stmt"/>
+        <line num="170" count="1" type="stmt"/>
+        <line num="177" count="1" type="stmt"/>
+        <line num="178" count="1" type="stmt"/>
+        <line num="180" count="1" type="stmt"/>
         <line num="183" count="1" type="stmt"/>
         <line num="184" count="1" type="stmt"/>
         <line num="185" count="1" type="stmt"/>
@@ -176,19 +260,19 @@
       </file>
     </package>
     <package name="backend.src.model.orm">
-      <metrics statements="43" coveredstatements="32" conditionals="0" coveredconditionals="0" methods="12" coveredmethods="5"/>
+      <metrics statements="43" coveredstatements="39" conditionals="0" coveredconditionals="0" methods="12" coveredmethods="10"/>
       <file name="moder_status.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\orm\moder_status.js">
-        <metrics statements="10" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
+        <metrics statements="10" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
         <line num="5" count="1" type="stmt"/>
         <line num="7" count="1" type="stmt"/>
         <line num="9" count="1" type="stmt"/>
         <line num="11" count="1" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
+        <line num="13" count="28" type="stmt"/>
         <line num="18" count="0" type="stmt"/>
         <line num="20" count="0" type="stmt"/>
-        <line num="33" count="0" type="stmt"/>
+        <line num="33" count="1" type="stmt"/>
       </file>
       <file name="permission.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\orm\permission.js">
         <metrics statements="10" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
@@ -198,24 +282,24 @@
         <line num="7" count="1" type="stmt"/>
         <line num="9" count="1" type="stmt"/>
         <line num="11" count="1" type="stmt"/>
-        <line num="13" count="139" type="stmt"/>
+        <line num="13" count="156" type="stmt"/>
         <line num="18" count="0" type="stmt"/>
         <line num="20" count="0" type="stmt"/>
         <line num="33" count="1" type="stmt"/>
       </file>
       <file name="shop.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\orm\shop.js">
-        <metrics statements="11" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
+        <metrics statements="11" coveredstatements="11" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
         <line num="5" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
         <line num="10" count="1" type="stmt"/>
         <line num="12" count="1" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
+        <line num="14" count="72" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="43" count="1" type="stmt"/>
       </file>
       <file name="user.js" path="C:\Users\Proger\Documents\pointsAdminApp\backend\src\model\orm\user.js">
         <metrics statements="12" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
@@ -226,7 +310,7 @@
         <line num="8" count="2" type="stmt"/>
         <line num="10" count="2" type="stmt"/>
         <line num="12" count="2" type="stmt"/>
-        <line num="14" count="140" type="stmt"/>
+        <line num="14" count="157" type="stmt"/>
         <line num="18" count="1" type="stmt"/>
         <line num="33" count="1" type="stmt"/>
         <line num="34" count="1" type="stmt"/>

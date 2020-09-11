@@ -28,12 +28,12 @@ module.exports = function (app) {
             response.login = req.user.email
             response.isAuth = true
             response.permission = req.user.permission[0].permission
-            response.loginS = req.session.adminId ? true : false
+            response.loginAs = req.session.adminId ? true : false
         } else {
             response.login = null
             response.isAuth = false
             response.permission = null
-            response.loginS = false
+            response.loginAs = false
         }
         res.json(response)
     })
