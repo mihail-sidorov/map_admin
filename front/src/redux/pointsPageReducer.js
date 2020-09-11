@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_CURRENT_PAGE_POINTS = 'RESET_CURRENT_PAGE_POINTS';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -70,6 +70,8 @@ let makeShortPoints = (state) => {
     if (currentPage > pages || state.addEditPointForm.newPoint === true) {
         currentPage = pages;
     }
+
+    if (currentPage === 0) currentPage = 1;
 
     let left = (currentPage - 1) * paginationCount + 1;
     let right = left + paginationCount - 1;
@@ -263,8 +265,16 @@ export let canselDuplicateActionCreator = () => {
     };
 }
 
-export let resetCurrentPagePointsActionCreator = () => ({
-    type: RESET_CURRENT_PAGE_POINTS,
+export let resetPaginationPointsActionCreator = () => ({
+    type: RESET_PAGINATION_POINTS,
+})
+
+export let resetPointsActionCreator = () => ({
+    type: RESET_POINTS,
+})
+
+export let resetSearchPointsActionCreator = () => ({
+    type: RESET_SEARCH_POINTS,
 })
 
 let pointsPageReducer = (state = initialState, action) => {
@@ -366,13 +376,25 @@ let pointsPageReducer = (state = initialState, action) => {
                 ...state,
                 duplicate: {},
             };
-        case RESET_CURRENT_PAGE_POINTS:
+        case RESET_PAGINATION_POINTS:
             return {
                 ...state,
                 pagination: {
                     ...state.pagination,
                     currentPage: 1,
+                    pages: 0,
                 },
+            };
+        case RESET_POINTS:
+            return {
+                ...state,
+                points: {},
+                shortPoints: {},
+            };
+        case RESET_SEARCH_POINTS:
+            return {
+                ...state,
+                search: '',
             };
         default:
             return state;
