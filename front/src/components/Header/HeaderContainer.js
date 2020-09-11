@@ -19,6 +19,7 @@ let mapDispatchToProps = (dispatch) => {
                         return getAuthData();
                     })
                     .then((data) => {
+                        dispatch(showAddEditPointFormActionCreator(null));
                         dispatch(setAuthDataActionCreator(data));
                     })
                     .catch((error) => {
