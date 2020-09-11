@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from "../serverName";
 
-const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER', RESET_CURRENT_PAGE_ADMIN = 'RESET_CURRENT_PAGE_ADMIN';
+const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER', RESET_PAGINATION_ADMIN = 'RESET_PAGINATION_ADMIN', RESET_SEARCH_ADMIN = 'RESET_SEARCH_ADMIN';
 
 let makeShortUsers = (state) => {
     let searchUsers = {}, shortUsers = {};
@@ -200,8 +200,12 @@ export let editUserActionCreator = (user) => ({
     user: user,
 })
 
-export let resetCurrentPageAdminActionCreator = () => ({
-    type: RESET_CURRENT_PAGE_ADMIN,
+export let resetPaginationAdminActionCreator = () => ({
+    type: RESET_PAGINATION_ADMIN,
+})
+
+export let resetSearchAdminActionCreator = () => ({
+    type: RESET_SEARCH_ADMIN,
 })
 
 let adminPageReducer = (state = initialState, action) => {
@@ -306,13 +310,19 @@ let adminPageReducer = (state = initialState, action) => {
             newState.shortUsers[action.user.id] = action.user;
 
             return newState;
-        case RESET_CURRENT_PAGE_ADMIN:
+        case RESET_PAGINATION_ADMIN:
             return {
                 ...state,
                 pagination: {
                     ...state.pagination,
                     currentPage: 1,
+                    pages: 0,
                 },
+            };
+        case RESET_SEARCH_ADMIN:
+            return {
+                ...state,
+                search: '',
             };
         default:
             return state;
