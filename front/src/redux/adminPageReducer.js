@@ -130,6 +130,28 @@ export let editUser = (data) => {
     });
 }
 
+export let loginAs = (id) => {
+    return axios.post(`${serverName}/api/admin/loginAs`, {id: id}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось войти под пользователем!';
+        }
+    });
+}
+
+export let returnToAdmin = () => {
+    return axios.post(`${serverName}/api/admin/returnToAdmin`, {}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось вернуться под админа!';
+        }
+    });
+}
+
 // Создание ActionCreator
 export let changePageAdminActionCreator = (page) => ({
     type: CHANGE_PAGE_ADMIN,

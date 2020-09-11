@@ -7,6 +7,7 @@ let initialState = {
     login: null,
     isAuth: false,
     permission: null,
+    loginAs: false,
 };
 
 export let login = (login, password) => {

@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import Header from './Header';
 import { logout, getAuthData, setAuthDataActionCreator } from '../../redux/authReducer';
 import { showAddEditPointFormActionCreator } from '../../redux/pointsPageReducer';
+import { closeAddUserFormActionCreator, closeEditUserFormActionCreator, returnToAdmin } from '../../redux/adminPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -12,17 +13,33 @@ let mapStateToProps = (state) => {
 let mapDispatchToProps = (dispatch) => {
     return {
         onLogout: () => {
-            dispatch(showAddEditPointFormActionCreator(null));
-            logout()
-                .then(() => {
-                    return getAuthData();
-                })
-                .then((data) => {
-                    dispatch(setAuthDataActionCreator(data));
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            if (window.store.getState().authState.loginAs) {
+                returnToAdmin()
+                    .then(() => {
+                        return getAuthData();
+                    })
+                    .then((data) => {
+                        dispatch(setAuthDataActionCreator(data));
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+            else {
+                logout()
+                    .then(() => {
+                        return getAuthData();
+                    })
+                    .then((data) => {
+                        dispatch(showAddEditPointFormActionCreator(null));
+                        dispatch(closeAddUserFormActionCreator());
+                        dispatch(closeEditUserFormActionCreator());
+                        dispatch(setAuthDataActionCreator(data));
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
         },
     };
 }
