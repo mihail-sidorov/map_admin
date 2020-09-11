@@ -106,15 +106,15 @@ test("Тест авторизации", async () => {
 })
 
 test("Получение данных пользователя для записи в req.user по id", async () => {
-    const emailTrim = getEmail()
-    const permissions = await getPermission()
-    const email = "  " + emailTrim + "   "
-    const permission_id = permissions[0].id
+    const emailTrim = getEmail() // генерируем рандомный емейл
+    const email = "  " + emailTrim + "   " //добовляем пробелы емейлу с обоих концов
+    const permissions = await getPermission() // Получаем список всех прав
+    const permission_id = permissions[0].id // Получаем Ид перых прав в базе
 
-    const addUserRes = await addUser(email, "testtest", permission_id)
-    const userId = addUserRes[0].id
-    const getUserByIdData = await getUserById(userId)
-    expect(getUserByIdData)
+    const addUserRes = await addUser(email, "testtest", permission_id) //добовляем пользователя с полученными правами
+    const userId = addUserRes[0].id //получаем ид пользователя
+    const getUserByIdData = await getUserById(userId)//Тест функции
+    expect(getUserByIdData)//
         .toMatchObject({
             id: userId,
             email: emailTrim,
@@ -128,18 +128,20 @@ test("Получение данных пользователя для запис
 //user interface
 
 test("Добавить точку", async () => {
-    const permission = await getIdByPermission("user")
-    const addUserRes = await addUser(getEmail(), "testtest", permission)
+    const permission = await getIdByPermission("user") //получаем ид для прав пользователя
+    const addUserRes = await addUser(getEmail(), "testtest", permission) // добовляем тестового пользователя для точки
     const userId = addUserRes[0].id
-    let testTitle = getTitle()
-    let addPointData = await addPoint({ lng: 54.407203, lat: 24.016567, title: testTitle },userId)
-    expect(addPointData[0].moder_status).toBe("moderated")
-    let getPointsUserDataAfterAdd = await Shop.query().where({lng: 54.407203, lat: 24.016567})
-    console.log(addPointData,getPointsUserDataAfterAdd)
-    expect(getPointsUserDataAfterAdd).toMatchObject(addPointData)
-    expect(addPointData).toMatchSchema(getPointsUserModel)
-    expect(getPointsUserDataAfterAdd.length).toBe(1)
-    expect(getPointsUserDataAfterAdd[0]).toMatchObject({ lng: 54.407203, lat: 24.016567, title: testTitle, moder_status: 'moderated' })
+    let testTitle = getTitle() // генерируем случайное имя, по которому потом тестовые точки будут удалятся
+    let addPointData = await addPoint({ lng: 54.407203, lat: 24.016567, title: testTitle },userId) //добавление точки
+    let addPointAfterData = await Shop.query().where({lng: 54.407203, lat: 24.016567}) //получение добавленной точки из базы
+    expect(addPointData).toMatchObject([{ lng: 54.407203, lat: 24.016567, title: testTitle, moder_status: "moderated" }]) // проверка что addPoint выдал ту точку которую мы добавляли
+    expect(addPointData).toMatchSchema(getPointsUserModel) //соответствие вывода Json схеме
+
+    expect(addPointAfterData.length).toBe(1) //проверка что добавилась одна точка
+    const {moder_status, ...addPointDataWhithoutModerStatus} = addPointData[0]
+    expect(addPointAfterData[0]).toMatchObject(addPointDataWhithoutModerStatus) //Проверка что addPoint выдал те данные которые добавились в базу
+
+    
 
 
 })

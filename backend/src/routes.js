@@ -6,6 +6,7 @@ const { delPoint, addPoint, getPointsUser, editPoint } = require("./model/adminP
 const { addUser, editUser, getUsers, getPermission } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 const { hasUserId } = require("./model/adminPanelApi/utilityFn")
+const { getUserById } = require("./model/adminPanelApi/others")
 
 module.exports = function (app) {
 
@@ -68,6 +69,8 @@ module.exports = function (app) {
         const userId = Number(req.body.id)
         if (!Number.isInteger(userId) || !await hasUserId(userId)) {
             next("this userId not found")
+        } else if ((await getUserById(userId)).permission[0].permission === "admin") {
+            next("login as admin is not allowed")
         } else {
             req.session.passport.user = userId
             req.user.id = userId
