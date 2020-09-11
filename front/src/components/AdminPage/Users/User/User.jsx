@@ -8,6 +8,11 @@ let User = (props) => {
             <button className="user__edit-btn" onClick={() => {
                 props.onOpenEditUserForm(props.user.id);
             }}>Редактировать</button>
+            {props.user.permission !== 'admin' && (
+                <button className="user__login-as-btn" onClick={() => {
+                    props.onLoginAs(props.user.id);
+                }}>Войти под</button>
+            )}
             <hr />
         </div>
     );

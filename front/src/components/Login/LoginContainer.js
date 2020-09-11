@@ -1,8 +1,8 @@
 import {connect} from 'react-redux';
 import Login from './Login';
 import { login, getAuthData, setAuthDataActionCreator } from '../../redux/authReducer';
-import { resetCurrentPageAdminActionCreator } from '../../redux/adminPageReducer';
-import { resetCurrentPagePointsActionCreator } from '../../redux/pointsPageReducer';
+import { resetPaginationAdminActionCreator, resetSearchAdminActionCreator } from '../../redux/adminPageReducer';
+import { resetPaginationPointsActionCreator, resetSearchPointsActionCreator, resetPointsActionCreator } from '../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -21,8 +21,11 @@ let mapDispatchToProps = (dispatch) => {
                     })
                     .then((data) => {
                         dispatch(setAuthDataActionCreator(data));
-                        dispatch(resetCurrentPageAdminActionCreator());
-                        dispatch(resetCurrentPagePointsActionCreator());
+                        dispatch(resetPaginationAdminActionCreator());
+                        dispatch(resetSearchAdminActionCreator());
+                        dispatch(resetPaginationPointsActionCreator());
+                        dispatch(resetSearchPointsActionCreator());
+                        dispatch(resetPointsActionCreator());
                     })
                     .catch((error) => {
                         console.log(error);
