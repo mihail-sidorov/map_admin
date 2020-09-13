@@ -5,11 +5,12 @@ const { hasEmail, getIdByPermission } = require("./utilityFn")
 const Permission = require("../orm/permission")
 
 
-function editUser(userId, email, password) {
+async function editUser(userId, email, password) {
     email = (typeof(email) == "string") ? email.trim() : undefined
     if (password === "") {
         password = undefined
     }
+    if(!(+userId)) throw "userId must be not empty"
 
     return User
         .query()
@@ -32,7 +33,11 @@ async function addUser(email, password, permission_id) {
         throw "permission_id must be integer"
     }
 
-    email = (typeof(email) == "string") ? email.trim() : undefined
+    if (typeof(email) === "string") {
+        email = email.trim()
+    } else {
+        throw "email must not be empty"
+    }
     
     if (!await Permission.query().findById(permission_id).first().then(Boolean)) {
         throw "permission with this id not found"

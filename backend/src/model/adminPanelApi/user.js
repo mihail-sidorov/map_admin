@@ -8,7 +8,6 @@ async function addPoint(point, id) {
 
     const insertField = await getPrepareForInsert(point)
     const { points, dupIds } = await getDuplicate(insertField)
-
     if (points && !point.force) {
         const response = {
             "outputAsIs": true,
@@ -27,22 +26,30 @@ async function addPoint(point, id) {
         .insert(insertField)
         .then(res => res.id)
 
-    markDuplicate(dupIds, pointId)
+    await markDuplicate(dupIds, pointId)
     return getPointUser(id, pointId)
 }
 
-function getPointsUser(id) {
-    return getPointUser(id)
+async function getPointsUser(userId) {
+    if (Number.isInteger(userId)){
+        return getPointUser(userId)
+    } else {
+        throw "userId must not be empty"
+    }
 }
 
-function delPoint(userId, pointId) {
+async function delPoint(userId, pointId) {
+    userId=+userId
+    pointId=+pointId
+    if (!userId) throw "userId must not be empty"
+    if (!pointId) throw "pointId must not be empty"
     return Shop
         .query()
         .delete()
         .where({ "id": pointId, "user_id": userId })
         .then(res => {
             if (res) {
-                return res
+                return "OK"
             } else {
                 throw "point id not found"
             }
@@ -70,9 +77,7 @@ async function editPoint(userId, pointId, point) {
     checkData.id = pointId
     checkData.user_id = userId
     await Shop.query().skipUndefined().first().where(checkData).then(async (res) => {
-        if (!res) {
-            updateData.moder_status_id = await getIdByModerStatus("moderated")
-        } else if (res.description != description && res.moder_status_id == moderStatusRefuse) {
+        if (!res || (res.description != description && res.moder_status_id == moderStatusRefuse)) {
             updateData.moder_status_id = await getIdByModerStatus("moderated")
         }
     })

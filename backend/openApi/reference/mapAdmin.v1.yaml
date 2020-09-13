@@ -9,7 +9,17 @@ info:
       "isError":boolean,
       "response": string or object or array
     },
-    В случае ошибки isError будет true, в response будет описание ошибки. Соответственно, в случае успеха isError будет false
+    В случае ошибки isError будет true, в response будет описание ошибки. Соответственно, в случае успеха isError будет false.
+    Если пытаемся получить доступ к конечной точке, для другой роли. Получим отывет
+    {
+      "isError": true,
+      "response": "No permission"
+    }
+    Если пытаемся получить доступ к конечной точке, без авторизации. Получим отывет
+    {
+      "isError": true,
+      "response": "Unauthorized"
+    }
   version: 1.0.0
   title: mapadmin API
   contact: {}
@@ -155,7 +165,7 @@ paths:
     post:
       tags:
         - admin
-      summary: Добовление пользователей
+      summary: Добавление пользователей
       operationId: addUser
       description: |
         Добавление пользователей с различными правами
@@ -212,10 +222,10 @@ paths:
                   value:
                     isError: true
                     response: this user already exists
-                Запрос не из под администратора:
+                поле email пустое или не строкового типа:
                   value:
                     isError: true
-                    response: No permission
+                    response: email must not be empty
                 Не авторизован:
                   value:
                     isError: true
@@ -315,6 +325,10 @@ paths:
                   value:
                     isError: true
                     response: fail
+                Поле id неверного формата или отсутствует:
+                  value:
+                    isError: true
+                    response: userId must be not empty
   /admin/getUsers:
     get:
       tags:
@@ -582,6 +596,14 @@ paths:
                           city: Майкоп
                           street: Заводская улица
                           house: '55'
+                Пустые координаты:
+                  value:
+                    isError: true
+                    response: lat and lng must not be empty
+                Проблема с получением гео данных(скорее всего в данной точке нет строений):
+                  value:
+                    isError: true
+                    response: failed to get geodata
       tags:
         - user
       requestBody:
@@ -615,5 +637,269 @@ paths:
                 - lng
                 - lat
       description: 'Добавляет точку в базу данных, статус выставляется moder_status выставляется в moderated, для дальнейшего одобрения модератором. Пока статус не выставится в accept точке не будет отображаться на карте. При добавлении точки с похожими координаторами (точка не дальше 200 метров от имеющейся), будет возвращена ошибка. Для того чтоб все равно добавить точку нужно выставить поле force в запросе в true. Все точки подходящие под критерий в базе будут помечены как возможные дубликаты и присвоены к одной группе. В дальнейшем если точка будет близкой хотя бы к одной из группы, как дубликаты будут выданы все точки группы.'
-components:
-  schemas: {}
+  /user/getPoints:
+    get:
+      summary: Получения точек пользователем
+      tags:
+        - user
+      responses:
+        '200':
+          description: Успех
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: string
+                  response:
+                    $ref: ../models/getPointsUser.v1.json
+                required:
+                  - isError
+                  - response
+              examples:
+                Пример:
+                  value:
+                    isError: false
+                    response:
+                      - id: 1223
+                        full_city_name: 'Майкоп, Республика Адыгея, Россия'
+                        street: улица Карла Маркса
+                        house: '23'
+                        title: Зоомир
+                        lng: 44.6117
+                        lat: 40.0888
+                        apartment: '777'
+                        hours: 'Пн-Пт: 9.00-20.00; Сб-Вс: 8.00-19.00'
+                        phone: '656565'
+                        site: 'https://karmy.su'
+                        isActive: 1
+                        description: ввыв
+                        timeStamp: '2020-09-10 16:05:11'
+                        moder_status: refuse
+                      - id: 1224
+                        full_city_name: 'Майкоп, Республика Адыгея, Россия'
+                        street: Пионерская улица
+                        house: 524А
+                        title: Зоомир
+                        lng: 44.6128
+                        lat: 40.0612
+                        apartment: null
+                        hours: 'Пн-Пт: 8.00-20.00; Сб-Вс: 8.00-19.00'
+                        phone: 8-962-763-11-02
+                        site: 'https://karmy.su'
+                        isActive: 0
+                        description: ппапаврагнвапнвапнгвагнвнаг
+                        timeStamp: '2020-09-08 14:26:26'
+                        moder_status: refuse
+      operationId: get-user-getPoints
+      description: Получения списка точек принадлежащих пользователю
+  /user/delPoint:
+    post:
+      summary: Удаление точки
+      tags:
+        - user
+      responses:
+        '200':
+          description: Успех
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type: string
+                required:
+                  - isError
+                  - response
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response: OK
+                Нет такой точки:
+                  value:
+                    isError: true
+                    response: point id not found
+                Поле id некорректно:
+                  value:
+                    isError: true
+                    response: pointId must not be empty
+      operationId: get-user-delPoint
+      description: 'Удаляет точку принадлежащию пользователю, который авторизован в данный момент. Принимает в качестве параметра id точки В случае если данный id, принадлежит точке другого пользователя или не существует будет возвращена ошибка с текстом "point id not found" Если в поле отосланы некорректные данные или поле не отправлено будет возвращена ошибка с текстом "pointId must not be empty"'
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+              required:
+                - id
+        description: Отправляем id точки
+  /moder/editPoint:
+    post:
+      summary: Редактирование точки модератором
+      tags:
+        - moder
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type:
+                      - string
+                      - integer
+                    description: id точки в случае успеха
+                required:
+                  - isError
+                  - response
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response: 33
+                Некоректное поле id:
+                  value:
+                    isError: true
+                    response: pointId must not be empty
+                отправлен id несуществующей точки:
+                  value:
+                    isError: true
+                    response: fail
+      operationId: get-moder-editPoint
+      description: Редактирует и сразу помечает точку как принятую.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                street:
+                  type: string
+                house:
+                  type: string
+                full_city_name:
+                  type: string
+                title:
+                  type: string
+                apartment:
+                  type: string
+                hours:
+                  type: string
+                phone:
+                  type: string
+                site:
+                  type: string
+  /moder/setPointRefuse:
+    post:
+      summary: Отклоняет точку
+      tags:
+        - moder
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type:
+                      - string
+                      - integer
+                    description: id точки в случае успеха
+                required:
+                  - isError
+                  - response
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response: 33
+                Некоректное поле id:
+                  value:
+                    isError: true
+                    response: pointId must not be empty
+                отправлен id несуществующей точки:
+                  value:
+                    isError: true
+                    response: fail
+      operationId: get-moder-setPointRefuse
+      description: 'Модератор помечает точку как отклоненную(refuse), он так же может оставить комментарий, объяснив причину отказа. '
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: id точки
+                description:
+                  type: string
+                  description: комментарий к отказу
+              required:
+                - id
+  /moder/setPointAccept:
+    post:
+      summary: Подтверждает точку
+      tags:
+        - moder
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    type:
+                      - string
+                      - integer
+                    description: id точки в случае успеха
+                required:
+                  - isError
+                  - response
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response: 33
+                Некоректное поле id:
+                  value:
+                    isError: true
+                    response: pointId must not be empty
+                отправлен id несуществующей точки:
+                  value:
+                    isError: true
+                    response: fail
+      operationId: get-moder-setPointRefuse
+      description: 'Модератор помечает точку как подтвержденную(accept). '
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: id точки
+              required:
+                - id
+        description: ''

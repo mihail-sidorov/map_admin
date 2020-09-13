@@ -8,7 +8,8 @@
     "docs": "cd docs && npx redoc-cli bundle ../openApi/reference/mapAdmin.v1.yaml"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testRunner": "jest-circus/runner"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +38,7 @@
     "flow-remove-types": "^2.131.0",
     "gulp-nodemon": "^2.5.0",
     "jest": "^26.4.2",
+    "jest-circus": "^26.4.2",
     "jest-json-schema": "^2.1.0",
     "redoc": "2.0.0-rc.40",
     "redoc-cli": "^0.9.12"

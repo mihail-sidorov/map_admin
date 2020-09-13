@@ -1,5 +1,7 @@
+'use strict'
+
 const Shop = require("../orm/shop")
-const { checkTimeStamp, getIdByModerStatus, getIdByIsModerated, getPrepareForInsert } = require("./utilityFn")
+const { getIdByModerStatus, getIdByIsModerated, getPrepareForInsert } = require("./utilityFn")
 
 async function getPointsModer() {
     const isModerated = await getIdByIsModerated(1)
@@ -18,11 +20,13 @@ async function getPointsModer() {
 }
 
 async function setPointRefuse(pointId, description) {
+    pointId=+pointId
+    if (!pointId) throw "pointId must not be empty"
     const isModerated = await getIdByIsModerated(1)
     const moderStatus = await getIdByModerStatus("refuse")
 
     if (!description) {
-        throw "the field description in must not be empty"
+        description = null
     }
     return Shop
         .query()
@@ -30,7 +34,6 @@ async function setPointRefuse(pointId, description) {
         .andWhere("id", pointId)
         .patch({ "description": description, "moder_status_id": moderStatus })
         .then(res => {
-            console.log(res)
             if (res) {
                 return pointId
             } else {
@@ -40,6 +43,8 @@ async function setPointRefuse(pointId, description) {
 }
 
 async function setPointAccept(pointId) {
+    pointId=+pointId
+    if (!pointId) throw "pointId must not be empty"
     const isModerated = await getIdByIsModerated(1)
     const moderStatus = await getIdByModerStatus("accept")
     return Shop
@@ -55,9 +60,10 @@ async function setPointAccept(pointId) {
             }
         })
 }
-//full_city_name, title, apartment, hours, phone, site, description
-'use strict'
-async function editPointModer(id, point) {
+
+async function editPointModer(pointId, point) {
+    pointId=+pointId
+    if (!pointId) throw "pointId must not be empty"
     const isModerated = await getIdByIsModerated(1)
     const moderStatus = await getIdByModerStatus("accept")
     const insertData = await getPrepareForInsert(point, "moder")
@@ -66,13 +72,13 @@ async function editPointModer(id, point) {
     return await Shop
         .query()
         .whereIn("moder_status_id", isModerated)
-        .andWhere({ "id": id })
+        .andWhere({ "id": pointId })
         .patch(insertData)
         .then(res => {
             if (res) {
-                return id
+                return pointId
             } else {
-                throw "editing failed"
+                throw "fail"
             }
         })
 }

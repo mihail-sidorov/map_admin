@@ -149,5 +149,6 @@
   },
   "required": [
     "duplicate"
-  ]
+  ],
+  "description": "Ответ при нахождении дубликата"
 }

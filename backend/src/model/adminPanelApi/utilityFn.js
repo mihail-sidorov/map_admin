@@ -65,9 +65,9 @@ async function getDuplicate(point, pointId) {
 async function markDuplicate(dupIds, pointId) {
     if (dupIds) {
         dupIds.push(pointId)
-        await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
+        return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
     } else if (pointId) {
-        await Shop.query().findById(pointId).patch({ "duplicateGroup": null })
+        return await Shop.query().findById(pointId).patch({ "duplicateGroup": null })
     }
 }
 
@@ -121,6 +121,7 @@ function getIdByModerStatus(moderStatus) {
 }
 
 async function getPrepareForInsert(fields, flag = "user") {
+    if (!fields) fields={}
     const flagData = {}
     if (flag == "user") {
         if (+fields.lat && +fields.lng) {
@@ -134,8 +135,10 @@ async function getPrepareForInsert(fields, flag = "user") {
             case "false": case "0": case 0: case false: flagData.isActive = false; break;
             case null: case "null": case "": flagData.isActive = undefined; break;
         }
-
+        flagData.description = fields.description
+        
     } else if (flag == "moder") {
+        flagData.description = null
         flagData.street = fields.street
         flagData.house = fields.house
         flagData.full_city_name = fields.full_city_name
@@ -146,8 +149,7 @@ async function getPrepareForInsert(fields, flag = "user") {
         apartment: fields.apartment,
         hours: fields.hours,
         phone: fields.phone,
-        site: fields.site,
-        description: fields.description,
+        site: fields.site
     }, flagData)
 }
 
