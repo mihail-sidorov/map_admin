@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { closeAddUserFormActionCreator, getPermissions, setPermissionsActionCreator, addUser, addUserActionCreator } from '../../../redux/adminPageReducer';
+import { closeAddUserFormActionCreator, getPermissions, setPermissionsActionCreator, addUser, addUserActionCreator } from '../../../../redux/adminPageReducer';
 import AddUserFormRequest from './AddUserForm';
 
 let AddUserFormContainer = connect(

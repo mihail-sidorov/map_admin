@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import UsersRequest from './Users';
-import { getUsers, getUsersActionCreator, openAddUserFormActionCreator } from '../../../redux/adminPageReducer';
+import { getUsers, getUsersActionCreator, openAddUserFormActionCreator } from '../../../../redux/adminPageReducer';
 
 let UsersContainer = connect(
     state => ({

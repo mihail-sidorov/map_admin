@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field, reduxForm } from 'redux-form';
-import modalWindowHOC from '../../../HOC/modalWindowHOC';
+import modalWindowHOC from '../../../../HOC/modalWindowHOC';
 
 let Form = (props) => {
     let permissions = [];

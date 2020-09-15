@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import SearchAdmin from './SearchAdmin';
-import { changeSearchAdminActionCreator, closeAddUserFormActionCreator, closeEditUserFormActionCreator } from '../../../redux/adminPageReducer';
+import { changeSearchAdminActionCreator, closeAddUserFormActionCreator, closeEditUserFormActionCreator } from '../../../../redux/adminPageReducer';
 
 let SearchAdminContainer = connect(
     state => ({

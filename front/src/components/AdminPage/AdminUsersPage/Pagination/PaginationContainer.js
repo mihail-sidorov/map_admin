@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import Pagination from '../../PointsPage/Pagination/Pagination';
-import { changePageAdminActionCreator, closeAddUserFormActionCreator, closeEditUserFormActionCreator } from '../../../redux/adminPageReducer';
+import Pagination from '../../../PointsPage/Pagination/Pagination';
+import { changePageAdminActionCreator, closeAddUserFormActionCreator, closeEditUserFormActionCreator } from '../../../../redux/adminPageReducer';
 
 let mapStateToProps = (state) => {
     return {

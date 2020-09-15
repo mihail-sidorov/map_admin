@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import EditUserFormModalWindow from './EditUserForm';
-import { closeEditUserFormActionCreator, editUser, editUserActionCreator } from '../../../redux/adminPageReducer';
-import { changeHeaderLoginActionCreator } from '../../../redux/authReducer';
+import { closeEditUserFormActionCreator, editUser, editUserActionCreator } from '../../../../redux/adminPageReducer';
+import { changeHeaderLoginActionCreator } from '../../../../redux/authReducer';
 
 let EditUserFormContainer = connect(
     state => ({

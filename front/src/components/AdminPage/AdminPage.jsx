@@ -1,10 +1,7 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
-import UsersContainer from './Users/UsersContainer';
-import PaginationContainer from './Pagination/PaginationContainer';
-import SearchAdminContainer from './SearchAdmin/SearchAdminContainer';
-import AddUserFormContainer from './AddUserForm/AddUserFormContainer';
-import EditUserFormContainer from './EditUserForm/EditUserFormContainer';
+import { NavLink, Redirect, Route, Switch } from 'react-router-dom';
+import AdminRegionsPage from './AdminRegionsPage/AdminRegionsPage';
+import AdminUsersPage from './AdminUsersPage/AdminUsersPage';
 
 let AdminPage = (props) => {
     if (props.permission !== 'admin') {
@@ -15,11 +12,19 @@ let AdminPage = (props) => {
 
     return (
         <div className="admin-page">
-            <SearchAdminContainer />
-            <UsersContainer />
-            <PaginationContainer />
-            <AddUserFormContainer />
-            <EditUserFormContainer />
+            <div className="tabs">
+                <div className="tabs__tab">
+                    <NavLink to="/admin/users">Пользователи</NavLink>
+                </div>
+                <div className="tabs__tab">
+                    <NavLink to="/admin/regions">Регионы</NavLink>
+                </div>
+            </div>
+            <Switch>
+                <Redirect exact from="/admin" to="/admin/users" />
+                <Route path="/admin/users" render={AdminUsersPage} />
+                <Route path="/admin/regions" render={AdminRegionsPage} />
+            </Switch>
         </div>
     );
 }

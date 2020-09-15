@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import User from './User';
-import { openEditUserFormActionCreator, loginAs, loginAsActionCreator } from '../../../../redux/adminPageReducer';
-import { getAuthData, setAuthDataActionCreator } from '../../../../redux/authReducer';
-import { resetPointsActionCreator, resetPaginationPointsActionCreator, resetSearchPointsActionCreator } from '../../../../redux/pointsPageReducer';
+import { openEditUserFormActionCreator, loginAs, loginAsActionCreator } from '../../../../../redux/adminPageReducer';
+import { getAuthData, setAuthDataActionCreator } from '../../../../../redux/authReducer';
+import { resetPointsActionCreator, resetPaginationPointsActionCreator, resetSearchPointsActionCreator } from '../../../../../redux/pointsPageReducer';
 
 let UserContainer = (id) => {
     return connect(
