@@ -1,5 +1,6 @@
 import React from 'react';
 import { Field, reduxForm } from 'redux-form';
+import modalWindowHOC from '../../../HOC/modalWindowHOC';
 
 let Form = (props) => {
     return (
@@ -29,11 +30,16 @@ let EditUserForm = (props) => {
     let initialValues = props.editUserForm.user;
 
     return (
-        props.editUserForm.open &&
         <div className="edit-user-form">
             <Form initialValues={initialValues} onCloseEditUserForm={props.onCloseEditUserForm} onSubmit={props.onSubmit} />
         </div>
     );
 }
 
-export default EditUserForm;
+let EditUserFormModalWindow = (props) => {
+    return (
+        modalWindowHOC(EditUserForm, props, props.editUserForm.open, props.onCloseEditUserForm, true, 'Редактировать пользователя')
+    );
+}
+
+export default EditUserFormModalWindow;

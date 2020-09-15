@@ -65,7 +65,7 @@ let AddUserFormRequest = class extends React.Component {
 
     render() {
         return (
-            modalWindowHOC(AddUserForm, this.props, this.props.addUserForm.open, this.props.onCloseAddUserForm, true)
+            modalWindowHOC(AddUserForm, this.props, this.props.addUserForm.open, this.props.onCloseAddUserForm, true, 'Добавить пользователя')
         );
     }
 }

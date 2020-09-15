@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
-import AddEditPointForm from './AddEditPoinForm';
+import AddEditPointFormModalWindow from './AddEditPoinForm';
 import { showAddEditPointFormActionCreator, addPoint, addPointActionCreator, editPointActionCreator, editPoint, addDuplicateActionCreator, delPointActionCreator } from '../../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
         action: state.pointsPageState.addEditPointForm.action,
+        open: state.pointsPageState.addEditPointForm.open,
     };
 }
 
@@ -69,6 +70,6 @@ let mapDispatchToProps = (dispatch) => {
     };
 }
 
-let AddEditPointFormContainer = connect(mapStateToProps, mapDispatchToProps)(AddEditPointForm);
+let AddEditPointFormContainer = connect(mapStateToProps, mapDispatchToProps)(AddEditPointFormModalWindow);
 
 export default AddEditPointFormContainer;
