@@ -5,11 +5,11 @@ import App from './components/App';
 import store from './redux/store';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
-import { getAuthData } from './redux/authReducer';
+import { getAuthData, setAuthDataActionCreator } from './redux/authReducer';
 import './App.css';
 
 getAuthData().then((data) => {
-    store.getState().authState = data;
+    store.dispatch(setAuthDataActionCreator(data));
 
     if (document.getElementById('app')) {
         ReactDOM.render(

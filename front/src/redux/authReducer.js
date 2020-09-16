@@ -1,13 +1,14 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const SET_AUTH_DATA = 'SET_AUTH_DATA', CHANGE_HEADER_LOGIN = 'CHANGE_HEADER_LOGIN';
+const SET_AUTH_DATA = 'SET_AUTH_DATA', CHANGE_HEADER_LOGIN = 'CHANGE_HEADER_LOGIN', RESET_MODER_TABS = 'RESET_MODER_TABS';
 
 let initialState = {
     login: null,
     isAuth: false,
     permission: null,
     loginAs: false,
+    moderTabs: false,
 };
 
 export let login = (login, password) => {
@@ -50,17 +51,29 @@ export let changeHeaderLoginActionCreator = (login) => ({
     login: login,
 })
 
+export let resetModerTabsActionCreator = () => ({
+    type: RESET_MODER_TABS,
+})
+
 let authReducer = (state = initialState, action) => {
     switch (action.type) {
         case SET_AUTH_DATA:
+            let moderTabs = state.moderTabs;
+            if (!moderTabs && action.data.permission === 'moder') moderTabs = true;
+
             return {
-                ...state,
                 ...action.data,
+                moderTabs: moderTabs,
             };
         case CHANGE_HEADER_LOGIN:
             return {
                 ...state,
                 login: action.login,
+            };
+        case RESET_MODER_TABS:
+            return {
+                ...state,
+                moderTabs: false,
             };
         default:
             return state;
