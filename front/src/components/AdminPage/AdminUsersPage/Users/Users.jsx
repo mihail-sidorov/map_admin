@@ -3,6 +3,7 @@ import UserContainer from './User/UserContainer';
 
 let UsersRequest = class extends React.Component {
     componentDidMount() {
+        console.log('componentDidMount');
         this.props.getUsers();
     }
 

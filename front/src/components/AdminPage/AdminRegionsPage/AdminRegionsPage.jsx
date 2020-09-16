@@ -1,9 +1,10 @@
 import React from 'react';
+import SearchAdminRegionsContainer from './SearchAdminRegions/SearchAdminRegionsContainer';
 
 let AdminRegionsPage = (props) => {
     return (
         <div className="admin-regions-page">
-            Страница регионов
+            <SearchAdminRegionsContainer />
         </div>
     );
 }
