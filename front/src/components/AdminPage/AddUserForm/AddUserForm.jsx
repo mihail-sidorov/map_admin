@@ -1,5 +1,6 @@
 import React from 'react';
 import { Field, reduxForm } from 'redux-form';
+import modalWindowHOC from '../../../HOC/modalWindowHOC';
 
 let Form = (props) => {
     let permissions = [];
@@ -51,7 +52,7 @@ let AddUserForm = (props) => {
     }
 
     return (
-        props.addUserForm.open && <div className="add-user-form">
+        <div className="add-user-form">
             <Form permissions={props.addUserForm.permissions} initialValues={initialValues} onCloseAddUserForm={props.onCloseAddUserForm} onSubmit={props.onSubmit} />
         </div>
     );
@@ -64,7 +65,7 @@ let AddUserFormRequest = class extends React.Component {
 
     render() {
         return (
-            <AddUserForm {...this.props} />
+            modalWindowHOC(AddUserForm, this.props, this.props.addUserForm.open, this.props.onCloseAddUserForm, true, 'Добавить пользователя')
         );
     }
 }

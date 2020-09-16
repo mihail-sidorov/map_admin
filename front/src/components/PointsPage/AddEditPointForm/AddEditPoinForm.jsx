@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
+import modalWindowHOC from '../../../HOC/modalWindowHOC';
 
 let Form = (props) => {
     let formFields = [];
@@ -102,11 +103,37 @@ Form = connect(
 
 let AddEditPointForm = (props) => {
     return (
-        props.action !== null &&
         <div className="add-edit-point-form">
-            <Form closeAddEditPointForm={props.closeAddEditPointForm} addEditPoint={props.addEditPoint} action={props.action} permission={props.permission} />
+            <Form closeAddEditPointForm={props.closeAddEditPointForm} addEditPoint={props.addEditPoint} action={props.localAction} permission={props.permission} />
         </div>
     );
 }
 
-export default AddEditPointForm;
+let AddEditPointFormModalWindow = (props) => {
+    const [action, setAction] = useState(props.action);
+    let title, newProps = {...props};
+
+    if (action !== props.action && props.action !== null) {
+        setAction(props.action);
+    }
+
+    if (action === 'add') {
+        title = 'Добавить точку';
+    }
+    else if (action === 'edit') {
+        if (props.permission === 'user') {
+            title = 'Редактировать точку';
+        }
+        else {
+            title = 'Утвердить точку';
+        }
+    }
+
+    newProps.localAction = action;
+
+    return (
+        modalWindowHOC(AddEditPointForm, newProps, props.open, props.closeAddEditPointForm, true, title)
+    );
+}
+
+export default AddEditPointFormModalWindow;

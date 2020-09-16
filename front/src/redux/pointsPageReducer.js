@@ -107,6 +107,7 @@ let initialState = {
         action: null,
         point: {},
         newPoint: false,
+        open: false,
     },
     search: '',
     pagination: {
@@ -318,6 +319,13 @@ let pointsPageReducer = (state = initialState, action) => {
         case SHOW_ADD_EDIT_POINT_FORM:
             newState = {...state};
             newState.addEditPointForm.action = action.action;
+
+            if (action.action === null) {
+                newState.addEditPointForm.open = false;
+            }
+            else {
+                newState.addEditPointForm.open = true;
+            }
 
             if (action.action === null || action.action === 'add') {
                 newState.addEditPointForm.point = {};
