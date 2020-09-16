@@ -1,0 +1,34 @@
+{
+  "title": "editPointModerRequest",
+  "type": "object",
+  "description": "request body для /moder/editPoint",
+  "properties": {
+    "street": {
+      "type": "string"
+    },
+    "house": {
+      "type": "string"
+    },
+    "full_city_name": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "apartment": {
+      "type": "string"
+    },
+    "hours": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "site": {
+      "type": "string"
+    },
+    "isActiv": {
+      "type": "string"
+    }
+  }
+}

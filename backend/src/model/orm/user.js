@@ -9,6 +9,9 @@ const knex = Knex(dbConfig)
 
 Model.knex(knex)
 
+/**@module model/orm/user*/
+/**@namespace User*/
+
 module.exports = class User extends Password(Model) {
     static get tableName() {
         return "users"
@@ -32,6 +35,7 @@ module.exports = class User extends Password(Model) {
 
         const Permission = require("./permission")
         const Shop = require("./shop")
+        const Region = require("./region")
 
         return {
             permission: {
@@ -40,6 +44,15 @@ module.exports = class User extends Password(Model) {
                 join: {
                     from: 'permissions.id',
                     to: 'users.permission_id'
+                }
+            },
+
+            region: {
+                relation: Model.HasManyRelation,
+                modelClass: Region,
+                join: {
+                    from: "regions.id",
+                    to: "users.region_id"
                 }
             },
 
@@ -52,5 +65,60 @@ module.exports = class User extends Password(Model) {
                 }
             }
         }
+    }
+
+    /**
+     * Проверка на существования email в таблице users
+     * @memberof module:model/orm/user~User
+     * @static
+     * @async
+     * @function hasEmail
+     * @param {string} email email пользователя
+     * @return {boolean} Возвращает результат проверки
+     */
+    static async hasEmail(email) {
+        if (typeof (email) === "string") {
+            //удаляем пробелы пробелы из email
+            email = email.trim()
+        } else {
+            //если емейл не строка
+            throw "email must not be empty"
+        }
+
+        return User.query()
+            .first()
+            .whereIn("email", [email])
+            .then(Boolean)
+    }
+    /**
+     * Функция получения данных пользователя по его id,
+     * включая данные из связанных таблиц, если id будет
+     * пустой возвратить данные по всем пользователям
+     * @memberof module:model/orm/user~User
+     * @static
+     * @async
+     * @param {number} userId id пользователя
+     * @return {} AAA
+     * @throw {"incorrect userId"} userId не целочисленный и не
+     * undefined
+     */
+    static async getUserById(userId) {
+        //валидация userId, пропускает undefined и целые числа
+        if (userId === null || (userId !== undefined && !Number.isInteger(+userId))) {
+            throw "incorrect userId"
+        }
+        
+        return this.query()
+            .withGraphJoined("[permission, region]")
+            .select("users.id", "email")
+            .skipUndefined()
+            .where("id", userId)
+            .then(res => {
+                res.forEach(elem => {
+                    elem.region = elem.region[0].region
+                    elem.permission = elem.permission[0].permission
+                })
+                return res
+            })
     }
 }

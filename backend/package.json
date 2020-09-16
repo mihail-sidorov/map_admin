@@ -5,11 +5,10 @@
   "main": "app.js",
   "scripts": {
     "test": "jest",
-    "docs": "cd docs && npx redoc-cli bundle ../openApi/reference/mapAdmin.v1.yaml"
+    "docs": "cd docs && npx redoc-cli bundle ../openApi/reference/mapAdmin.v1.yaml && npx jsdoc ../src/ -r -d ./"
   },
   "jest": {
-    "testEnvironment": "node",
-    "testRunner": "jest-circus/runner"
+    "testEnvironment": "node"
   },
   "keywords": [],
   "author": "",
@@ -40,6 +39,7 @@
     "jest": "^26.4.2",
     "jest-circus": "^26.4.2",
     "jest-json-schema": "^2.1.0",
+    "jsdoc": "^3.6.5",
     "redoc": "2.0.0-rc.40",
     "redoc-cli": "^0.9.12"
   }

@@ -31,7 +31,7 @@ async function addPoint(point, id) {
 }
 
 async function getPointsUser(userId) {
-    if (Number.isInteger(userId)){
+    if (Number.isInteger(userId)) {
         return getPointUser(userId)
     } else {
         throw "userId must not be empty"
@@ -39,8 +39,8 @@ async function getPointsUser(userId) {
 }
 
 async function delPoint(userId, pointId) {
-    userId=+userId
-    pointId=+pointId
+    userId = +userId
+    pointId = +pointId
     if (!userId) throw "userId must not be empty"
     if (!pointId) throw "pointId must not be empty"
     return Shop
@@ -56,12 +56,31 @@ async function delPoint(userId, pointId) {
         })
 }
 
+/**
+ * Функция редактирования точек пользоателем. Стауc меняется на moderated в случаях:
+ * Меняются любые поля кроме isActive, description;
+ * Меняется discription при статусе refuse
+ * @param {number} userId id пользователя
+ * @param {number} pointId id точки
+ * @param {object} point обьект с полями для редактирования см.  editPointUserRequest.v1.json
+ * @return {object} данные добавленной точки в случае успеха см. {@link ../openApi/models/getPointsUser.v1.json} 
+ * в случае дубликата (точка ближе чем ~200 метров к другой точке с базы) см. {@link ../openApi/models/duplicate.v1.json} 
+ */
+
 async function editPoint(userId, pointId, point) {
+    
     await checkTimeStamp(pointId, point.timeStamp)
+
     const moderStatusRefuse = await getIdByModerStatus("refuse")
+    const moderStatusModerated = await getIdByModerStatus("moderated")
+
     const updateData = await getPrepareForInsert(point)
+
     const { isActive, description, ...checkData } = updateData
-    const { points, dupIds } = await getDuplicate(point,pointId)
+    checkData.id = pointId
+    checkData.user_id = userId
+
+    const { points, dupIds } = await getDuplicate(point, pointId)
 
     if (points && !point.force) {
         const response = {
@@ -74,11 +93,14 @@ async function editPoint(userId, pointId, point) {
         throw response
     }
 
-    checkData.id = pointId
-    checkData.user_id = userId
-    await Shop.query().skipUndefined().first().where(checkData).then(async (res) => {
+    await Shop.query().skipUndefined().first().where(checkData).then((res) => {
+        //если хоть одно поле меняется кроме isActiv или description тогда ставим статуы moderated
+        //если меняется комментарии при статусе refuse тогда статус тоже ставим moderated
         if (!res || (res.description != description && res.moder_status_id == moderStatusRefuse)) {
-            updateData.moder_status_id = await getIdByModerStatus("moderated")
+            updateData.moder_status_id = moderStatusModerated
+         //если ничего не меняли при статусе не равном refuse и moderated то отчищаем комментарии
+        } else if (res.moder_status_id != moderStatusModerated) {
+            res.description = null
         }
     })
 

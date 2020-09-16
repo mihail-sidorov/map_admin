@@ -24,9 +24,11 @@ const {
     setPointAccept,
     editPointModer } = require("../src/model/adminPanelApi/moder")
 
-const { addPoint, getPointsUser, delPoint } = require("../src/model/adminPanelApi/user")
+const { addPoint, getPointsUser, delPoint, editPoint } = require("../src/model/adminPanelApi/user")
 
 const { getIdByPermission, getPrepareForInsert } = require("../src/model/adminPanelApi/utilityFn")
+const Permission = require("../src/model/orm/permission")
+const Moder_status = require("../src/model/orm/moder_status")
 
 expect.extend(matchers)
 
@@ -95,7 +97,7 @@ test("Добавление пользователя", async () => {
     const getUser = await User.query().findById(addUserRes[0].id).first()
     expect(getUser.id).toBe(addUserRes[0].id)
 
-    addUserRes = addUser(email+"  ", "testtest", permission_id)
+    addUserRes = addUser(email + "  ", "testtest", permission_id)
     await expect(addUserRes).rejects.toEqual('this user already exists')
 
     addUserRes = addUser(45445, "testtest", permission_id)
@@ -352,15 +354,152 @@ test("Удаление точек", async () => {
     expect(await getPointsUser(userId)).toEqual([])
 })
 
-// test("Редактирование точек пользователем", () => {
-//     //добавляем пользователя
-//     const { userId } = await addTestUser()
-//     //добавляем точки
-//     await addPoint({ title: getTitle(), lat: 24.130330, lng: 56.953938 }, userId)
-//     await addPoint({ title: getTitle(), lat: 24.109677, lng: 56.954095 }, userId)
-//     //получаем список добавленных точек
-//     const points = await getPointsUser(userId)
+test("Редактирование точек пользователем", async () => {
+    //добавляем пользователя
+    const { userId } = await addTestUser()
+    //let point1, point2, points, insertData1, editPointData1, insertData2, editPointData2
+    async function testEdit(insertData, moder_status_id_before, moder_status_after) {
+        let point, editPointData, points
+        //добавляем точку
+        point = await addPoint({ title: getTitle(), lat: 23.718856, lng: 56.649276 }, userId)
+        //меняем статус точи
+        await Shop.query().findById(point[0].id).patch({ moder_status_id: moder_status_id_before })
+        //получаем список добавленных точек
+        points = await getPointsUser(userId)
+        //ставим timeStamp
+        insertData = Object.assign(insertData, { timeStamp: points[0].timeStamp })
+        //редактирование
+        editPointData = await editPoint(userId, point[0].id, insertData)
+        //соответствие схемы
+        expect(editPointData).toMatchSchema(getPointsUserModel)
+        //соответствие возвращаемого значение значениям добавленной точки
+        delete (insertData.unwanted)
+        delete (insertData.timeStamp)
+        expect(editPointData[0]).toMatchObject(insertData)
+        //получаем все точки
+        points = await getPointsUser(userId)
+        //проверяем новые данные точек
+        expect(points).toContainEqual(editPointData[0])
+        //проверяем статус точки
+        expect(editPointData[0]).toHaveProperty('moder_status', moder_status_after)
+        //удаляем точки
+        return await delPoint(userId, editPointData[0].id)
+    }
+
+    const moderStatus = await Moder_status.query()
+    for (let elem of moderStatus) { //тест на точках все статусов
+        await testEdit({ phone: "111" }, elem.id, "moderated")
+        await testEdit({
+            title: getTitle(),
+            apartment: "111",
+            hours: "111",
+            phone: "111",
+            site: "111",
+            lng: 56.887585,
+            lat: 24.179342,
+            isActive: 0,
+            description: "111",
+            unwanted: "111"
+        }, elem.id, "moderated")
+        await testEdit({}, elem.id, elem.moder_status)
+    }
+
+    // const moderStatus = await Moder_status.query()
+    // for (let elem of moderStatus) { //тест на точках все статусов
+    //     //добавляем точки
+    //     point1 = await addPoint({ title: getTitle(), lat: 23.718856, lng: 56.649276 }, userId)
+    //     point2 = await addPoint({ title: getTitle(), lat: 23.707439, lng: 56.643248 }, userId)
+    //     //меняем статус точек
+    //     await Shop.query().findById(point1[0].id).patch({ moder_status_id: elem.id })
+    //     await Shop.query().findById(point2[0].id).patch({ moder_status_id: elem.id })
+    //     //получаем список добавленных точек
+    //     points = await getPointsUser(userId)
+    //     //статус точек moderated
+    //     //минимальное редактирование
+    //     insertData1 = { phone: "111", timeStamp: points[0].timeStamp }
+    //     editPointData1 = await editPoint(userId, point1[0].id, insertData1)
+    //     //максимальное редактирование
+    //     point2[0].title = getTitle()
+    //     insertData2 = {
+    //         title: point2[0].title,
+    //         apartment: "111",
+    //         hours: "111",
+    //         phone: "111",
+    //         site: "111",
+    //         lng: 56.887585,
+    //         lat: 24.179342,
+    //         isActive: 0,
+    //         description: "111",
+    //         unwanted: "111",
+    //         timeStamp: points[1].timeStamp
+    //     }
+    //     editPointData2 = await editPoint(userId, point2[0].id, insertData2)
+    //     //соответствие схемы
+    //     expect(editPointData1).toMatchSchema(getPointsUserModel)
+    //     expect(editPointData2).toMatchSchema(getPointsUserModel)
+    //     //соответствие возвращаемого значение значениям добавленной точки
+    //     delete (insertData1.timeStamp)
+    //     expect(editPointData1[0]).toMatchObject(insertData1)
+    //     delete (insertData2.unwanted)
+    //     delete (insertData2.timeStamp)
+    //     expect(editPointData2[0]).toMatchObject(insertData2)
+    //     //получаем все точки
+    //     points = await getPointsUser(userId)
+    //     //проверяем новые данные точек
+    //     expect(points).toContainEqual(editPointData1[0])
+    //     expect(points).toContainEqual(editPointData2[0])
+    //     //проверяем статус точки
+    //     expect(editPointData1[0]).toHaveProperty('moder_status', "moderated")
+    //     expect(editPointData2[0]).toHaveProperty('moder_status', "moderated")
+    //     //удаляем точки
+    //     await delPoint(userId, editPointData1[0].id)
+    //     await delPoint(userId, editPointData2[0].id)
 // })
+
+//     point1 = await addPoint({ title: getTitle(), lat: 23.718856, lng: 56.649276 }, userId)
+//     point2 = await addPoint({ title: getTitle(), lat: 23.707439, lng: 56.643248 }, userId)
+//     //получаем список добавленных точек
+//     points = await getPointsUser(userId)
+//     //ничего не редактируем
+//     editPointData1 = await editPoint(userId, point1[0].id, {})
+//     //максимальное редактирование
+//     point2[0].title = getTitle()
+//     insertData2 = {
+//         title: point2[0].title,
+//         apartment: "111",
+//         hours: "111",
+//         phone: "111",
+//         site: "111",
+//         lng: 56.887585,
+//         lat: 24.179342,
+//         isActive: 0,
+//         description: "111",
+//         unwanted: "111",
+//         timeStamp: points[1].timeStamp
+//     }
+//     editPointData2 = await editPoint(userId, point2[0].id, insertData2)
+//     //соответствие схемы
+//     expect(editPointData1).toMatchSchema(getPointsUserModel)
+//     expect(editPointData2).toMatchSchema(getPointsUserModel)
+//     //соответствие возвращаемого значение значениям добавленной точки
+//     delete (insertData1.timeStamp)
+//     expect(editPointData1[0]).toMatchObject(insertData1)
+//     delete (insertData2.unwanted)
+//     delete (insertData2.timeStamp)
+//     expect(editPointData2[0]).toMatchObject(insertData2)
+//     //получаем все точки
+//     points = await getPointsUser(userId)
+//     //проверяем новые данные точек
+//     expect(points).toContainEqual(editPointData1[0])
+//     expect(points).toContainEqual(editPointData2[0])
+//     //проверяем статус точки
+//     expect(editPointData1[0]).toHaveProperty('moder_status', "moderated")
+//     expect(editPointData2[0]).toHaveProperty('moder_status', "moderated")
+//     //удаляем точки
+//     await delPoint(userId, editPointData1[0].id)
+//     await delPoint(userId, editPointData2[0].id)
+
+})
 
 test("Получение, редактирование, отклонение и подтверждение точек модератором", async () => {
     //добавляем пользователя

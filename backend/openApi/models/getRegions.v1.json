@@ -1,0 +1,19 @@
+{
+  "title": "getRegions",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "region": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "region"
+    ]
+  }
+}

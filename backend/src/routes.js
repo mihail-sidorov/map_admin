@@ -109,7 +109,17 @@ module.exports = function (app) {
 
     app.post("/api/moder/editPoint/:id", checkAuth("moder"), (req, res, next) => {
         modelPromiseToRes(
-            editPointModer(req.params.id, req.body)
+            editPointModer(req.params.id, {
+                street: req.body.street,
+                house: req.body.house,
+                full_city_name: req.body.full_city_name,
+                title: req.body.title,
+                apartment: req.body.apartment,
+                hours: req.body.hours,
+                phone: req.body.phone,
+                site: req.body.site,
+                isActiv: req.body.isActiv
+            })
             , res, next)
     })
 

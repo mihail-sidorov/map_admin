@@ -2,6 +2,8 @@
   "type": "array",
   "title": "getUsers",
   "uniqueItems": false,
+  "description": "Список пользователей",
+  "x-examples": {},
   "items": {
     "type": "object",
     "properties": {
@@ -20,14 +22,16 @@
           "moder",
           "admin"
         ]
+      },
+      "region": {
+        "type": "string"
       }
     },
     "required": [
       "id",
       "email",
-      "permission"
+      "permission",
+      "region"
     ]
-  },
-  "description": "Список пользователей",
-  "x-examples": {}
+  }
 }

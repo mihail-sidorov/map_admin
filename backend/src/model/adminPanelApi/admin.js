@@ -1,16 +1,16 @@
 'use strict'
 const User = require("../orm/user")
-
-const { hasEmail, getIdByPermission } = require("./utilityFn")
 const Permission = require("../orm/permission")
+const Region = require("../orm/region")
 
+/** @module model/adminPanelApi/admin */
 
-async function editUser(userId, email, password) {
-    email = (typeof(email) == "string") ? email.trim() : undefined
+async function editUser(userId, email, password, region_id) {
+    email = (typeof (email) == "string") ? email.trim() : undefined
     if (password === "") {
         password = undefined
     }
-    if(!(+userId)) throw "userId must be not empty"
+    if (!(+userId)) throw "userId must be not empty"
 
     return User
         .query()
@@ -19,60 +19,126 @@ async function editUser(userId, email, password) {
         .patch({ email, password })
         .then(res => {
             if (res) {
-                return getUsers(userId)
+                return User.getUserById(userId)
             } else {
                 throw "fail"
             }
         })
 }
 
-async function addUser(email, password, permission_id) { 
-    permission_id = Number(permission_id)
-
-    if (!Number.isInteger(permission_id)) {
+/**
+ * Добавляет нового пользователя
+ * @param {string} email Все пробелы вначале и конце будут стерты
+ * JSON Scheme формат email, другой формат не пройдет валидацию
+ * @param {string} password пароль не короче 8 символов максимальная длина 72
+ * @param {number} permission_id id назначаемых пользователю прав
+ * @param {number} region_id id назначаемого пользователю региона
+ * @return {} см. User.getUserById
+ * @see {@link module:model/orm/user~User.getUserById}
+ */
+async function addUser(email, password, permission_id, region_id) {
+    //проверки входных данных
+    if (!permission_id || !Number.isInteger(+permission_id)) {
         throw "permission_id must be integer"
     }
 
-    if (typeof(email) === "string") {
+    if (!region_id || !Number.isInteger(+region_id)) {
+        throw "region_id must be integer"
+    }
+
+    if (typeof (email) === "string") {
+        //удаляем пробелы пробелы из email
         email = email.trim()
     } else {
         throw "email must not be empty"
     }
-    
-    if (!await Permission.query().findById(permission_id).first().then(Boolean)) {
+
+    if (!await Permission.hasPermission()) {
         throw "permission with this id not found"
     }
 
-    if (await hasEmail(email)) {
+    if (await User.hasEmail(email)) {
         throw "this user already exists"
     }
-
-    const userId = await User.query().insert({ email, password, permission_id }).then(res => res.id)
-    return await getUsers(userId)
+    //добавление пользователя
+    const userId = await User.query().insert({ email, password, permission_id, region_id }).then(res => res.id)
+    return await User.getUserById(userId)
 }
 
-function getUsers(userId) {
-    return User.query()
-        .withGraphFetched("permission")
-        .select("id", "email")
-        .skipUndefined()
-        .where("id", userId)
-        .then(res => {
-            res.forEach(elem => {
-                elem.permission = elem.permission[0].permission
-            })
-            return res
-        })
+/**
+ * Возвращает данные всех пользователей
+ * @return {} см. User.getUserById
+ * @see {@link module:model/orm/user~User.getUserById}
+ */
+async function getUsers() {
+    return User.getUserById()
 }
 
+/**
+ * Добавляет регион в таблицу
+ * @param {string} region Имя добавляемого региона
+ * @return {} ответ вида [{"id": 1, "region": "адыгея"}]
+ * @see {@link module:model/orm/region~Region.getRegionById} формат вывода.
+ * @throws {"incorrect region"} region либо пустое либо не является строкой
+ */
+async function addRegion(region) {
+    if (!region || typeof (region) != "string") {
+        throw "incorrect region"
+    }
+    return [await Region.query().insert({ region })]
+}
+
+/**
+ * Возвращает данные всех регионов из базы данных
+ * @return {} ответ вида [{"id": 1, "region": "адыгея"}]
+ * @see {@link module:model/orm/region~Region.getRegionById} формат вывода.
+ */
+async function getRegions() {
+    return Region.getRegionById()
+}
+
+/**
+ * Редактирование региона
+ * @param {number} regionId id региона который будем редактировать
+ * @param {string} region новое имя региона
+ * @return {} ответ вида [{"id": 1, "region": "адыгея"}]
+ * @see {@link module:model/orm/region~Region.getRegionById} формат вывода.
+ * @throws {"incorrect regionId"} параметр regionId не integer
+ * @throws {"incorrect region"} параметр region не string
+ * @throws {"fail"} не удалось добавить в базу, вероятно нет такого regionId
+ */
+async function editRegion(regionId, region) {
+    if (!Number.isInteger(+regionId)) {
+        throw "incorrect regionId"
+    }
+    if (typeof (region) != "string") {
+        throw "incorrect region"
+    }
+
+    const getRegion = await Region.query().findById(regionId).patch({ region })
+    if (getRegion) {
+        return await Region.getRegionById(regionId)
+    } else {
+        throw "fail"
+    }
+}
+
+/**
+ * Возвращает данные всех прав из базы данных
+ * @return {} ответ вида [{"id": 1, "permission": "admin"}]
+ * @see AAA
+ */
 function getPermission() {
     return Permission.query()
 }
 
-// function delUser(id) {
-//     User.query().delete().where("email",email)
-// }
+function delUser(id) {
+    User.query().delete().where("email", email)
+}
 
+exports.editRegion = editRegion
+exports.getRegions = getRegions
+exports.addRegion = addRegion
 exports.editUser = editUser
 exports.addUser = addUser
 exports.getUsers = getUsers

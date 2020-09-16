@@ -84,6 +84,12 @@
         "enum": [
           "moderated"
         ]
+      },
+      "isActive": {
+        "type": [
+          "integer",
+          "boolean"
+        ]
       }
     },
     "required": [
@@ -97,7 +103,8 @@
       "full_city_name",
       "house",
       "street",
-      "moder_status"
+      "moder_status",
+      "isActive"
     ]
   }
 }
