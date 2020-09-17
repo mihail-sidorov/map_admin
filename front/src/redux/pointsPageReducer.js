@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -115,6 +115,7 @@ let initialState = {
         currentPage: 1,
         pages: 0,
     },
+    moderTabs: false,
 };
 
 // Запросы к API
@@ -278,6 +279,14 @@ export let resetSearchPointsActionCreator = () => ({
     type: RESET_SEARCH_POINTS,
 })
 
+export let setModerTabsActionCreator = () => ({
+    type: SET_MODER_TABS,
+})
+
+export let resetModerTabsActionCreator = () => ({
+    type: RESET_MODER_TABS,
+})
+
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -403,6 +412,16 @@ let pointsPageReducer = (state = initialState, action) => {
             return {
                 ...state,
                 search: '',
+            };
+        case SET_MODER_TABS:
+            return {
+                ...state,
+                moderTabs: true,
+            };
+        case RESET_MODER_TABS:
+            return {
+                ...state,
+                moderTabs: false,
             };
         default:
             return state;

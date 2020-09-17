@@ -8,7 +8,6 @@ let initialState = {
     isAuth: false,
     permission: null,
     loginAs: false,
-    moderTabs: false,
 };
 
 export let login = (login, password) => {
@@ -51,29 +50,16 @@ export let changeHeaderLoginActionCreator = (login) => ({
     login: login,
 })
 
-export let resetModerTabsActionCreator = () => ({
-    type: RESET_MODER_TABS,
-})
-
 let authReducer = (state = initialState, action) => {
     switch (action.type) {
         case SET_AUTH_DATA:
-            let moderTabs = state.moderTabs;
-            if (!moderTabs && action.data.permission === 'moder') moderTabs = true;
-
             return {
                 ...action.data,
-                moderTabs: moderTabs,
             };
         case CHANGE_HEADER_LOGIN:
             return {
                 ...state,
                 login: action.login,
-            };
-        case RESET_MODER_TABS:
-            return {
-                ...state,
-                moderTabs: false,
             };
         default:
             return state;

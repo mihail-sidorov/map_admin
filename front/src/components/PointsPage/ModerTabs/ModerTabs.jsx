@@ -6,8 +6,12 @@ let ModerTabs = (props) => {
     return (
         props.moderTabs &&
         <div className="moder-tabs">
-            <div className="moder-tabs__tab">Модерация</div>
-            <div className="moder-tabs__tab">Точки</div>
+            <div className="moder-tabs__tab" onClick={() => {
+                props.onGoToModer();
+            }}>Модерация</div>
+            <div className="moder-tabs__tab" onClick={() => {
+                props.onGoToPoints();
+            }}>Точки</div>
         </div>
     );
 }

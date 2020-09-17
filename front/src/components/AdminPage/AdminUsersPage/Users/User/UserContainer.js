@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import User from './User';
 import { openEditUserFormActionCreator, loginAs, loginAsActionCreator } from '../../../../../redux/adminPageReducer';
 import { getAuthData, setAuthDataActionCreator } from '../../../../../redux/authReducer';
-import { resetPointsActionCreator, resetPaginationPointsActionCreator, resetSearchPointsActionCreator } from '../../../../../redux/pointsPageReducer';
+import { resetPointsActionCreator, resetPaginationPointsActionCreator, resetSearchPointsActionCreator, setModerTabsActionCreator } from '../../../../../redux/pointsPageReducer';
 
 let UserContainer = (id) => {
     return connect(
@@ -19,6 +19,9 @@ let UserContainer = (id) => {
                         return getAuthData();
                     })
                     .then((data) => {
+                        if (data.permission === 'moder') {
+                            dispatch(setModerTabsActionCreator());
+                        }
                         dispatch(setAuthDataActionCreator(data));
                         dispatch(resetPaginationPointsActionCreator());
                         dispatch(resetSearchPointsActionCreator());

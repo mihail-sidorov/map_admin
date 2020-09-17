@@ -7,9 +7,14 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { getAuthData, setAuthDataActionCreator } from './redux/authReducer';
 import './App.css';
+import { setModerTabsActionCreator } from './redux/pointsPageReducer';
 
 getAuthData().then((data) => {
     store.dispatch(setAuthDataActionCreator(data));
+
+    if (data.permission === 'moder') {
+        store.dispatch(setModerTabsActionCreator());
+    }
 
     if (document.getElementById('app')) {
         ReactDOM.render(

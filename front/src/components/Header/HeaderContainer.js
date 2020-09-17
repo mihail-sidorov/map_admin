@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import Header from './Header';
-import { logout, getAuthData, setAuthDataActionCreator, resetModerTabsActionCreator } from '../../redux/authReducer';
-import { showAddEditPointFormActionCreator } from '../../redux/pointsPageReducer';
+import { logout, getAuthData, setAuthDataActionCreator } from '../../redux/authReducer';
+import { resetModerTabsActionCreator, showAddEditPointFormActionCreator } from '../../redux/pointsPageReducer';
 import { closeAddUserFormActionCreator, closeEditUserFormActionCreator, returnToAdmin } from '../../redux/adminPageReducer';
 
 let mapStateToProps = (state) => {
