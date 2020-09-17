@@ -63,6 +63,13 @@ let Point = (props) => {
             </div>
         );
     }
+    else {
+        pointInform.push(
+            <div className="point__inform" key={1}>
+                <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>
+            </div>
+        );
+    }
 
     let delPointBtn = [];
     if (props.permission === 'user') {

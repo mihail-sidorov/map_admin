@@ -42,28 +42,31 @@ let Form = (props) => {
         formFields.push(
             <div className="add-edit-point-form__form-fields" key={1}>
                 <div className="add-edit-point-form__form-full-city-name">
-                    <label><Field name={'full_city_name'} type={'text'} component={'input'} /></label>
+                    <label><Field name={'full_city_name'} type={'text'} component={'input'} placeholder="full_city_name" /></label>
                 </div>
                 <div className="add-edit-point-form__form-street">
-                    <label><Field name={'street'} type={'text'} component={'input'} /></label>
+                    <label><Field name={'street'} type={'text'} component={'input'} placeholder="street" /></label>
                 </div>
                 <div className="add-edit-point-form__form-house">
-                    <label><Field name={'house'} type={'text'} component={'input'} /></label>
+                    <label><Field name={'house'} type={'text'} component={'input'} placeholder="house" /></label>
                 </div>
                 <div className="add-edit-point-form__form-apartment">
-                    <label><Field name={'apartment'} type={'text'} component={'input'} /></label>
+                    <label><Field name={'apartment'} type={'text'} component={'input'} placeholder="apartment" /></label>
                 </div>
                 <div className="add-edit-point-form__form-title">
-                    <label><Field name={'title'} type={'text'} component={'input'} /></label>
+                    <label><Field name={'title'} type={'text'} component={'input'} placeholder="title" /></label>
                 </div>
                 <div className="add-edit-point-form__form-hours">
-                    <label><Field name={'hours'} type={'text'} component={'input'} /></label>
+                    <label><Field name={'hours'} type={'text'} component={'input'} placeholder="hours" /></label>
                 </div>
                 <div className="add-edit-point-form__form-phone">
-                    <label><Field name={'phone'} type={'text'} component={'input'} /></label>
+                    <label><Field name={'phone'} type={'text'} component={'input'} placeholder="phone" /></label>
                 </div>
                 <div className="add-edit-point-form__form-site">
-                    <label><Field name={'site'} type={'text'} component={'input'} /></label>
+                    <label><Field name={'site'} type={'text'} component={'input'} placeholder="site" /></label>
+                </div>
+                <div className="add-edit-point-form__form-isActive">
+                    <label>Активна<Field name={'isActive'} type={'checkbox'} component={'input'} /></label>
                 </div>
             </div>
         );
