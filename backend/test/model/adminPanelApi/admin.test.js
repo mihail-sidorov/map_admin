@@ -4,6 +4,7 @@ const { getRegions, addRegion, editRegion, getUsers, addUser } = require("../../
 const { nanoid } = require("nanoid")
 const getUserModel = require("../../../openApi/models/getUsers.v1.json")
 const Permission = require("../../../src/model/orm/permission")
+const { addTestUser } = require("../../testhelper")
 
 expect.extend(matchers)
 
@@ -69,4 +70,30 @@ test("Добавление пользователей", async () => {
     email=nanoid()+"@nanoid.nanoid"
     Permission.getIdByPermission("user")
     addUser(email,"testtest",)
+})
+
+test("Добавление пользователя", async () => {
+    let addUserRes
+    let {
+        email,
+        permission_id,
+        region_id
+    } = await addTestUser("admin" ,true)
+
+    addUserRes = addUser(email, "testtest", undefined,region_id)
+    await expect(addUserRes).rejects.toEqual('permission_id must be integer')
+
+    addUserRes = addUser(email, "testtest", 2222233232)
+    await expect(addUserRes).rejects.toEqual('permission with this id not found')
+
+    addUserRes = await addUser(email, "testtest", permission_id)
+    await expect(addUserRes).toMatchSchema(getUsersModel)
+    const getUser = await User.query().findById(addUserRes[0].id).first()
+    expect(getUser.id).toBe(addUserRes[0].id)
+
+    addUserRes = addUser(email + "  ", "testtest", permission_id)
+    await expect(addUserRes).rejects.toEqual('this user already exists')
+
+    addUserRes = addUser(45445, "testtest", permission_id)
+    await expect(addUserRes).rejects.toEqual('email must not be empty')
 })

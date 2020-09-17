@@ -29,7 +29,6 @@ exports.passportModule = function (app) {
 exports.checkAuth = function (permission) {
     return (req, res, next) => {
         if (req.user) {
-            //console.log(permission)
             if ((typeof (permission) == "string" && permission === req.user.permission[0].permission) ||
                 (typeof (permission) == "object" && permission.includes(req.user.permission[0].permission)) ||
                 permission === "all") {

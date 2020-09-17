@@ -5,6 +5,7 @@ const Permission = require("../orm/permission")
 const fetch = require('node-fetch')
 const Moder_status = require("../orm/moder_status")
 const { nanoid } = require("nanoid")
+const Region = require("../orm/region")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
 async function getDuplicate(point, pointId) {
@@ -121,7 +122,7 @@ function getIdByModerStatus(moderStatus) {
 }
 
 async function getPrepareForInsert(fields, flag = "user") {
-    if (!fields) fields={}
+    if (!fields) fields = {}
     const flagData = {}
     if (flag == "user") {
         if (+fields.lat && +fields.lng) {
@@ -136,7 +137,7 @@ async function getPrepareForInsert(fields, flag = "user") {
             case null: case "null": case "": flagData.isActive = undefined; break;
         }
         flagData.description = fields.description
-        
+
     } else if (flag == "moder") {
         flagData.description = null
         flagData.street = fields.street
@@ -178,27 +179,57 @@ function getGeoData(point) { //должен содержать поля lat, lng
         })
 }
 
-async function getPointUser(userId, pointId) {
-    return Shop
-        .query()
-        .withGraphFetched("moder_status")
+async function getPoint(user, pointId) {
+    const points = []
+    let userId
+    const select = [
+        "id",
+        "full_city_name",
+        "street",
+        "house",
+        "title",
+        "lng",
+        "lat",
+        "apartment",
+        "hours",
+        "phone",
+        "site",
+        "isActive",
+        "description",
+        "timeStamp"]
+
+    if (user.permission[0].permission == "user") {
+        userId = user.id
+    }
+
+    const regionUsers = await Region.query()
+        .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
         .skipUndefined()
-        .where({ "user_id": userId, "id": pointId })
-        .select("id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "isActive", "description", "timeStamp")
-        .then(res => {
-            res.forEach(elem => {
-                elem.moder_status = elem.moder_status[0].moder_status
-            })
-            return res
+        .where("user_id", userId)
+        .andWhere({ "region_id": user.region_id, "id": pointId })
+        .modifyGraph('user.shop', bulder => {
+            bulder.select(...select)
         })
+        .first()
+
+    for (let regionUser of regionUsers.user) {
+        points.push(...regionUser.shop)
+    }
+
+    points.forEach(elem => {
+        elem.moder_status = elem.moder_status[0].moder_status
+    })
+
+    return points
 }
+
 exports.hasUserId = hasUserId
 exports.hasEmail = hasEmail
 exports.getIdByPermission = getIdByPermission
 exports.getIdByIsModerated = getIdByIsModerated
 exports.getIdByModerStatus = getIdByModerStatus
 exports.getPrepareForInsert = getPrepareForInsert
-exports.getPointUser = getPointUser
+exports.getPoint = getPoint
 exports.checkTimeStamp = checkTimeStamp
 exports.getDuplicate = getDuplicate
 exports.markDuplicate = markDuplicate
