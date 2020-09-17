@@ -7,6 +7,9 @@ const { addUser, editUser, getUsers, getPermission, getRegions, editRegion } = r
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 const { hasUserId } = require("./model/adminPanelApi/utilityFn")
 const { getUserById } = require("./model/adminPanelApi/others")
+const { body, validationResult } = require('express-validator')
+const Permission = require("./model/orm/permission")
+const User = require("./model/orm/user")
 
 module.exports = function (app) {
 
@@ -40,7 +43,24 @@ module.exports = function (app) {
     })
 
     //Интерфейс администратора
-    app.post("/api/admin/addUser", checkAuth("admin"), (req, res, next) => {
+    app.post("/api/admin/addUser", [
+        body('email').not().isEmpty().trim().isEmail().custom(value => {
+            if (User.hasEmail(value)) {
+                throw new Error('this user already exists')
+            }
+        }),
+        body('password').not().isEmpty(),
+        body('permission_id').isInt().custom(value => {
+            if (Permission.hasPermission(value)) {
+                throw new Error('permission with this id not found')
+            }
+        }),
+        body('region_id').isInt().not().isEmpty()
+    ], checkAuth("admin"), (req, res, next) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         modelPromiseToRes(
             addUser(
                 req.body.email,

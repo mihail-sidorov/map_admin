@@ -17,16 +17,17 @@ module.exports = class User extends Password(Model) {
         return "users"
     }
 
-    static get jsonSchema() { //проверка типов при обновление или добовлении в таблицу
+    static get jsonSchema() { 
         return {
             type: "object",
-            required: ["email", "password"],
+            required: ["email", "password", "permission_id","region_id"],
 
             properties: {
                 id: { type: "integer" },
                 email: { type: "string", maxLength: 320, format: "email" },
                 password: { type: "string", minLength: 8, maxLength: 72 },
-                permission_id: { type: "integer" }
+                permission_id: { type: "integer" },
+                region_id: { type: "integer" }
             },
         }
     }
@@ -112,7 +113,7 @@ module.exports = class User extends Password(Model) {
             .withGraphJoined("[permission, region]")
             .select("users.id", "email")
             .skipUndefined()
-            .where("id", userId)
+            .where("users.id", userId)
             .then(res => {
                 res.forEach(elem => {
                     elem.region = elem.region[0].region
