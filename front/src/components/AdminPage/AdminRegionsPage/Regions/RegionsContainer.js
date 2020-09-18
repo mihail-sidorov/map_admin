@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { getRegions, getRegionsActionCreator } from '../../../../redux/adminRegionsPageReducer';
+import { getRegions, getRegionsActionCreator, openAddRegionFormActionCreator } from '../../../../redux/adminRegionsPageReducer';
 import RegionsRequest from './Regions';
 
 let RegionsContainer = connect(
@@ -8,7 +8,7 @@ let RegionsContainer = connect(
     }),
     dispatch => ({
         onOpenAddRegionForm: () => {
-            
+            dispatch(openAddRegionFormActionCreator());
         },
         onGetRegions: () => {
             getRegions()

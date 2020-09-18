@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const CHANGE_SEARCH_ADMIN_REGIONS = 'CHANGE_SEARCH_ADMIN_REGIONS', GET_REGIONS = 'GET_REGIONS', CHANGE_PAGE_ADMIN_REGIONS = 'CHANGE_PAGE_ADMIN_REGIONS';
+const CHANGE_SEARCH_ADMIN_REGIONS = 'CHANGE_SEARCH_ADMIN_REGIONS', GET_REGIONS = 'GET_REGIONS', CHANGE_PAGE_ADMIN_REGIONS = 'CHANGE_PAGE_ADMIN_REGIONS', OPEN_ADD_REGIONS_FORM = 'OPEN_ADD_REGIONS_FORM', ADD_REGION = 'ADD_REGION';
 
 let makeShortRegions = (state) => {
     let searchRegions = {}, shortRegions = {};
@@ -91,6 +91,17 @@ export let getRegions = () => {
     });
 }
 
+export let addRegion = (data) => {
+    return axios.post(`${serverName}/api/admin/addRegion`, data, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response[0];
+        }
+        else {
+            throw 'Не удалось добавить регион!';
+        }
+    });
+}
+
 // Создание ActionCreator
 export let changeSearchAdminRegionsActionCreator = (value) => ({
     type: CHANGE_SEARCH_ADMIN_REGIONS,
@@ -105,6 +116,15 @@ export let getRegionsActionCreator = (regionsArr) => ({
 export let changePageAdminRegionsActionCreator = (page) => ({
     type: CHANGE_PAGE_ADMIN_REGIONS,
     page: page,
+})
+
+export let openAddRegionFormActionCreator = () => ({
+    type: OPEN_ADD_REGIONS_FORM,
+})
+
+export let addRegionActionCreator = (region) => ({
+    type: ADD_REGION,
+    region: region,
 })
 
 let adminRegionsPageReducer = (state = initialState, action) => {
@@ -144,6 +164,29 @@ let adminRegionsPageReducer = (state = initialState, action) => {
             newState.shortRegions = makeShortRegionsResult.shortRegions;
             newState.pagination.currentPage = makeShortRegionsResult.currentPage;
             newState.pagination.pages = makeShortRegionsResult.pages;
+
+            return newState;
+        case OPEN_ADD_REGIONS_FORM:
+            return {
+                ...state,
+                addRegionForm: {
+                    ...state.addRegionForm,
+                    open: true,
+                },
+            };
+        case ADD_REGION:
+            newState = {...state};
+            newState.regions[action.region.id] = action.region;
+
+            newState.addRegionForm.newRegion = true;
+
+            makeShortRegionsResult = makeShortRegions(newState);
+            newState.shortRegions = makeShortRegionsResult.shortRegions;
+            newState.pagination.currentPage = makeShortRegionsResult.currentPage;
+            newState.pagination.pages = makeShortRegionsResult.pages;
+
+            newState.addRegionForm.newRegion = false;
+            newState.addRegionForm.open = false;
 
             return newState;
         default:
