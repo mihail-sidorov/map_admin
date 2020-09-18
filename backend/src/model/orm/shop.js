@@ -52,4 +52,8 @@ module.exports = class Shop extends Model {
             }
         }
     }
+
+    static async getModerStatusById() {
+        
+    }
 }

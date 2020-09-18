@@ -54,9 +54,6 @@ module.exports = class Permission extends Model {
      * @return {boolean} Возвращает результат проверки
      */
     static async hasPermission(permission_id) {
-        if (!permission_id || !Number.isInteger(permission_id)) {
-            throw "permission_id must be integer"
-        }
         return this.query().findById(permission_id).first().then(Boolean)
     }
 

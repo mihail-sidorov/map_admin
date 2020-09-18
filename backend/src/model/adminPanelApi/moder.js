@@ -1,8 +1,7 @@
 'use strict'
 
 const Shop = require("../orm/shop")
-const { getIdByModerStatus, getIdByIsModerated, getPrepareForInsert } = require("./utilityFn")
-const Moder_status = require("../orm/moder_status")
+const { getIdByModerStatus, getIdByIsModerated } = require("./utilityFn")
 const Region = require("../orm/region")
 
 /**
@@ -25,10 +24,6 @@ async function getPointsModer(regionId) {
         "street",
         "isActive"]
     const points = []
-
-    if (!regionId || !Number.isInteger(+regionId)) {
-        throw "incorrect regionId"
-    }
 
     const regionUsers = await Region.query().findById(regionId)
         .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
@@ -57,9 +52,15 @@ async function getPointsModer(regionId) {
     return (points)
 }
 
-async function setPointRefuse(pointId, description) {
-    pointId = +pointId
-    if (!pointId) throw "pointId must not be empty"
+async function setPointRefuse(user, pointId, description) {
+    
+    await Region.query().findById(user.region_id)
+        .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
+        .modifyGraph('user.shop.moder_status', bulder => {
+            bulder.where("isModerated", 1)
+        })
+        .first()
+
     const isModerated = await getIdByIsModerated(1)
     const moderStatus = await getIdByModerStatus("refuse")
 

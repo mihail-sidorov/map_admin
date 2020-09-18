@@ -60,7 +60,7 @@ module.exports = class Region extends Model {
      */
 
     static async getRegionById(regionId) {
-        //если regionId не является целым числом выдаем ошибку
+ 
         if (regionId === null || (regionId !== undefined && !Number.isInteger(+regionId))) {
             throw "incorrect regionId"
         }
@@ -75,5 +75,19 @@ module.exports = class Region extends Model {
             throw "failed to find a region with this regionId"
         }
 
+    }
+
+    /**
+     * Проварка ну существование id региона
+     * @memberof module:model/orm/region~Region
+     * @static
+     * @async
+     * @function hasRegion
+     * @param {number} regionId id региона, должен быть целым
+     * @return {boolean} результат проверки
+     */
+
+    static async hasRegion(regionId) {
+        return this.query().findById(regionId).then(Boolean)
     }
 }

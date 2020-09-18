@@ -1,6 +1,8 @@
 const Permission = require("../src/model/orm/permission")
-const { getRegions } = require("../src/model/adminPanelApi/admin")
+const { getRegions, addUser } = require("../src/model/adminPanelApi/admin")
 const { nanoid } = require("nanoid")
+const User = require("../src/model/orm/user")
+const Region = require("../src/model/orm/region")
 
 function getEmail(prefix) { // получение тестового емейла
     const email = nanoid(21) + "@nanoid."+prefix
@@ -31,8 +33,14 @@ async function addTestUser(prefix, onlyValueGen = false, permission = "user", re
 }
 
 function delTestUser(prefix) {
-    return User.query().delete().where('email', 'like', "%nanoid."+prefix)
+    return () => User.query().delete().where('email', 'like', "%nanoid."+prefix)
 }
 
+function delTestRegion(prefix) {
+    return () => Region.query().delete().where('region', 'like', "nanoid"+prefix+"%")
+}
+
+module.exports.getEmail = getEmail
 module.exports.addTestUser = addTestUser
 module.exports.delTestUser = delTestUser
+module.exports.delTestRegion = delTestRegion

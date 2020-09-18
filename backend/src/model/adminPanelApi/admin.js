@@ -18,14 +18,6 @@ const Region = require("../orm/region")
  * @throw {"fail"} не удалось отредактировать пользователя
  */
 async function editUser(userId, email, password) {
-    email = (typeof (email) == "string") ? email.trim() : undefined
-    if (password === "") {
-        password = undefined
-    }
-    if (!userId || !Number.isInteger(+userId)) {
-        throw "userId must be integer"
-    }
-
     return User
         .query()
         .findById(userId)
@@ -51,27 +43,6 @@ async function editUser(userId, email, password) {
  * @see {@link module:model/orm/user~User.getUserById} формат вывода
  */
 async function addUser(email, password, permission_id, region_id) {
-    // if (!permission_id || !Number.isInteger(+permission_id)) {
-    //     throw "permission_id must be integer"
-    // }
-
-    // if (!region_id || !Number.isInteger(+region_id)) {
-    //     throw "region_id must be integer"
-    // }
-
-    // if (typeof (email) === "string") {
-    //     email = email.trim()
-    // } else {
-    //     throw "email must not be empty"
-    // }
-
-    // if (!await Permission.hasPermission(permission_id)) {
-    //     throw "permission with this id not found"
-    // }
-
-    // if (await User.hasEmail(email)) {
-    //     throw "this user already exists"
-    // }
     const userId = await User.query().insert({ email, password, permission_id, region_id }).then(res => res.id)
     return await User.getUserById(userId)
 }

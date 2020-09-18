@@ -1,17 +1,14 @@
 const getRegionsModel = require("../../../openApi/models/getRegions.v1.json")
 const { matchers } = require("jest-json-schema")
-const { getRegions, addRegion, editRegion, getUsers, addUser } = require("../../../src/model/adminPanelApi/admin")
+const { getRegions, addRegion, editRegion, getUsers, addUser, editUser } = require("../../../src/model/adminPanelApi/admin")
 const { nanoid } = require("nanoid")
 const getUserModel = require("../../../openApi/models/getUsers.v1.json")
 const Permission = require("../../../src/model/orm/permission")
-const { addTestUser, delTestUser } = require("../../testhelper")
+const { addTestUser, delTestUser, delTestRegion, getEmail } = require("../../testhelper")
 const User = require("../../../src/model/orm/user")
 
 expect.extend(matchers)
 
-// function delTestRegions() {
-
-// }
 
 test("Тест функции getRegions", async () => {
 
@@ -40,8 +37,8 @@ test("Тест функции addRegion, добавление региона", a
 })
 
 test("Редактирование региона editRegion", async () => {
-    let region = "nanoidAdmin" + nanoid()
-    let nameEdit = "nanoidAdmin" + nanoid()
+    let region = "nanoidadmin" + nanoid()
+    let nameEdit = "nanoidadmin" + nanoid()
     let getRegion, regions
 
     getRegion = await addRegion(region)
@@ -81,4 +78,36 @@ test("Добавление пользователя", async () => {
 
 })
 
+test("Редактирование пользователя", async () => {
+    let userAfterEdit, userBeforeEdit
+    const {
+        addUserRes
+    } = await addTestUser("admin")
+
+    userBeforeEdit = await User.query().findById(addUserRes[0].id).first()
+    expect(await editUser(addUserRes[0].id, undefined, "password")).toMatchSchema(getUserModel)
+    userAfterEdit = await User.query().findById(addUserRes[0].id).first() 
+    const {
+        password,
+        ...userAfterEditPassword
+    } = userAfterEdit
+
+    expect(userBeforeEdit).toMatchObject(userAfterEditPassword)
+    expect(userBeforeEdit.password).not.toBe(password)
+
+    userBeforeEdit = userAfterEdit
+    expect(await editUser(addUserRes[0].id, getEmail("admin"), undefined)).toMatchSchema(getUserModel)
+    userAfterEdit = await User.query().findById(addUserRes[0].id).first()
+    const {
+        email,
+        ...userAfterEditEmail
+    } = userAfterEdit
+
+    expect(userBeforeEdit).toMatchObject(userAfterEditEmail)
+    expect(userBeforeEdit.email).not.toBe(email)
+
+    expect(editUser(-2323, getEmail(), undefined)).rejects.toBe("fail")
+})
+
 afterAll(delTestUser("admin"))
+afterAll(delTestRegion("admin"))
