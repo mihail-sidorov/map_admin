@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const CHANGE_SEARCH_ADMIN_REGIONS = 'CHANGE_SEARCH_ADMIN_REGIONS', GET_REGIONS = 'GET_REGIONS', CHANGE_PAGE_ADMIN_REGIONS = 'CHANGE_PAGE_ADMIN_REGIONS', OPEN_ADD_REGIONS_FORM = 'OPEN_ADD_REGIONS_FORM', ADD_REGION = 'ADD_REGION';
+const CHANGE_SEARCH_ADMIN_REGIONS = 'CHANGE_SEARCH_ADMIN_REGIONS', GET_REGIONS = 'GET_REGIONS', CHANGE_PAGE_ADMIN_REGIONS = 'CHANGE_PAGE_ADMIN_REGIONS', OPEN_ADD_REGIONS_FORM = 'OPEN_ADD_REGIONS_FORM', ADD_REGION = 'ADD_REGION', CANSEL_ADD_REGION = '';
 
 let makeShortRegions = (state) => {
     let searchRegions = {}, shortRegions = {};
@@ -127,6 +127,10 @@ export let addRegionActionCreator = (region) => ({
     region: region,
 })
 
+export let canselAddRegionActionCreator = () => ({
+    type: CANSEL_ADD_REGION,
+})
+
 let adminRegionsPageReducer = (state = initialState, action) => {
     let newState, makeShortRegionsResult;
 
@@ -189,6 +193,14 @@ let adminRegionsPageReducer = (state = initialState, action) => {
             newState.addRegionForm.open = false;
 
             return newState;
+        case CANSEL_ADD_REGION:
+            return {
+                ...state,
+                addRegionForm: {
+                    ...state.addRegionForm,
+                    open: false,
+                },
+            };
         default:
             return state;
     }

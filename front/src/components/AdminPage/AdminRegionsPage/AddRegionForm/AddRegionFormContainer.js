@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import AddRegionForm from './AddRegionForm';
-import {addRegion, addRegionActionCreator} from '../../../../redux/adminRegionsPageReducer';
+import {addRegion, addRegionActionCreator, canselAddRegionActionCreator} from '../../../../redux/adminRegionsPageReducer';
 
 let AddRegionFormContainer = connect(
     state => ({
@@ -17,6 +17,9 @@ let AddRegionFormContainer = connect(
                         console.log(error);
                     });
             }
+        },
+        onCanselAddRegion: () => {
+            dispatch(canselAddRegionActionCreator());
         },
     })
 )(AddRegionForm);
