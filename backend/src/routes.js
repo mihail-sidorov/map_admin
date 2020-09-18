@@ -7,7 +7,7 @@ const { addUser, editUser, getUsers, getPermission, getRegions, editRegion, addR
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 const { hasUserId } = require("./model/adminPanelApi/utilityFn")
 const { getUserById } = require("./model/adminPanelApi/others")
-const { validReqEditUser, validReqAddUser, validErrHandler } = require("./reqValidators")
+const { validReqEditUser, validReqAddUser, validReqSetPointRefuse, validErrHandler } = require("./reqValidators")
 
 module.exports = function (app) {
 

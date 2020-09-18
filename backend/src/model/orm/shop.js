@@ -53,7 +53,7 @@ module.exports = class Shop extends Model {
         }
     }
 
-    static async getModerStatusById() {
-        
+    static async getModerStatusByPointId(pointId) {
+        return this.query().findById(pointId).joinRelated("moder_status").select("moder_status").then(res => res.moder_status)
     }
 }
