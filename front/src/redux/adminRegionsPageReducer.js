@@ -9,20 +9,20 @@ let makeShortRegions = (state) => {
     if (state.search !== '') {
         for (let id in state.regions) {
             let pattern = new RegExp(state.search.toLowerCase());
-            let name;
+            let region;
 
 
             for (let property in state.regions[id]) {
                 switch (property) {
-                    case 'name':
-                        name = state.regions[id][property];
+                    case 'region':
+                        region = state.regions[id][property];
                         break;
                     default:
                         break;
                 }
             }
 
-            let searchStr = name;
+            let searchStr = region;
 
             if (searchStr.toLowerCase().match(pattern)) {
                 searchRegions[id] = state.regions[id];
@@ -112,10 +112,15 @@ let adminRegionsPageReducer = (state = initialState, action) => {
 
     switch (action.type) {
         case CHANGE_SEARCH_ADMIN_REGIONS:
-            return {
-                ...state,
-                search: action.value,
-            };
+            newState = {...state};
+            newState.search = action.value;
+
+            makeShortRegionsResult = makeShortRegions(newState);
+            newState.shortRegions = makeShortRegionsResult.shortRegions;
+            newState.pagination.currentPage = makeShortRegionsResult.currentPage;
+            newState.pagination.pages = makeShortRegionsResult.pages;
+
+            return newState;
         case GET_REGIONS:
             let regions = {};
             action.regionsArr.forEach((region) => {
