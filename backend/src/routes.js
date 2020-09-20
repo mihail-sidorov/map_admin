@@ -7,7 +7,7 @@ const { addUser, editUser, getUsers, getPermission, getRegions, editRegion, addR
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 const { hasUserId } = require("./model/adminPanelApi/utilityFn")
 const { getUserById } = require("./model/adminPanelApi/others")
-const { validReqEditUser, validReqAddUser, validReqSetPointRefuse, validErrHandler } = require("./reqValidators")
+const { validReqEditUser, validReqAddUser, validReqSetPointRefuse, validErrHandler, validAddUser } = require("./reqValidators")
 
 module.exports = function (app) {
 
@@ -47,7 +47,7 @@ module.exports = function (app) {
             res, next)
     })
 
-    app.post("/api/admin/addUser", validReqAddUser, validErrHandler, checkAuth("admin"), (req, res, next) => {
+    app.post("/api/admin/addUser", validAddUser, checkAuth("admin"), (req, res, next) => {
         modelPromiseToRes(
             addUser(
                 req.body.email,
@@ -57,7 +57,7 @@ module.exports = function (app) {
             res, next)
     })
 
-    app.post("/api/admin/editUser", validReqEditUser, validErrHandler, checkAuth("admin"), (req, res, next) => {
+    app.post("/api/admin/editUser", checkAuth("admin"), (req, res, next) => {
         modelPromiseToRes(
             editUser(
                 req.body.id,
@@ -134,7 +134,7 @@ module.exports = function (app) {
             , res, next)
     })
 
-    app.post("/api/moder/setPointRefuse", validReqSetPointRefuse, validErrHandler, checkAuth("moder"), (req, res, next) => {
+    app.post("/api/moder/setPointRefuse", checkAuth("moder"), (req, res, next) => {
         modelPromiseToRes(
             setPointRefuse(req.user, req.body.id, req.body.description),
             res, next)

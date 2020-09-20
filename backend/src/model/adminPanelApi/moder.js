@@ -53,50 +53,50 @@ async function getPointsModer(regionId) {
 }
 
 async function setPointRefuse(user, pointId, description) {
-    const { moder_status, isModerated } = await Shop.getModerStatusByPointId(pointId)
-    if (isModerated == 0) throw "this point does not require moderation"
-    switch (moder_status) {
-        case "moderated":
-            const newModerStatusId =  
-            Shop.query()
-                .withGraphJoined("[user,moder_status]")
-                .modifyGraph('user', bulder => {
-                    bulder.where("region_id", user.region_id)
-                })
-                .where()
-            Region.query().findById(user.region_id)
-                .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
-                .modifyGraph('user.shop.moder_status', bulder => {
-                    bulder.where("isModerated", 1)
-                })
-                .first()
-            break
-    }
-    await Region.query().findById(user.region_id)
-        .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
-        .modifyGraph('user.shop.moder_status', bulder => {
-            bulder.where("isModerated", 1)
-        })
-        .first()
+    // const { moder_status, isModerated } = await Shop.getModerStatusByPointId(pointId)
+    // if (isModerated == 0) throw "this point does not require moderation"
+    // switch (moder_status) {
+    //     case "moderated":
+    //         const newModerStatusId =  
+    //         Shop.query()
+    //             .withGraphJoined("[user,moder_status]")
+    //             .modifyGraph('user', bulder => {
+    //                 bulder.where("region_id", user.region_id)
+    //             })
+    //             .where()
+    //         Region.query().findById(user.region_id)
+    //             .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
+    //             .modifyGraph('user.shop.moder_status', bulder => {
+    //                 bulder.where("isModerated", 1)
+    //             })
+    //             .first()
+    //         break
+    // }
+    // await Region.query().findById(user.region_id)
+    //     .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
+    //     .modifyGraph('user.shop.moder_status', bulder => {
+    //         bulder.where("isModerated", 1)
+    //     })
+    //     .first()
 
-    const isModerated = await getIdByIsModerated(1)
-    const moderStatus = await getIdByModerStatus("refuse")
+    // const isModerated = await getIdByIsModerated(1)
+    // const moderStatus = await getIdByModerStatus("refuse")
 
-    if (!description) {
-        description = null
-    }
-    return Shop
-        .query()
-        .whereIn("moder_status_id", isModerated)
-        .andWhere("id", pointId)
-        .patch({ "description": description, "moder_status_id": moderStatus })
-        .then(res => {
-            if (res) {
-                return pointId
-            } else {
-                throw "fail"
-            }
-        })
+    // if (!description) {
+    //     description = null
+    // }
+    // return Shop
+    //     .query()
+    //     .whereIn("moder_status_id", isModerated)
+    //     .andWhere("id", pointId)
+    //     .patch({ "description": description, "moder_status_id": moderStatus })
+    //     .then(res => {
+    //         if (res) {
+    //             return pointId
+    //         } else {
+    //             throw "fail"
+    //         }
+    //     })
 }
 
 async function setPointAccept(pointId) {

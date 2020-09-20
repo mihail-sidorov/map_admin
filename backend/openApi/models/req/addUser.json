@@ -1,0 +1,31 @@
+{
+  "title": "addUser",
+  "type": "object",
+  "properties": {
+    "email": {
+      "format": "email",
+      "type": "string"
+    },
+    "password": {
+      "type": "string"
+    },
+    "region_id": {
+      "type": [
+        "integer",
+        "number",
+        "string"
+      ]
+    },
+    "permission_id": {
+      "type": [
+        "integer",
+        "number",
+        "string"
+      ]
+    }
+  },
+  "required": [
+    "region_id",
+    "permission_id"
+  ]
+}
