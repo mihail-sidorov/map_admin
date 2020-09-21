@@ -49,30 +49,26 @@ let Point = (props) => {
         }
     }
 
-    let pointInform = [];
+    let pointInform = [], moderStatus = '';
     if (props.permission === 'user') {
-        let moderStatus = '';
         if (props.point.moder_status === 'moderated') moderStatus = 'На модерации';
         if (props.point.moder_status === 'refuse') moderStatus = 'Отклонено';
         if (props.point.moder_status === 'accept') moderStatus = 'Допущена к публикации';
-
-        pointInform.push(
-            <div className="point__inform" key={1}>
-                <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>***
-                <span className="point__moder-status">{moderStatus}</span>
-            </div>
-        );
     }
     else {
-        pointInform.push(
-            <div className="point__inform" key={1}>
-                <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>
-            </div>
-        );
+        if (props.point.moder_status === 'moderated') moderStatus = 'На утверждение';
+        if (props.point.moder_status === 'delete') moderStatus = 'На удаление';
     }
 
+    pointInform.push(
+        <div className="point__inform" key={1}>
+            <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>***
+            <span className="point__moder-status">{moderStatus}</span>
+        </div>
+    );
+
     let delPointBtn = [];
-    if (props.permission === 'user') {
+    if ((props.permission === 'user') || (props.permission === 'moder' && props.point.moder_status === 'delete')) {
         delPointBtn.push(<button className="point__del-button" onClick={onDelPoint} key={1}>Удалить</button>);
     }
 
@@ -83,19 +79,26 @@ let Point = (props) => {
         }}>Отклонить</button>);
     }
 
+    let editAcceptBtn = [];
+    if ((props.permission === 'user') || (props.permission === 'moder' && props.point.moder_status === 'moderated')) {
+        editAcceptBtn.push(
+            <button className="point__edit-button" onClick={() => {
+                props.showAddEditPointForm('edit', props.point.id);
+            }} key={1}>{props.permission === 'user' ? 'Редактировать' : 'Утвердить'}</button>
+        );
+    }
+
     return (
         <div point-id={props.point.id} className="point">
             {pointInform}
             
             <PointProperties point={props.point} permission={props.permission}/>
 
-            <button className="point__edit-button" onClick={() => {
-                props.showAddEditPointForm('edit', props.point.id);
-            }}>{props.permission === 'user' ? 'Редактировать' : 'Утвердить'}</button>
-
-            {refuseBtn}
+            {editAcceptBtn}
 
             {delPointBtn}
+
+            {refuseBtn}
 
             <div className="point__description">
                 {props.point.description}
