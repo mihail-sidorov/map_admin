@@ -8,21 +8,13 @@ let makeShortRegions = (state) => {
 
     if (state.search !== '') {
         for (let id in state.regions) {
-            let pattern = new RegExp(state.search.toLowerCase());
-            let region;
-
+            let pattern = new RegExp(state.search.toLowerCase()), searchStr = '';
 
             for (let property in state.regions[id]) {
-                switch (property) {
-                    case 'region':
-                        region = state.regions[id][property];
-                        break;
-                    default:
-                        break;
+                if (state.regions[id][property] !== undefined && state.regions[id][property] !== null && state.regions[id][property] !== '') {
+                    searchStr += state.regions[id][property];
                 }
             }
-
-            let searchStr = region;
 
             if (searchStr.toLowerCase().match(pattern)) {
                 searchRegions[id] = state.regions[id];

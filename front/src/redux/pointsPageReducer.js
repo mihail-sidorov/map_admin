@@ -8,48 +8,13 @@ let makeShortPoints = (state) => {
 
     if (state.search !== '') {
         for (let id in state.points) {
-            let pattern = new RegExp(state.search.toLowerCase());
-            let full_city_name, street, house, apartment, lng, lat, title, hours, phone, site;
-
+            let pattern = new RegExp(state.search.toLowerCase()), searchStr = '';
 
             for (let property in state.points[id]) {
-                switch (property) {
-                    case 'full_city_name':
-                        full_city_name = state.points[id][property];
-                        break;
-                    case 'street':
-                        street = state.points[id][property];
-                        break;
-                    case 'house':
-                        house = state.points[id][property];
-                        break;
-                    case 'apartment':
-                        apartment = state.points[id][property];
-                        break;
-                    case 'lng':
-                        lng = state.points[id][property];
-                        break;
-                    case 'lat':
-                        lat = state.points[id][property];
-                        break;
-                    case 'title':
-                        title = state.points[id][property];
-                        break;
-                    case 'hours':
-                        hours = state.points[id][property];
-                        break;
-                    case 'phone':
-                        phone = state.points[id][property];
-                        break;
-                    case 'site':
-                        site = state.points[id][property];
-                        break;
-                    default:
-                        break;
+                if (state.points[id][property] !== undefined && state.points[id][property] !== null && state.points[id][property] !== '') {
+                    searchStr += state.points[id][property];
                 }
             }
-
-            let searchStr = full_city_name + street + house + apartment + lng + lat + title + hours + phone + site;
 
             if (searchStr.toLowerCase().match(pattern)) {
                 searchPoints[id] = state.points[id];

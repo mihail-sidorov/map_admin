@@ -8,24 +8,13 @@ let makeShortUsers = (state) => {
 
     if (state.search !== '') {
         for (let id in state.users) {
-            let pattern = new RegExp(state.search.toLowerCase());
-            let email, permission;
-
+            let pattern = new RegExp(state.search.toLowerCase()), searchStr = '';
 
             for (let property in state.users[id]) {
-                switch (property) {
-                    case 'email':
-                        email = state.users[id][property];
-                        break;
-                    case 'permission':
-                        permission = state.users[id][property];
-                        break;
-                    default:
-                        break;
+                if (state.users[id][property] !== undefined && state.users[id][property] !== null && state.users[id][property] !== '') {
+                    searchStr += state.users[id][property];
                 }
             }
-
-            let searchStr = email + permission;
 
             if (searchStr.toLowerCase().match(pattern)) {
                 searchUsers[id] = state.users[id];
@@ -46,6 +35,8 @@ let makeShortUsers = (state) => {
     if (currentPage > pages || state.addUserForm.newUser === true) {
         currentPage = pages;
     }
+
+    if (currentPage === 0) currentPage = 1;
 
     let left = (currentPage - 1) * paginationCount + 1;
     let right = left + paginationCount - 1;
