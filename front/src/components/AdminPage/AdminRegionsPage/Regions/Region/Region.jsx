@@ -5,7 +5,7 @@ let Region = (props) => {
         <div className="region">
             <span className="region__name">{props.region.region}</span>
             <button className="region__edit-btn" onClick={() => {
-                props.onOpenEditRegionForm(props.region.id);
+                props.onOpenEditRegionForm(props.region);
             }}>Редактировать</button>
             <hr />
         </div>

@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const CHANGE_SEARCH_ADMIN_REGIONS = 'CHANGE_SEARCH_ADMIN_REGIONS', GET_REGIONS = 'GET_REGIONS', CHANGE_PAGE_ADMIN_REGIONS = 'CHANGE_PAGE_ADMIN_REGIONS', OPEN_ADD_REGIONS_FORM = 'OPEN_ADD_REGIONS_FORM', ADD_REGION = 'ADD_REGION', CANSEL_ADD_REGION = '';
+const CHANGE_SEARCH_ADMIN_REGIONS = 'CHANGE_SEARCH_ADMIN_REGIONS', GET_REGIONS = 'GET_REGIONS', CHANGE_PAGE_ADMIN_REGIONS = 'CHANGE_PAGE_ADMIN_REGIONS', OPEN_ADD_REGION_FORM = 'OPEN_ADD_REGION_FORM', ADD_REGION = 'ADD_REGION', CANSEL_ADD_REGION = '', EDIT_REGION = 'EDIT_REGION', OPEN_EDIT_REGION_FORM = 'OPEN_EDIT_REGION_FORM', CANSEL_EDIT_REGION = 'CANSEL_EDIT_REGION';
 
 let makeShortRegions = (state) => {
     let searchRegions = {}, shortRegions = {};
@@ -77,6 +77,10 @@ let initialState = {
         open: false,
         newRegion: false,
     },
+    editRegionForm: {
+        open: false,
+        region: {},
+    },
 };
 
 // Запросы к API
@@ -102,6 +106,17 @@ export let addRegion = (data) => {
     });
 }
 
+export let editRegion = (data) => {
+    return axios.post(`${serverName}/api/admin/editRegion`, data, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response[0];
+        }
+        else {
+            throw 'Не удалось отредактировать регион!';
+        }
+    });
+}
+
 // Создание ActionCreator
 export let changeSearchAdminRegionsActionCreator = (value) => ({
     type: CHANGE_SEARCH_ADMIN_REGIONS,
@@ -119,7 +134,7 @@ export let changePageAdminRegionsActionCreator = (page) => ({
 })
 
 export let openAddRegionFormActionCreator = () => ({
-    type: OPEN_ADD_REGIONS_FORM,
+    type: OPEN_ADD_REGION_FORM,
 })
 
 export let addRegionActionCreator = (region) => ({
@@ -131,6 +146,20 @@ export let canselAddRegionActionCreator = () => ({
     type: CANSEL_ADD_REGION,
 })
 
+export let openEditRegionFormActionCreator = (region) => ({
+    type: OPEN_EDIT_REGION_FORM,
+    region: region,
+})
+
+export let editRegionActionCreator = (region) => ({
+    type: EDIT_REGION,
+    region: region,
+})
+
+export let canselEditRegionActionCreator = () => ({
+    type: CANSEL_EDIT_REGION,
+})
+
 let adminRegionsPageReducer = (state = initialState, action) => {
     let newState, makeShortRegionsResult;
 
@@ -138,6 +167,7 @@ let adminRegionsPageReducer = (state = initialState, action) => {
         case CHANGE_SEARCH_ADMIN_REGIONS:
             newState = {...state};
             newState.search = action.value;
+            newState.pagination.currentPage = 1;
 
             makeShortRegionsResult = makeShortRegions(newState);
             newState.shortRegions = makeShortRegionsResult.shortRegions;
@@ -170,7 +200,7 @@ let adminRegionsPageReducer = (state = initialState, action) => {
             newState.pagination.pages = makeShortRegionsResult.pages;
 
             return newState;
-        case OPEN_ADD_REGIONS_FORM:
+        case OPEN_ADD_REGION_FORM:
             return {
                 ...state,
                 addRegionForm: {
@@ -198,6 +228,32 @@ let adminRegionsPageReducer = (state = initialState, action) => {
                 ...state,
                 addRegionForm: {
                     ...state.addRegionForm,
+                    open: false,
+                },
+            };
+        case OPEN_EDIT_REGION_FORM:
+            return {
+                ...state,
+                editRegionForm: {
+                    open: true,
+                    region: action.region,
+                },
+            };
+        case EDIT_REGION:
+            newState = {...state};
+            newState.regions[action.region.id] = action.region;
+            newState.shortRegions[action.region.id] = action.region;
+            newState.editRegionForm = {
+                ...newState.editRegionForm,
+                open: false,
+            };
+
+            return newState;
+        case CANSEL_EDIT_REGION:
+            return {
+                ...state,
+                editRegionForm: {
+                    ...state.editRegionForm,
                     open: false,
                 },
             };

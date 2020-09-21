@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import { openEditRegionFormActionCreator } from '../../../../../redux/adminRegionsPageReducer';
 import Region from './Region';
 
 let RegionContainer = (id) => {
@@ -7,8 +8,8 @@ let RegionContainer = (id) => {
             region: state.adminRegionsPageState.shortRegions[id],
         }),
         dispatch => ({
-            onOpenEditRegionForm: (id) => {
-                
+            onOpenEditRegionForm: (region) => {
+                dispatch(openEditRegionFormActionCreator(region));
             },
         })
     )(Region);
