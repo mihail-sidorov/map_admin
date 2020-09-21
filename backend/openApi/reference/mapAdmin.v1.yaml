@@ -176,22 +176,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                  maximum: 320
-                password:
-                  type: string
-                  minimum: 8
-                  maximum: 72
-                permission_id:
-                  type: integer
-              required:
-                - email
-                - password
-                - permission_id
+              $ref: ../models/req/addUser.json
       responses:
         '200':
           description: Возвращает данные добавленного пользователя

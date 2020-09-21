@@ -28,7 +28,10 @@
       "type": "string"
     },
     "isActiv": {
-      "type": "string"
+      "type": [
+        "boolean",
+        "integer"
+      ]
     }
   }
 }

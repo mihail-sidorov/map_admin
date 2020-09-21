@@ -114,4 +114,11 @@ module.exports = class User extends Password(Model) {
                 return res
             })
     }
+
+    static async hasUserId(userId) {
+        return this.query()
+            .first()
+            .findById(userId)
+            .then(Boolean)
+    }
 }

@@ -1,0 +1,16 @@
+{
+  "title": "editRegion",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "region": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "region"
+  ]
+}

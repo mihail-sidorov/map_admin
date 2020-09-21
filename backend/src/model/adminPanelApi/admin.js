@@ -22,7 +22,7 @@ async function editUser(userId, email, password) {
         .query()
         .findById(userId)
         .first()
-        .patch({ email, password})
+        .patch({ email, password })
         .then(res => {
             if (res) {
                 return User.getUserById(userId)
@@ -64,9 +64,6 @@ async function getUsers() {
  * @throws {"incorrect region"} region либо пустое либо не является строкой
  */
 async function addRegion(region) {
-    if (!region || typeof (region) != "string") {
-        throw "incorrect region"
-    }
     return [await Region.query().insert({ region })]
 }
 
@@ -90,13 +87,6 @@ async function getRegions() {
  * @throws {"fail"} не удалось добавить в базу, вероятно нет такого regionId
  */
 async function editRegion(regionId, region) {
-    if (!Number.isInteger(+regionId)) {
-        throw "incorrect regionId"
-    }
-    if (typeof (region) != "string") {
-        throw "incorrect region"
-    }
-
     const getRegion = await Region.query().findById(regionId).patch({ region })
     if (getRegion) {
         return await Region.getRegionById(regionId)

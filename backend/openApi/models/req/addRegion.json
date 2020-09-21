@@ -1,0 +1,12 @@
+{
+  "title": "addRegion",
+  "type": "object",
+  "properties": {
+    "region": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "region"
+  ]
+}

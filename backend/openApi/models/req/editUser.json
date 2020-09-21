@@ -1,8 +1,10 @@
 {
-  "title": "addUser",
+  "title": "editUser",
   "type": "object",
-  "description": "",
   "properties": {
+    "id": {
+      "type": "integer"
+    },
     "email": {
       "allOf": [
         {
@@ -22,18 +24,9 @@
       "type": "string",
       "minLength": 8,
       "maxLength": 72
-    },
-    "region_id": {
-      "type": "integer"
-    },
-    "permission_id": {
-      "type": "integer"
     }
   },
   "required": [
-    "email",
-    "password",
-    "region_id",
-    "permission_id"
+    "id"
   ]
 }

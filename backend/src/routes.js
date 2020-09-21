@@ -5,15 +5,14 @@ const { checkAuth } = require("./middlewares/passport")
 const { delPoint, addPoint, getPoints, editPoint } = require("./model/adminPanelApi/user")
 const { addUser, editUser, getUsers, getPermission, getRegions, editRegion, addRegion } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
-const { hasUserId } = require("./model/adminPanelApi/utilityFn")
-const { getUserById } = require("./model/adminPanelApi/others")
 
-const { validReqEditUser, validReqAddUser, validReqSetPointRefuse, validErrHandler, validAddUser } = require("./reqValidators")
+const { validAddUser, validEditUser, validLogin, validAddRegion, validEditRegion, validLoginAs, validSetPointRefuse } = require("./reqValidators")
+const User = require("./model/orm/user")
 
 module.exports = function (app) {
 
     //Интерфейс авторизации
-    app.post("/api/login", passport.authenticate('local'), function (req, res, next) {
+    app.post("/api/login", validLogin, passport.authenticate('local'), function (req, res, next) {
         req.session.adminId = undefined
         res.json(jsonResPattern("OK"))
     })
@@ -42,13 +41,13 @@ module.exports = function (app) {
     })
 
     //Интерфейс администратора
-    app.post("/api/admin/addRegion", checkAuth("admin"), (req, res, next) => {
+    app.post("/api/admin/addRegion", checkAuth("admin"), validAddRegion, (req, res, next) => {
         modelPromiseToRes(
             addRegion(req.body.region),
             res, next)
     })
 
-    app.post("/api/admin/addUser", validAddUser, checkAuth("admin"), (req, res, next) => {
+    app.post("/api/admin/addUser", checkAuth("admin"), validAddUser, (req, res, next) => {
         modelPromiseToRes(
             addUser(
                 req.body.email,
@@ -58,10 +57,10 @@ module.exports = function (app) {
             res, next)
     })
 
-    app.post("/api/admin/editUser", checkAuth("admin"), (req, res, next) => {
+    app.post("/api/admin/editUser", checkAuth("admin"), validEditUser, (req, res, next) => {
         modelPromiseToRes(
             editUser(
-                req.body.id,
+                +req.body.id,
                 req.body.email,
                 req.body.password),
             res, next)
@@ -73,10 +72,10 @@ module.exports = function (app) {
             res, next)
     })
 
-    app.post("/api/admin/editRegion", checkAuth("admin"), (req, res, next) => {
+    app.post("/api/admin/editRegion", checkAuth("admin"), validEditRegion, (req, res, next) => {
         modelPromiseToRes(
             editRegion(
-                req.body.id,
+                +req.body.id,
                 req.body.region),
             res, next)
     })
@@ -93,12 +92,10 @@ module.exports = function (app) {
             res, next)
     })
 
-    app.post("/api/admin/loginAs", checkAuth("admin"), async (req, res, next) => {
+    app.post("/api/admin/loginAs", checkAuth("admin"), validLoginAs, async (req, res, next) => {
         req.session.adminId = req.user.id
-        const userId = Number(req.body.id)
-        if (!Number.isInteger(userId) || !await hasUserId(userId)) {
-            next("this userId not found")
-        } else if ((await getUserById(userId)).permission[0].permission === "admin") {
+        const userId = +req.body.id
+        if ((await User.getUserById(userId)).permission[0].permission === "admin") {
             next("login as admin is not allowed")
         } else {
             req.session.passport.user = userId
@@ -135,7 +132,8 @@ module.exports = function (app) {
             , res, next)
     })
 
-    app.post("/api/moder/setPointRefuse", checkAuth("moder"), (req, res, next) => {
+    app.post("/api/moder/setPointRefuse", checkAuth("moder"), validSetPointRefuse, (req, res, next) => {
+        console.log(typeof req.body.description, req.body.description)
         modelPromiseToRes(
             setPointRefuse(req.user, req.body.id, req.body.description),
             res, next)

@@ -1,9 +1,8 @@
 {
-  "title": "addUser",
+  "title": "login",
   "type": "object",
-  "description": "",
   "properties": {
-    "email": {
+    "login": {
       "allOf": [
         {
           "transform": [
@@ -22,18 +21,10 @@
       "type": "string",
       "minLength": 8,
       "maxLength": 72
-    },
-    "region_id": {
-      "type": "integer"
-    },
-    "permission_id": {
-      "type": "integer"
     }
   },
   "required": [
-    "email",
-    "password",
-    "region_id",
-    "permission_id"
+    "login",
+    "password"
   ]
 }

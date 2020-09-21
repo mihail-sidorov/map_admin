@@ -1,0 +1,17 @@
+{
+  "title": "setPointsModer",
+  "type": "object",
+  "description": "",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "description": {
+      "type": "string",
+      "description": ""
+    }
+  },
+  "required": [
+    "id"
+  ]
+}
