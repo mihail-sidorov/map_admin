@@ -31,5 +31,4 @@ module.exports = function (app) {
         })
     )
 
-    passportModule(app) //middlware для аутентефикации вынесенно в модуль
-}
+    passportModule(app)
