@@ -7,6 +7,7 @@ const { addUser, editUser, getUsers, getPermission, getRegions, editRegion, addR
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 const { hasUserId } = require("./model/adminPanelApi/utilityFn")
 const { getUserById } = require("./model/adminPanelApi/others")
+
 const { validReqEditUser, validReqAddUser, validReqSetPointRefuse, validErrHandler, validAddUser } = require("./reqValidators")
 
 module.exports = function (app) {
@@ -52,8 +53,8 @@ module.exports = function (app) {
             addUser(
                 req.body.email,
                 req.body.password,
-                req.body.permission_id,
-                req.body.region_id),
+                +req.body.permission_id,
+                +req.body.region_id),
             res, next)
     })
 
@@ -75,7 +76,7 @@ module.exports = function (app) {
     app.post("/api/admin/editRegion", checkAuth("admin"), (req, res, next) => {
         modelPromiseToRes(
             editRegion(
-                req.body.region_id,
+                req.body.id,
                 req.body.region),
             res, next)
     })
@@ -191,6 +192,7 @@ module.exports = function (app) {
     })
 
     app.use(function (err, req, res, next) {
+        //console.log(err)
         res.status(200).json(jsonResPattern(err, true))
     })
 }

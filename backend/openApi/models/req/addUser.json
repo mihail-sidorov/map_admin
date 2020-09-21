@@ -1,30 +1,33 @@
 {
   "title": "addUser",
   "type": "object",
+  "description": "",
   "properties": {
     "email": {
-      "format": "email",
-      "type": "string"
+      "allOf": [
+        {
+            "transform":["trim","toLowerCase"]
+        },
+        {
+          "type": "string",
+          "format": "email"
+        }
+      ]
     },
     "password": {
-      "type": "string"
+      "type": "string",
+      "minLength": 8
     },
     "region_id": {
-      "type": [
-        "integer",
-        "number",
-        "string"
-      ]
+      "type": "integer"
     },
     "permission_id": {
-      "type": [
-        "integer",
-        "number",
-        "string"
-      ]
+      "type": "integer"
     }
   },
   "required": [
+    "email",
+    "password",
     "region_id",
     "permission_id"
   ]

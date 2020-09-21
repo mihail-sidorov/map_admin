@@ -1,5 +1,5 @@
 {
-  "title": "editPointModerRequest",
+  "title": "editPoint",
   "type": "object",
   "description": "request body для /moder/editPoint",
   "properties": {

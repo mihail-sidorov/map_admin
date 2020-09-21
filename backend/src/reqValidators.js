@@ -1,81 +1,65 @@
-
-//const moderEditPoint = require("../openApi/models/moder/req/editPoint.json")
+const moderEditPointJson = require("../openApi/models/req/editPoint.json")
 const addUserJson = require("../openApi/models/req/addUser.json")
 
 const Permission = require("./model/orm/permission")
 const User = require("./model/orm/user")
 const Region = require("./model/orm/region")
-const { body, validationResult } = require("express-validator")
 
+let yup = require('yup')
 const Ajv = require('ajv')
-const Joi = require('joi')
+const ajv = new Ajv({ allErrors: false, coerceTypes: true })
+require('ajv-keywords')(ajv, ['transform'])
 
 
-
-// module.exports.validErrHandler = (req, res, next) => {
-//     const errors = validationResult(req)
-//     if (!errors.isEmpty()) {
-//         next(errors.array())
-//     } else {
-//         next()
-//     }
-// }
-
-// module.exports.validReqAddUser = [
-//     body('email').not().isEmpty().trim().isEmail().bail().custom(async (value) => {
-//         const check = await User.hasEmail(value)
-//         if (check) {
-//             throw new Error('this user already exists')
-//         }
-//     }),
-//     body('password').not().isEmpty().isLength({ min: 8, max: 72 }),
-//     body('permission_id').isInt().not().isEmpty().toInt().bail().custom(async (value) => {
-//         const check = await Permission.hasPermission(value)
-//         if (!check) {
-//             throw new Error('this permission_id not found')
-//         }
-//     }),
-//     body('region_id').isInt().not().isEmpty().toInt().bail().custom(async (value) => {
-//         const check = await Region.hasRegion(value)
-//         if (!check) {
-//             throw new Error('this region_id not found')
-//         }
-//     })
-// ]
-
-// module.exports.validReqEditUser = [
-//     body('id').isInt().not().isEmpty().toInt(),
-//     body('email').trim().isEmail().optional(),
-//     body('password').customSanitizer(value => {
-//         return (value == "") ? undefined : value
-//     }).optional().isLength({ min: 8, max: 72 })
-// ]
-
-// module.exports.validReqSetPointRefuse = [
-//     body('id').isInt().not().isEmpty().toInt()
-// ]
-
-function validConstructor(ajvSchema, joiSchemaRaw) {
-    const ajv = new Ajv()
+function validConstructor(ajvSchema, yupSchemaRaw) {
     const validate = ajv.compile(ajvSchema)
-    const joiSchema = Joi.object(joiSchemaRaw).unknown(true)
-    return (req, res, next) => {
+    const yupSchema = yup.object().shape(yupSchemaRaw).unknown(true)
+    return async (req, res, next) => {
         const valid = validate(req.body)
         if (valid) {
-            console.log(req.body)
-            const error = joiSchema.validate(req.body).error
-            next(error)
+            await yupSchema.validate(req.body).catch((err => next(err.path + ": " + err.message)))
+            next()
         } else {
-            next(validate.errors)
+            const error = validate.errors[0].dataPath.slice(1) + ": " + validate.errors[0].message
+            next(error)
         }
     }
 }
 
 module.exports.validAddUser = validConstructor(addUserJson, {
-    email: Joi.custom(async (value) => {
-        const check = await User.hasEmail(value)
-        if (check) {
-            throw new Error('this user already exists')
-        }
-    })
+    email: yup.string().test(
+        'email',
+        'this user already exists',
+        async value => !(await User.hasEmail(value))
+    ),
+    permission_id: yup.number().test(
+        'permission_id',
+        "this permission_id not found",
+        async value => Permission.hasPermission(value)
+    ),
+    region_id: yup.number().test(
+        'region_id',
+        "this region_id not found",
+        async value => Region.hasRegion(value)
+    )
+
+})
+
+module.exports.validModerEditPoint = validConstructor(moderEditPointJson, {
+    email: yup.string().test(
+        'email',
+        'this user already exists',
+        async value => !(await User.hasEmail(value))
+    ),
+    permission_id: yup.number().test(
+        'permission_id',
+        "this permission_id not found",
+        async value => Permission.hasPermission(value)
+    ),
+    region_id: yup.number().test(
+        'region_id',
+        "this region_id not found",
+        async value => Region.hasRegion(value)
+    )
+
 })

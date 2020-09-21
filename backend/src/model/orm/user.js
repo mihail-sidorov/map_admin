@@ -78,14 +78,6 @@ module.exports = class User extends Password(Model) {
      * @return {boolean} Возвращает результат проверки
      */
     static async hasEmail(email) {
-        if (typeof (email) === "string") {
-            //удаляем пробелы пробелы из email
-            email = email.trim()
-        } else {
-            //если емейл не строка
-            throw "email must not be empty"
-        }
-
         return User.query()
             .first()
             .whereIn("email", [email])
