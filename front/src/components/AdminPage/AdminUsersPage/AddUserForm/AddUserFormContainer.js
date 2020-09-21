@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
-import { closeAddUserFormActionCreator, getPermissions, setPermissionsActionCreator, addUser, addUserActionCreator } from '../../../../redux/adminPageReducer';
+import { closeAddUserFormActionCreator, getPermissions, setPermissionsActionCreator, addUser, addUserActionCreator, setRegionsToAddUserFormActionCreator } from '../../../../redux/adminPageReducer';
+import { getRegions } from '../../../../redux/adminRegionsPageReducer';
 import AddUserFormRequest from './AddUserForm';
 
 let AddUserFormContainer = connect(
@@ -11,8 +12,9 @@ let AddUserFormContainer = connect(
             dispatch(closeAddUserFormActionCreator());
         },
         onSubmit: (values) => {
-            if (values.email && values.password && values.permission) {
+            if (values.email && values.password && values.permission && values.region) {
                 values.permission_id = values.permission;
+                values.region_id = values.region;
 
                 console.log(values);
 
@@ -30,6 +32,15 @@ let AddUserFormContainer = connect(
             getPermissions()
                 .then((permissionsArr) => {
                     dispatch(setPermissionsActionCreator(permissionsArr));
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        onGetRegions: () => {
+            getRegions()
+                .then((regionsArr) => {
+                    dispatch(setRegionsToAddUserFormActionCreator(regionsArr));
                 })
                 .catch((error) => {
                     console.log(error);

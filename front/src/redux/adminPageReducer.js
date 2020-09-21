@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from "../serverName";
 
-const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER', RESET_PAGINATION_ADMIN = 'RESET_PAGINATION_ADMIN', RESET_SEARCH_ADMIN = 'RESET_SEARCH_ADMIN';
+const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER', RESET_PAGINATION_ADMIN = 'RESET_PAGINATION_ADMIN', RESET_SEARCH_ADMIN = 'RESET_SEARCH_ADMIN', SET_REGIONS_TO_ADD_USER_FORM = 'SET_REGIONS_TO_ADD_USER_FORM';
 
 let makeShortUsers = (state) => {
     let searchUsers = {}, shortUsers = {};
@@ -69,6 +69,7 @@ let initialState = {
         open: false,
         newUser: false,
         permissions: [],
+        regions: [],
     },
     editUserForm: {
         open: false,
@@ -199,6 +200,11 @@ export let resetSearchAdminActionCreator = () => ({
     type: RESET_SEARCH_ADMIN,
 })
 
+export let setRegionsToAddUserFormActionCreator = (regionsArr) => ({
+    type: SET_REGIONS_TO_ADD_USER_FORM,
+    regionsArr: regionsArr,
+})
+
 let adminPageReducer = (state = initialState, action) => {
     let newState, makeShortUsersResult;
 
@@ -314,6 +320,14 @@ let adminPageReducer = (state = initialState, action) => {
             return {
                 ...state,
                 search: '',
+            };
+        case SET_REGIONS_TO_ADD_USER_FORM:
+            return {
+                ...state,
+                addUserForm: {
+                    ...state.addUserForm,
+                    regions: action.regionsArr,
+                },
             };
         default:
             return state;
