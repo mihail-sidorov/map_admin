@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { canselEditRegionActionCreator, editRegion, editRegionActionCreator } from '../../../../redux/adminRegionsPageReducer';
-import EditRegionForm from './EditRegionForm';
+import EditRegionFormModalWindow from './EditRegionForm';
 
 let EditRegionFormContainer = connect(
     state => ({
@@ -22,6 +22,6 @@ let EditRegionFormContainer = connect(
             dispatch(canselEditRegionActionCreator());
         },
     })
-)(EditRegionForm);
+)(EditRegionFormModalWindow);
 
 export default EditRegionFormContainer;

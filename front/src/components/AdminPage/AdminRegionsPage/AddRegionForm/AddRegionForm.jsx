@@ -1,5 +1,6 @@
 import React from 'react';
 import { Field, reduxForm } from 'redux-form';
+import modalWindowHOC from '../../../../HOC/modalWindowHOC';
 
 let Form = (props) => {
     return (
@@ -23,11 +24,16 @@ Form = reduxForm({
 
 let AddRegionForm = (props) => {
     return (
-        props.open &&
         <div className="add-region-form">
             <Form onSubmit={props.onAddRegion} {...props} />
         </div>
     );
 }
 
-export default AddRegionForm;
+let AddRegionFormModalWindow = (props) => {
+    return (
+        modalWindowHOC(AddRegionForm, props, props.open, props.onCanselAddRegion, true, 'Добавить регион')
+    );
+}
+
+export default AddRegionFormModalWindow;

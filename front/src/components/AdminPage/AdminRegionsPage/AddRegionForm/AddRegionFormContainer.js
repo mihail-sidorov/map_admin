@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import AddRegionForm from './AddRegionForm';
+import AddRegionFormModalWindow from './AddRegionForm';
 import {addRegion, addRegionActionCreator, canselAddRegionActionCreator} from '../../../../redux/adminRegionsPageReducer';
 
 let AddRegionFormContainer = connect(
@@ -22,6 +22,6 @@ let AddRegionFormContainer = connect(
             dispatch(canselAddRegionActionCreator());
         },
     })
-)(AddRegionForm);
+)(AddRegionFormModalWindow);
 
 export default AddRegionFormContainer;
