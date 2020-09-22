@@ -6,24 +6,43 @@
       "type": "integer"
     },
     "email": {
-      "allOf": [
+      "oneOf": [
         {
-          "transform": [
-            "trim",
-            "toLowerCase"
+          "allOf": [
+            {
+              "transform": [
+                "trim",
+                "toLowerCase"
+              ]
+            },
+            {
+              "type": "string",
+              "format": "email",
+              "maxLength": 320
+            }
           ]
         },
         {
           "type": "string",
-          "format": "email",
-          "maxLength": 320
+          "enum": [
+            ""
+          ]
         }
       ]
     },
     "password": {
-      "type": "string",
-      "minLength": 8,
-      "maxLength": 72
+      "oneOf": [
+        {
+          "minLength": 8,
+          "maxLength": 72
+        },
+        {
+          "enum": [
+            ""
+          ]
+        }
+      ],
+      "type": "string"
     }
   },
   "required": [

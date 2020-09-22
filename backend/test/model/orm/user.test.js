@@ -1,7 +1,7 @@
 const User = require("../../../src/model/orm/user")
 const { nanoid } = require("nanoid")
 const { matchers } = require("jest-json-schema")
-const getUserModel = require("../../../openApi/models/getUsers.v1.json")
+const getUserModel = require("../../../openApi/models/res/getUsers.json")
 
 expect.extend(matchers)
 

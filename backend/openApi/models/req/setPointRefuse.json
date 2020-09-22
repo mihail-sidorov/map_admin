@@ -8,7 +8,7 @@
     },
     "description": {
       "type": "string",
-      "description": ""
+      "default": ""
     }
   },
   "required": [

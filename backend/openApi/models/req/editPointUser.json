@@ -1,0 +1,44 @@
+{
+  "title": "editPointUser",
+  "type": "object",
+  "properties": {
+    "lng": {
+      "type": "number"
+    },
+    "lat": {
+      "type": "number"
+    },
+    "title": {
+      "type": "string"
+    },
+    "apartment": {
+      "type": "string"
+    },
+    "hours": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "site": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "force": {
+      "type": [
+        "boolean",
+        "integer"
+      ],
+      "description": "при true добавит точку в любом случае, даже если есть дубликат"
+    },
+    "isActive": {
+      "type": [
+        "boolean",
+        "integer"
+      ],
+      "default": 1
+    }
+  }
+}

@@ -5,9 +5,21 @@ const { checkAuth } = require("./middlewares/passport")
 const { delPoint, addPoint, getPoints, editPoint } = require("./model/adminPanelApi/user")
 const { addUser, editUser, getUsers, getPermission, getRegions, editRegion, addRegion } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
-
-const { validAddUser, validEditUser, validLogin, validAddRegion, validEditRegion, validLoginAs, validSetPointRefuse } = require("./reqValidators")
+const yup = require('yup')
+const {
+    validAddUser,
+    validEditUser,
+    validLogin,
+    validAddRegion,
+    validEditRegion,
+    validLoginAs,
+    validSetPointRefuse,
+    validDelPoint,
+    validAddPoint,
+    validEditPointModer,
+    validEditPointUser } = require("./reqValidators")
 const User = require("./model/orm/user")
+const Shop = require("./model/orm/shop")
 
 module.exports = function (app) {
 
@@ -95,7 +107,7 @@ module.exports = function (app) {
     app.post("/api/admin/loginAs", checkAuth("admin"), validLoginAs, async (req, res, next) => {
         req.session.adminId = req.user.id
         const userId = +req.body.id
-        if ((await User.getUserById(userId)).permission[0].permission === "admin") {
+        if ((await User.getUserById(userId)).permission === "admin") {
             next("login as admin is not allowed")
         } else {
             req.session.passport.user = userId
@@ -133,9 +145,9 @@ module.exports = function (app) {
     })
 
     app.post("/api/moder/setPointRefuse", checkAuth("moder"), validSetPointRefuse, (req, res, next) => {
-        console.log(typeof req.body.description, req.body.description)
+        console.log(typeof req.body.description, req.body)
         modelPromiseToRes(
-            setPointRefuse(req.user, req.body.id, req.body.description),
+            setPointRefuse(req.user, +req.body.id, req.body.description),
             res, next)
     })
 
@@ -145,9 +157,13 @@ module.exports = function (app) {
             res, next)
     })
 
-    app.post("/api/moder/editPoint/:id", checkAuth("moder"), (req, res, next) => {
+    app.post("/api/moder/editPoint/:id", checkAuth("moder"), validEditPointModer, async (req, res, next) => {
+        //валидация point id
+        await yup.number().integer()
+            .validate(req.params.id).catch((err => next("id: " + err.message)))
+
         modelPromiseToRes(
-            editPointModer(req.params.id, {
+            editPointModer(+req.params.id, {
                 street: req.body.street,
                 house: req.body.house,
                 full_city_name: req.body.full_city_name,
@@ -156,7 +172,7 @@ module.exports = function (app) {
                 hours: req.body.hours,
                 phone: req.body.phone,
                 site: req.body.site,
-                isActiv: req.body.isActiv
+                isActive: Boolean(req.body.isActive)
             })
             , res, next)
     })
@@ -167,21 +183,46 @@ module.exports = function (app) {
             , res, next)
     })
 
-    app.post("/api/user/delPoint", checkAuth(["user", "moder"]), (req, res, next) => {
+    app.post("/api/user/delPoint", checkAuth(["user", "moder"]), validDelPoint, (req, res, next) => {
         modelPromiseToRes(
-            delPoint(req.user.id, req.body.id),
+            delPoint(req.user.id, +req.body.id),
             res, next)
     })
 
-    app.post("/api/user/addPoint", checkAuth(["user", "moder"]), (req, res, next) => {
+    app.post("/api/user/addPoint", checkAuth(["user", "moder"]), validAddPoint, (req, res, next) => {
         modelPromiseToRes(
-            addPoint(req.user, req.body)
-            , res, next) // id, title, lng, lat, apartment, hours, phone, site, user_description
+            addPoint(req.user, {
+                lng: +req.body.lng,
+                lat: +req.body.lat,
+                title: req.body.title,
+                apartment: req.body.apartment,
+                hours: req.body.hours,
+                phone: req.body.phone,
+                site: req.body.site,
+                description: req.body.description,
+                force: Boolean(req.body.force),
+                isActive: Boolean(req.body.isActive),
+            })
+            , res, next)
     })
 
-    app.post("/api/user/editPoint/:id", checkAuth(["user", "moder"]), (req, res, next) => {
+    app.post("/api/user/editPoint/:id", checkAuth(["user", "moder"]), validEditPointUser, async (req, res, next) => {
+        await yup.number().integer()
+            .validate(req.params.id).catch((err => next("id: " + err.message)))
         modelPromiseToRes(
-            editPoint(req.user, req.params.id, req.body)
+            editPoint(req.user,
+                +req.params.id, {
+                lng: +req.body.lng,
+                lat: +req.body.lat,
+                title: req.body.title,
+                apartment: req.body.apartment,
+                hours: req.body.hours,
+                phone: req.body.phone,
+                site: req.body.site,
+                description: req.body.description,
+                force: Boolean(req.body.force),
+                isActive: Boolean(req.body.isActive),
+            })
             , res, next)
     })
 

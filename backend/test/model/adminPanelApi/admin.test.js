@@ -1,8 +1,9 @@
-const getRegionsModel = require("../../../openApi/models/getRegions.v1.json")
+const getRegionsModel = require("../../../openApi/models/res/getRegions.json")
+const getPermissionJson = require("../../../openApi/models/res/getPermissions.json")
 const { matchers } = require("jest-json-schema")
-const { getRegions, addRegion, editRegion, getUsers, addUser, editUser } = require("../../../src/model/adminPanelApi/admin")
+const { getRegions, addRegion, editRegion, getUsers, addUser, editUser, getPermission } = require("../../../src/model/adminPanelApi/admin")
 const { nanoid } = require("nanoid")
-const getUserModel = require("../../../openApi/models/getUsers.v1.json")
+const getUserModel = require("../../../openApi/models/res/getUsers.json")
 const Permission = require("../../../src/model/orm/permission")
 const { addTestUser, delTestUser, delTestRegion, getEmail } = require("../../testhelper")
 const User = require("../../../src/model/orm/user")
@@ -32,8 +33,6 @@ test("Тест функции addRegion, добавление региона", a
     expect(regions).toContainEqual(getRegion[0])
     expect(regions).toContainEqual(expect.objectContaining({ region }))
 
-    await expect(addRegion(3)).rejects.toBe("incorrect region")
-    await expect(addRegion()).rejects.toBe("incorrect region")
 })
 
 test("Редактирование региона editRegion", async () => {
@@ -46,14 +45,12 @@ test("Редактирование региона editRegion", async () => {
     regionEdit = await editRegion(getRegion[0].id, nameEdit)
 
     regions = await getRegions()
- 
+
     expect(regions).toContainEqual(expect.objectContaining({ region: nameEdit }))
     expect(regions).toContainEqual(regionEdit[0])
     expect(regionEdit).toMatchSchema(getRegionsModel)
 
-    await expect(editRegion(undefined, nameEdit)).rejects.toEqual("incorrect regionId")
-    await expect(editRegion(undefined)).rejects.toBe("incorrect regionId")
-    await expect(editRegion(getRegion[0].id)).rejects.toEqual("incorrect region")
+    await expect(editRegion(getRegion[0].id)).rejects.toEqual("fail")
     await expect(editRegion(-23, nameEdit)).rejects.toEqual("fail")
 })
 
@@ -86,7 +83,7 @@ test("Редактирование пользователя", async () => {
 
     userBeforeEdit = await User.query().findById(addUserRes[0].id).first()
     expect(await editUser(addUserRes[0].id, undefined, "password")).toMatchSchema(getUserModel)
-    userAfterEdit = await User.query().findById(addUserRes[0].id).first() 
+    userAfterEdit = await User.query().findById(addUserRes[0].id).first()
     const {
         password,
         ...userAfterEditPassword
@@ -107,6 +104,10 @@ test("Редактирование пользователя", async () => {
     expect(userBeforeEdit.email).not.toBe(email)
 
     expect(editUser(-2323, getEmail(), undefined)).rejects.toBe("fail")
+})
+
+test("getPermission", async () => {
+    expect(await getPermission()).toMatchSchema(getPermissionJson)
 })
 
 afterAll(delTestUser("admin"))

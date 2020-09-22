@@ -1,0 +1,9 @@
+{
+  "title": "delPoint",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    }
+  }
+}

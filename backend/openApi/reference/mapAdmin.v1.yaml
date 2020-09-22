@@ -47,19 +47,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              required:
-                - login
-                - password
-              properties:
-                login:
-                  type: string
-                  format: email
-                  maxLength: 320
-                password:
-                  type: string
-                  minimum: 8
-                  maximum: 72
+              $ref: ../models/req/login.json
       responses:
         '200':
           description: Ответ
@@ -190,7 +178,7 @@ paths:
                   response:
                     oneOf:
                       - type: string
-                      - $ref: ../models/getUsers.v1.json
+                      - $ref: ../models/res/getUsers.json
                 required:
                   - isError
                   - response
@@ -206,35 +194,27 @@ paths:
                 Такой пользователь уже есть:
                   value:
                     isError: true
-                    response: this user already exists
-                поле email пустое или не строкового типа:
-                  value:
-                    isError: true
-                    response: email must not be empty
+                    response: 'email: this email is already in use'
                 Не авторизован:
                   value:
                     isError: true
                     response: Unauthorized
-                Поле пароль не отправленно:
-                  value:
-                    isError: true
-                    response: 'ValidationError: password: is a required property'
                 Поле пароль слишком короткое:
                   value:
                     isError: true
-                    response: 'ValidationError: password: should NOT be shorter than 8 characters'
+                    response: 'password: should NOT be shorter than 8 characters'
                 Неверный формат email:
                   value:
                     isError: true
-                    response: 'ValidationError: email: should match format "email"'
+                    response: 'email: should match format "email"'
                 Данного permission_id нет в базе:
                   value:
                     isError: true
-                    response: permission with this id not found
-                'permission_id пустое, либо не является числом':
+                    response: 'permission_id: this permission_id not found'
+                Нет такого region_id:
                   value:
                     isError: true
-                    response: permission_id must be integer
+                    response: 'region_id: this region_id not found'
   /admin/editUser:
     post:
       tags:
@@ -249,20 +229,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              required:
-                - id
-              properties:
-                id:
-                  type: integer
-                email:
-                  type: string
-                  format: email
-                  maximum: 320
-                password:
-                  type: string
-                  minimum: 8
-                  maximum: 72
+              $ref: ../models/req/editUser.json
       responses:
         '200':
           description: Возвращает данные отредактированного пользователя
@@ -276,7 +243,10 @@ paths:
                   response:
                     oneOf:
                       - type: string
-                      - $ref: ../models/getUsers.v1.json
+                      - $ref: ../models/res/getUsers.json
+                required:
+                  - isError
+                  - response
               examples:
                 Пароль изменен:
                   description: response возвращает поля отредактированного пользователя
@@ -294,26 +264,18 @@ paths:
                   value:
                     isError: true
                     response: Unauthorized
-                Поле пароль не отправленно:
-                  value:
-                    isError: true
-                    response: 'ValidationError: password: is a required property'
                 Поле пароль слишком короткое:
                   value:
                     isError: true
-                    response: 'ValidationError: password: should NOT be shorter than 8 characters'
+                    response: 'password: should NOT be shorter than 8 characters'
                 Неверный формат email:
                   value:
                     isError: true
-                    response: 'ValidationError: email: should match format "email"'
+                    response: 'email: should match format "email"'
                 Остальные ошибки:
                   value:
                     isError: true
                     response: fail
-                Поле id неверного формата или отсутствует:
-                  value:
-                    isError: true
-                    response: userId must be not empty
   /admin/getUsers:
     get:
       tags:
@@ -336,7 +298,7 @@ paths:
                   response:
                     oneOf:
                       - type: string
-                      - $ref: ../models/getUsers.v1.json
+                      - $ref: ../models/res/getUsers.json
                 required:
                   - isError
                   - response
@@ -452,19 +414,14 @@ paths:
                 Нет такого id:
                   value:
                     isError: true
-                    response: this userId not found
+                    response: 'id: this userId not found'
           description: Ответ
       operationId: get-admin-loginAs
       requestBody:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              properties:
-                id:
-                  type:
-                    - string
-                    - integer
+              $ref: ../models/req/loginAs.json
             examples: {}
         description: Отправлем id пользователя под которого мы хотим зайти
       description: 'Заходим под другим пользователем, система будет идентифицировать как другого пользователя до того как не будет выполнен запрос returnToAdmin'
@@ -726,7 +683,7 @@ paths:
               required:
                 - id
         description: Отправляем id точки
-  /moder/editPoint:
+  '/moder/editPoint/{id}':
     post:
       summary: Редактирование точки модератором
       tags:
@@ -769,6 +726,13 @@ paths:
           application/x-www-form-urlencoded:
             schema:
               $ref: ../models/editPointModerRequest.v1.json
+        description: Запрос
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
   /moder/setPointRefuse:
     post:
       summary: Отклоняет точку
@@ -996,3 +960,94 @@ paths:
       description: |-
         Редактирует точку в базе данных, Стаус меняется на moderated в случаях: меняются любые поля кроме isActive, description;
         меняется discription при статусе refuse. При добавлении точки с похожими координаторами (точка не дальше 200 метров от имеющейся), будет возвращена ошибка. Для того чтоб все равно добавить точку нужно выставить поле force в запросе в true. Все точки подходящие под критерий в базе будут помечены как возможные дубликаты и присвоены к одной группе. В дальнейшем если точка будет близкой хотя бы к одной из группы, как дубликаты будут выданы все точки группы.
+  /admin/editRegion:
+    post:
+      summary: Редактирование региона
+      tags:
+        - admin
+      responses:
+        '200':
+          description: Возвращает данные отредактированного региона
+          content:
+            application/json:
+              schema:
+                $ref: ../models/res/getRegions.json
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response:
+                      - id: 1
+                        region: qqq
+                Неудача:
+                  value:
+                    isError: false
+                    response: fail
+      operationId: get-admin-editRegion
+      description: Изменение имени региона
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: ../models/req/editRegion.json
+            examples: {}
+        description: Принимает id и новое имя региона
+  /admin/getRegions:
+    get:
+      summary: Получение списка всех регионов
+      tags:
+        - admin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ../models/res/getRegions.json
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response:
+                      - id: 1
+                        region: qqq
+                      - id: 2
+                        region: Краснодарский край1
+                Неудача:
+                  value:
+                    isError: false
+                    response: fail
+      operationId: get-admin-getRegions
+      description: Получение списка всех регионов
+    parameters: []
+  /admin/addRegion:
+    post:
+      summary: Добавление нового региона
+      tags:
+        - admin
+      responses:
+        '200':
+          description: Возвращает данные добавленого региона
+          content:
+            application/json:
+              schema:
+                $ref: ../models/res/getRegions.json
+              examples:
+                Успех:
+                  value:
+                    isError: false
+                    response:
+                      - id: 1
+                        region: qqq
+                Неудача:
+                  value:
+                    isError: false
+                    response: fail
+      operationId: get-admin-addRegion
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: ../models/req/addRegion.json
+        description: Принимает название региона
+      description: Добавление нового региона

@@ -27,7 +27,7 @@
     "site": {
       "type": "string"
     },
-    "isActiv": {
+    "isActive": {
       "type": [
         "boolean",
         "integer"

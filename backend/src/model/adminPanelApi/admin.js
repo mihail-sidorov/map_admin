@@ -104,9 +104,9 @@ function getPermission() {
     return Permission.query()
 }
 
-function delUser(id) {
-    User.query().delete().where("email", email)
-}
+// function delUser(id) {
+//     User.query().delete().findById(id)
+// }
 
 exports.editRegion = editRegion
 exports.getRegions = getRegions

@@ -1,5 +1,5 @@
 const Region = require("../../../src/model/orm/region")
-const getRegionsModel= require("../../../openApi/models/getRegions.v1.json")
+const getRegionsModel= require("../../../openApi/models/res/getRegions.json")
 const {matchers} = require("jest-json-schema")
 
 expect.extend(matchers)
