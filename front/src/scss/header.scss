@@ -1,0 +1,35 @@
+.header {
+
+    height: 70px;
+    background-color: #432F21;
+    color: #fff;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+
+    .header__wrapper {
+
+        display: flex;
+        line-height: 70px;
+        justify-content: space-between;
+
+        .header__logo {
+
+            img {
+                vertical-align: middle;
+            }
+        }
+    
+        .header__logout {
+
+            a {
+                color: #fff;
+
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+}

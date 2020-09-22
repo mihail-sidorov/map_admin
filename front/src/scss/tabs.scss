@@ -1,0 +1,26 @@
+.tabs {
+
+    display: flex;
+    justify-content: center;
+
+    .tabs__tab {
+
+        margin-right: 10px;
+
+        .tabs__tab-link {
+
+            color: #fff;
+            text-decoration: none;
+            vertical-align: top;
+            display: inline-block;
+            padding: 30px;
+            background-color: #F0AA87;
+            border-radius: 10px;
+
+            &.active, &:hover {
+
+                background-color: #EB824D;
+            }
+        }
+    }
+}

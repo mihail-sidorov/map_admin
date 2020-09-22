@@ -61,7 +61,7 @@ let initialState = {
     shortUsers: {},
     search: '',
     pagination: {
-        count: 2,
+        count: 10,
         currentPage: 1,
         pages: 0,
     },

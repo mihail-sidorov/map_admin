@@ -7,7 +7,7 @@ import UsersContainer from "./Users/UsersContainer";
 
 let AdminUsersPage = (props) => {
     return (
-        <div className="admin-users-page">
+        <div className="admin-users-page section">
             <SearchAdminContainer />
             <UsersContainer />
             <PaginationContainer />
