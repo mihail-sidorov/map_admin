@@ -6,7 +6,7 @@ import store from './redux/store';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { getAuthData, setAuthDataActionCreator } from './redux/authReducer';
-import './App.css';
+import './scss/index.scss';
 import { setModerTabsActionCreator } from './redux/pointsPageReducer';
 
 getAuthData().then((data) => {
