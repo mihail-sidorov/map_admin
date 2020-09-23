@@ -1,34 +1,13 @@
 'use strict'
 const Shop = require("../orm/shop")
 
-const { getDuplicate, markDuplicate, checkTimeStamp, getPoint, getIdByModerStatus, getPrepareForInsert, getGeoData } = require("./utilityFn")
+const { throwDuplicate, markDuplicate, getPoint, getIdByModerStatus, getGeoData } = require("./utilityFn")
 const Moder_status = require("../orm/moder_status")
 
 async function addPoint(user, point, force) {
-    //добовляем street, house, full_city_name
+    //добавляем street, house, full_city_name
     await getGeoData(point)
-
-    const points = await getDuplicate(point)
-    if (points && !force) {
-        return {
-            "outputAsIs": true,
-            "duplicate": {
-                "points": points,
-                "point": {
-                    title: point.title,
-                    hours: point.hours,
-                    phone: point.phone,
-                    site: point.site,
-                    lat: point.lat,
-                    lng: point.lng,
-                    full_city_name: point.full_city_name,
-                    city: point.city,
-                    street: point.street,
-                    house: point.house,
-                }
-            }
-        }
-    }
+    await throwDuplicate(point,force)
 
     point.user_id = user.id
     point.moder_status_id = await Moder_status.getIdByModerStatus("moderated")
@@ -72,8 +51,10 @@ async function delPoint(userId, pointId) {
  * в случае дубликата (точка ближе чем ~200 метров к другой точке с базы) см. {@link ../openApi/models/duplicate.v1.json} 
  */
 
-async function editPoint(user, pointId, point) {
-
+async function editPoint(user, pointId, point, force) {
+    if (!point.lat || !point.lng) await getGeoData(point)
+    await throwDuplicate(point, force)
+    
     const { moder_status, isModerated } = await Shop.getModerStatusByPointId(pointId)
     if (moder_status == "accept" ||
         !req.body.description) {

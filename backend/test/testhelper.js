@@ -24,7 +24,7 @@ async function addTestUser(prefix, onlyValueGen = false, permission = "user", re
     }
 
     const email = getEmail(prefix) 
-    let userId, addUserRes
+    let userId, addUserRes, user
     if (!onlyValueGen) {
         addUserRes = await addUser(email, "testtest", permission_id, region_id) 
         userId = addUserRes[0].id

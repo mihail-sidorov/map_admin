@@ -75,32 +75,6 @@ module.exports.validEditUser = validConstructor(editUserJson, {
         async (value) => {
             return !(await User.hasEmail(value))
         })
-}, async (req) => {
-    const pointId = +req.params.id
-    const value = await checkTimeStamp(pointId, req.body.timeStamp)
-    if (!value) {
-        return "timeStamp: timeStamp does not match"
-    } else {
-        req.body.timeStamp = undefined
-    }
-    if (!req.body.lng || !req.body.lat) {
-        delete(req.body.lng)
-        delete(req.body.lat)
-    } else {
-        const { points, dupIds } = await getDuplicate(req.body, pointId)
-        if (points && !req.body.force) {
-            const response = {
-                "outputAsIs": true,
-                "duplicate": {
-                    "points": points,
-                    "point": req.body
-                }
-            }
-            return response
-        } else if (!points) {
-            delete(req.body.force)
-        }
-    }
 })
 module.exports.validLogin = validConstructor(loginJson)
 module.exports.validAddRegion = validConstructor(addRegionJson)
@@ -116,4 +90,12 @@ module.exports.validSetPointRefuse = validConstructor(setPointRefuseJson)
 module.exports.validEditPointModer = validConstructor(editPointModerJson)
 module.exports.validDelPoint = validConstructor(delPointJson)
 module.exports.validAddPoint = validConstructor(addPointJson)
-module.exports.validEditPointUser = validConstructor(editPointUserJson)
+module.exports.validEditPointUser = validConstructor(editPointUserJson, undefined, async (req) => {
+    const pointId = +req.params.id
+    const value = await checkTimeStamp(pointId, req.body.timeStamp)
+    if (!value) {
+        return "timeStamp: timeStamp does not match"
+    } else {
+        req.body.timeStamp = undefined
+    }
+})

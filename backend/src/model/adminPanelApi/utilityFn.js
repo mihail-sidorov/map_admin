@@ -8,6 +8,30 @@ const { nanoid } = require("nanoid")
 const Region = require("../orm/region")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
+async function throwDuplicate(point, force) {
+    const points = await getDuplicate(point)
+    if (points && !force) {
+        throw {
+            "outputAsIs": true,
+            "duplicate": {
+                "points": points,
+                "point": {
+                    title: point.title,
+                    hours: point.hours,
+                    phone: point.phone,
+                    site: point.site,
+                    lat: point.lat,
+                    lng: point.lng,
+                    full_city_name: point.full_city_name,
+                    city: point.city,
+                    street: point.street,
+                    house: point.house,
+                }
+            }
+        }
+    }
+}
+
 async function getDuplicate(point) {
     const pointAccuratyMeter = 200
     const pointAccuratyDegrees = 0.00000900900900900901 * pointAccuratyMeter
@@ -16,19 +40,20 @@ async function getDuplicate(point) {
         .whereBetween("lat", [+point.lat - pointAccuratyDegrees, +point.lat + pointAccuratyDegrees])
         .andWhereBetween("lng", [+point.lng - pointAccuratyDegrees, +point.lng + pointAccuratyDegrees])
 
+    if (!dupCoord[0]) {
+        return false
+    }
     let dupIds
-    //ищем уже расставленные группы
-    let dupGroup = await dupCoord.$query().distinct("duplicateGroup")
-    //если еть формируем массив из групп [group1,group2,...] и из id
-    if (dupGroup && dupGroup[0]) {
-        dupGroup = dupGroup.map((value) => {
-            return value.duplicateGroup
-        })
+    const dupGroup = dupCoord.map((value) => {
+        return value.duplicateGroup
+    })
+    //выбираем только уникальные и непустые значения из массива групп
+    const dupGroupUnique = dupGroup.filter((v, i, a) => (v != null && a.indexOf(v) === i))
 
+    if (dupGroupUnique.length) {
         dupIds = dupCoord.map((value) => {
             return value.id
         })
-        //если нет просто отправляем точки удалив столбец duplicateGroup
     } else {
         dupCoord.forEach((value) => {
             value.duplicateGroup = undefined
@@ -43,8 +68,8 @@ async function getDuplicate(point) {
         .orWhereIn("duplicateGroup", dupGroup)
 }
 
-async function markDuplicate(point,force,pointId) {
-    if (!point.lat || !point.lng) {
+async function markDuplicate(point, force, pointId) {
+    if (!point || !point.lat || !point.lng) {
         return
     }
     if (!force) {
@@ -54,7 +79,7 @@ async function markDuplicate(point,force,pointId) {
     const dupIds = duplicate.map((elem) => {
         return elem.id
     })
-    if (dupIds.length == 1){
+    if (dupIds.length == 1) {
         return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": null })
     } else if (dupIds.length > 1) {
         return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
@@ -185,6 +210,6 @@ exports.getIdByIsModerated = getIdByIsModerated
 exports.getIdByModerStatus = getIdByModerStatus
 exports.getPoint = getPoint
 exports.checkTimeStamp = checkTimeStamp
-exports.getDuplicate = getDuplicate
+exports.throwDuplicate = throwDuplicate
 exports.markDuplicate = markDuplicate
 exports.getGeoData = getGeoData
