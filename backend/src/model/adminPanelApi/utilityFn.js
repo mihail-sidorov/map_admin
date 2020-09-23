@@ -8,82 +8,64 @@ const { nanoid } = require("nanoid")
 const Region = require("../orm/region")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
-async function getDuplicate(point, pointId) {
-    if (!(+point.lat && +point.lng)) return false
-
-    const select = ["id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "duplicateGroup"]
+async function getDuplicate(point) {
     const pointAccuratyMeter = 200
     const pointAccuratyDegrees = 0.00000900900900900901 * pointAccuratyMeter
-    const prepareQuery = Shop.query()
-        .withGraphFetched("user")
-        .select(...select)
-
-    let duplicatePoints = await prepareQuery
+    const select = ["shops.id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "email as user"]
+    const dupCoord = await Shop.query().select(...select, "duplicateGroup").joinRelated("user")
         .whereBetween("lat", [+point.lat - pointAccuratyDegrees, +point.lat + pointAccuratyDegrees])
         .andWhereBetween("lng", [+point.lng - pointAccuratyDegrees, +point.lng + pointAccuratyDegrees])
 
-    const duplicateGroups = []
-    const duplicatePointWithoutGroups = []
-    const duplicateId = []
-    if (duplicatePoints[0] && !(duplicatePoints.length == 1 && duplicatePoints[0].id == pointId)) {
-        duplicatePoints.forEach(elem => {
-            if (elem.duplicateGroup) {
-                duplicateGroups.push(elem.duplicateGroup)
-            } else {
-                duplicatePointWithoutGroups.push(elem)
-            }
+    let dupIds
+    //ищем уже расставленные группы
+    let dupGroup = await dupCoord.$query().distinct("duplicateGroup")
+    //если еть формируем массив из групп [group1,group2,...] и из id
+    if (dupGroup && dupGroup[0]) {
+        dupGroup = dupGroup.map((value) => {
+            return value.duplicateGroup
         })
 
-        if (duplicateGroups.length) {
-            duplicatePoints = duplicatePointWithoutGroups.concat(
-                await prepareQuery.whereIn("duplicateGroup", duplicateGroups)
-            )
-        }
-
-        duplicatePoints.forEach(elem => {
-            duplicateId.push(elem.id)
+        dupIds = dupCoord.map((value) => {
+            return value.id
         })
-
-        if (pointId) {
-            duplicatePoints = duplicatePoints.filter(elem => elem.id != pointId)
-        }
-
-        duplicatePoints.forEach(elem => {
-            if (elem.user[0]) {
-                elem.user = elem.user[0].email
-                elem.id = undefined
-                elem.duplicateGroup = undefined
-            } else {
-                Shop.query().findById(elem.id).delete().then(res => res) //удаляем точки у которых нет владельца
-            }
-        })
-        return { "points": duplicatePoints, "dupIds": duplicateId }
+        //если нет просто отправляем точки удалив столбец duplicateGroup
     } else {
-        return false
+        dupCoord.forEach((value) => {
+            value.duplicateGroup = undefined
+        })
+        return dupCoord
     }
+
+    return await Shop.query()
+        .select(...select)
+        .joinRelated("user")
+        .whereIn("shops.id", dupIds)
+        .orWhereIn("duplicateGroup", dupGroup)
 }
 
-async function markDuplicate(dupIds, pointId) {
-    if (dupIds) {
-        dupIds.push(pointId)
-        return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
-    } else if (pointId) {
+async function markDuplicate(point,force,pointId) {
+    if (!point.lat || !point.lng) {
+        return
+    }
+    if (!force) {
         return await Shop.query().findById(pointId).patch({ "duplicateGroup": null })
+    }
+    const duplicate = await getDuplicate(point)
+    const dupIds = duplicate.map((elem) => {
+        return elem.id
+    })
+    if (dupIds.length == 1){
+        return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": null })
+    } else if (dupIds.length > 1) {
+        return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
     }
 }
 
 function checkTimeStamp(pointId, timeStamp) {
-    if (!timeStamp) throw "the field timeStamp in must not be empty"
     return Shop.query()
         .first()
         .where({ "id": pointId, "timeStamp": timeStamp })
-        .then(res => {
-            if (res) {
-                return true
-            } else {
-                throw "timeStamp does not match"
-            }
-        })
+        .then(Boolean)
 }
 
 async function hasUserId(userId) {
@@ -121,39 +103,13 @@ function getIdByModerStatus(moderStatus) {
     return Moder_status.query().where("moder_status", moderStatus).first().then(res => res.id)
 }
 
-async function getPrepareForInsert(fields, flag = "user") {
-    if (!fields) fields = {}
-    const flagData = {}
-    if (flag == "user") {
-        if (+fields.lat && +fields.lng) {
-            flagData.lat = +fields.lat
-            flagData.lng = +fields.lng
-            await getGeoData(flagData)
-        }
-
-        switch (fields.isActive) {
-            case "true": case "1": case 1: case true: flagData.isActive = true; break;
-            case "false": case "0": case 0: case false: flagData.isActive = false; break;
-            case null: case "null": case "": flagData.isActive = undefined; break;
-        }
-        flagData.description = fields.description
-
-    } else if (flag == "moder") {
-        flagData.description = null
-        flagData.street = fields.street
-        flagData.house = fields.house
-        flagData.full_city_name = fields.full_city_name
-    }
-
-    return Object.assign({
-        title: fields.title,
-        apartment: fields.apartment,
-        hours: fields.hours,
-        phone: fields.phone,
-        site: fields.site
-    }, flagData)
-}
-
+/**
+ * Получение геоданных
+ * заполняет свойство street, house, city, full_city_name
+ * @param {number} point.lat широта
+ * @param {number} point.lng долгота
+ * @throws {failed to get geodata} неудалось получить геоданные
+ */
 function getGeoData(point) { //должен содержать поля lat, lng; модифецирует обьект добовляя full_city_name, city, street, house
     return fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${apiYandex}&geocode=${point.lat},${point.lng}&format=json&kind=house&results=1`)
         .then(res => res.json())
@@ -205,13 +161,12 @@ async function getPoint(user, pointId) {
     const regionUsers = await Region.query()
         .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
         .skipUndefined()
-        .where("user_id", userId)
-        .andWhere({ "region_id": user.region_id, "id": pointId })
+        .where({ "regions.id": user.region_id })
         .modifyGraph('user.shop', bulder => {
-            bulder.select(...select)
+            bulder.skipUndefined().where({ "shops.id": pointId, "user_id": userId }).select(...select)
         })
         .first()
-
+    if (!regionUsers) return []
     for (let regionUser of regionUsers.user) {
         points.push(...regionUser.shop)
     }
@@ -228,8 +183,8 @@ exports.hasEmail = hasEmail
 exports.getIdByPermission = getIdByPermission
 exports.getIdByIsModerated = getIdByIsModerated
 exports.getIdByModerStatus = getIdByModerStatus
-exports.getPrepareForInsert = getPrepareForInsert
 exports.getPoint = getPoint
 exports.checkTimeStamp = checkTimeStamp
 exports.getDuplicate = getDuplicate
 exports.markDuplicate = markDuplicate
+exports.getGeoData = getGeoData

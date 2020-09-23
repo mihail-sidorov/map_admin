@@ -53,11 +53,19 @@ module.exports = class Shop extends Model {
         }
     }
 
+    /**
+     * Возвращет данные модерации по точке
+     * @param {number} pointId id точки
+     * @typedef {Object} getModerStatusByPointId
+     * @property {string} moder_status значение соответствуйщего поля в бд
+     * @property {number} isModerated значение соответствуйщего поля в бд
+     * @returns {getModerStatusByPointId} {moder_status:"accept", isModerated: 0}
+     */
     static async getModerStatusByPointId(pointId) {
-        return this.query().findById(pointId).joinRelated("moder_status").select("moder_status","isModerated")
+        return this.query().findById(pointId).joinRelated("moder_status").select("moder_status", "isModerated")
     }
 
-    static async hasPointId (pointId) {
+    static async hasPointId(pointId) {
         return this.query().findById(pointId).then(Boolean)
     }
 }

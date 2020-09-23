@@ -1,32 +1,44 @@
 'use strict'
 const Shop = require("../orm/shop")
 
-const { getDuplicate, markDuplicate, checkTimeStamp, getPoint, getIdByModerStatus, getPrepareForInsert } = require("./utilityFn")
+const { getDuplicate, markDuplicate, checkTimeStamp, getPoint, getIdByModerStatus, getPrepareForInsert, getGeoData } = require("./utilityFn")
+const Moder_status = require("../orm/moder_status")
 
-async function addPoint(user, point) {
+async function addPoint(user, point, force) {
+    //добовляем street, house, full_city_name
+    await getGeoData(point)
 
-    
-    const insertField = await getPrepareForInsert(point)
-    const { points, dupIds } = await getDuplicate(insertField)
-    if (points && !point.force) {
-        const response = {
+    const points = await getDuplicate(point)
+    if (points && !force) {
+        return {
             "outputAsIs": true,
             "duplicate": {
                 "points": points,
-                "point": insertField
+                "point": {
+                    title: point.title,
+                    hours: point.hours,
+                    phone: point.phone,
+                    site: point.site,
+                    lat: point.lat,
+                    lng: point.lng,
+                    full_city_name: point.full_city_name,
+                    city: point.city,
+                    street: point.street,
+                    house: point.house,
+                }
             }
         }
-        throw response
     }
 
-    insertField.user_id = user.id
-    insertField.moder_status_id = await getIdByModerStatus("moderated")
+    point.user_id = user.id
+    point.moder_status_id = await Moder_status.getIdByModerStatus("moderated")
+
     const pointId = await Shop
         .query()
-        .insert(insertField)
+        .insert(point)
         .then(res => res.id)
 
-    await markDuplicate(dupIds, pointId)
+    await markDuplicate(point, force, pointId)
     return getPoint(user, pointId)
 }
 
@@ -35,10 +47,6 @@ async function getPoints(user) {
 }
 
 async function delPoint(userId, pointId) {
-    userId = +userId
-    pointId = +pointId
-    if (!userId) throw "userId must not be empty"
-    if (!pointId) throw "pointId must not be empty"
     return Shop
         .query()
         .delete()
@@ -66,29 +74,18 @@ async function delPoint(userId, pointId) {
 
 async function editPoint(user, pointId, point) {
 
-    await checkTimeStamp(pointId, point.timeStamp)
+    const { moder_status, isModerated } = await Shop.getModerStatusByPointId(pointId)
+    if (moder_status == "accept" ||
+        !req.body.description) {
+        delete (req.body.description)
+    }
 
-    const moderStatusRefuse = await getIdByModerStatus("refuse")
-    const moderStatusModerated = await getIdByModerStatus("moderated")
+    const moderStatusRefuse = await Moder_status.getIdByModerStatus("refuse")
+    const moderStatusModerated = await Moder_status.getIdByModerStatus("moderated")
 
-    const updateData = await getPrepareForInsert(point)
-
-    const { isActive, description, ...checkData } = updateData
+    const { description, ...checkData } = point
     checkData.id = pointId
     checkData.user_id = user.id
-
-    const { points, dupIds } = await getDuplicate(point, pointId)
-
-    if (points && !point.force) {
-        const response = {
-            "outputAsIs": true,
-            "duplicate": {
-                "points": points,
-                "point": updateData
-            }
-        }
-        throw response
-    }
 
     await Shop.query().skipUndefined().first().where(checkData).then((res) => {
         //если хоть одно поле меняется кроме isActiv или description тогда ставим статуы moderated

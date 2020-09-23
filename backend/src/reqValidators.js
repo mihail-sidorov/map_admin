@@ -18,11 +18,14 @@ const Region = require("./model/orm/region")
 
 const yup = require('yup')
 const Ajv = require('ajv')
+const { checkTimeStamp } = require("./model/adminPanelApi/utilityFn")
+const Moder_status = require("./model/orm/moder_status")
+const Shop = require("./model/orm/shop")
 const ajv = new Ajv({ allErrors: false, coerceTypes: true, useDefaults: "empty" })
 require('ajv-keywords')(ajv, ['transform'])
 
 
-function validConstructor(ajvSchema, yupSchemaRaw) {
+function validConstructor(ajvSchema, yupSchemaRaw, callback) {
     const validate = ajv.compile(ajvSchema)
     const yupSchema = yup.object().shape(yupSchemaRaw).unknown(true)
     return async (req, res, next) => {
@@ -30,7 +33,11 @@ function validConstructor(ajvSchema, yupSchemaRaw) {
         if (valid) {
             req.body = yupSchema.cast(req.body)
             await yupSchema.validate(req.body).catch((err => next(err.path + ": " + err.message)))
-            next()
+            if (typeof callback == "function") {
+                next(await callback(req))
+            } else {
+                next()
+            }
         } else {
             const error = validate.errors[0].dataPath.slice(1) + ": " + validate.errors[0].message
             next(error)
@@ -68,6 +75,32 @@ module.exports.validEditUser = validConstructor(editUserJson, {
         async (value) => {
             return !(await User.hasEmail(value))
         })
+}, async (req) => {
+    const pointId = +req.params.id
+    const value = await checkTimeStamp(pointId, req.body.timeStamp)
+    if (!value) {
+        return "timeStamp: timeStamp does not match"
+    } else {
+        req.body.timeStamp = undefined
+    }
+    if (!req.body.lng || !req.body.lat) {
+        delete(req.body.lng)
+        delete(req.body.lat)
+    } else {
+        const { points, dupIds } = await getDuplicate(req.body, pointId)
+        if (points && !req.body.force) {
+            const response = {
+                "outputAsIs": true,
+                "duplicate": {
+                    "points": points,
+                    "point": req.body
+                }
+            }
+            return response
+        } else if (!points) {
+            delete(req.body.force)
+        }
+    }
 })
 module.exports.validLogin = validConstructor(loginJson)
 module.exports.validAddRegion = validConstructor(addRegionJson)

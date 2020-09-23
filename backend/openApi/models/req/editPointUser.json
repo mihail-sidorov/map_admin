@@ -39,6 +39,12 @@
         "integer"
       ],
       "default": 1
+    },
+    "timeStamp": {
+      "type": "string"
     }
-  }
+  },
+  "required": [
+    "timeStamp"
+  ]
 }

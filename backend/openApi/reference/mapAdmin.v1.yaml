@@ -19,7 +19,8 @@ info:
     {
       "isError": true,
       "response": "Unauthorized"
-    }
+    },
+    Все запросы проходят через валидатор ajv, который будет выводить ошибки в виде строки в respone если is Error = true, в формате %path%:%message%
   version: 1.0.0
   title: mapadmin API
   contact: {}
@@ -474,8 +475,8 @@ paths:
                   response:
                     oneOf:
                       - type: string
-                      - $ref: ../models/getPointsUser.v1.json
-                      - $ref: ../models/duplicate.v1.json
+                      - $ref: ../models/res/getPointsUser.json
+                      - $ref: ../models/res/duplicate.json
                 required:
                   - isError
                   - response
@@ -538,10 +539,6 @@ paths:
                           city: Майкоп
                           street: Заводская улица
                           house: '55'
-                Пустые координаты:
-                  value:
-                    isError: true
-                    response: lat and lng must not be empty
                 Проблема с получением гео данных(скорее всего в данной точке нет строений):
                   value:
                     isError: true
@@ -552,33 +549,8 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              properties:
-                lng:
-                  type: number
-                lat:
-                  type: number
-                title:
-                  type: string
-                apartment:
-                  type: string
-                hours:
-                  type: string
-                phone:
-                  type: string
-                site:
-                  type: string
-                description:
-                  type: string
-                force:
-                  type: boolean
-                  description: 'при true добавит точку в любом случае, даже если есть дубликат'
-                isActive:
-                  type: boolean
-              required:
-                - lng
-                - lat
-      description: 'Добавляет точку в базу данных, статус выставляется moder_status выставляется в moderated, для дальнейшего одобрения модератором. Пока статус не выставится в accept точке не будет отображаться на карте. При добавлении точки с похожими координаторами (точка не дальше 200 метров от имеющейся), будет возвращена ошибка. Для того чтоб все равно добавить точку нужно выставить поле force в запросе в true. Все точки подходящие под критерий в базе будут помечены как возможные дубликаты и присвоены к одной группе. В дальнейшем если точка будет близкой хотя бы к одной из группы, как дубликаты будут выданы все точки группы.'
+              $ref: ../models/req/addPoint.json
+      description: 'Добавляет точку в базу данных, статус moder_status выставляется в moderated, для дальнейшего одобрения модератором. Пока статус не выставится в accept точки не будет отображаться на карте. При добавлении точки с похожими координаторами (точка не дальше 200 метров от имеющейся), будет возвращена ошибка. Для того чтоб все равно добавить точку нужно выставить поле force в запросе в true. Все точки подходящие под критерий в базе будут помечены как возможные дубликаты и присвоены к одной группе. В дальнейшем если точка будет близкой хотя бы к одной из группы, как дубликаты будут выданы все точки группы.'
   /user/getPoints:
     get:
       summary: Получения точек пользователем
@@ -595,7 +567,7 @@ paths:
                   isError:
                     type: string
                   response:
-                    $ref: ../models/getPointsUser.v1.json
+                    $ref: ../models/res/getPointsUser.json
                 required:
                   - isError
                   - response
@@ -635,7 +607,7 @@ paths:
                         timeStamp: '2020-09-08 14:26:26'
                         moder_status: refuse
       operationId: get-user-getPoints
-      description: Получения списка точек принадлежащих пользователю
+      description: 'Получения списка точек принадлежащих пользователю, в случае отсутствия вернет пустой массив'
   /user/delPoint:
     post:
       summary: Удаление точки
@@ -665,23 +637,14 @@ paths:
                   value:
                     isError: true
                     response: point id not found
-                Поле id некорректно:
-                  value:
-                    isError: true
-                    response: pointId must not be empty
       operationId: get-user-delPoint
-      description: 'Удаляет точку принадлежащию пользователю, который авторизован в данный момент. Принимает в качестве параметра id точки В случае если данный id, принадлежит точке другого пользователя или не существует будет возвращена ошибка с текстом "point id not found" Если в поле отосланы некорректные данные или поле не отправлено будет возвращена ошибка с текстом "pointId must not be empty"'
+      description: 'Удаляет точку принадлежащию пользователю, который авторизован в данный момент. Принимает в качестве параметра id точки В случае если данный id, принадлежит точке другого пользователя или не существует будет возвращена ошибка с текстом "point id not found"'
       parameters: []
       requestBody:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-              required:
-                - id
+              $ref: ../models/req/delPoint.json
         description: Отправляем id точки
   '/moder/editPoint/{id}':
     post:
