@@ -62,48 +62,49 @@ let Point = (props) => {
 
     pointInform.push(
         <div className="point__inform" key={1}>
-            <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>***
+            <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>&nbsp;/&nbsp;
             <span className="point__moder-status">{moderStatus}</span>
         </div>
     );
 
     let delPointBtn = [];
     if ((props.permission === 'user') || (props.permission === 'moder' && props.point.moder_status === 'delete')) {
-        delPointBtn.push(<button className="point__del-button" onClick={onDelPoint} key={1}>Удалить</button>);
+        delPointBtn.push(<button className={`point__del-button list__item-btn${props.permission === 'moder' && props.moderTabsActive === 1 ? ' list__item-btn_accept list__item-btn_2' : ' list__item-btn_delete'}`} onClick={onDelPoint} key={1}></button>);
     }
 
     let refuseBtn = [];
     if (props.permission === 'moder') {
-        refuseBtn.push(<button className="point__refuse-btn" key={1} onClick={() => {
+        refuseBtn.push(<button className="point__refuse-btn list__item-btn list__item-btn_refuse" key={1} onClick={() => {
             props.onRefusePoint(props.point.id, prompt('Введите комментарий для пользователя', ''));
-        }}>Отклонить</button>);
+        }}></button>);
     }
 
     let editAcceptBtn = [];
     if ((props.permission === 'user') || (props.permission === 'moder' && props.point.moder_status === 'moderated')) {
         editAcceptBtn.push(
-            <button className="point__edit-button" onClick={() => {
+            <button className={`point__edit-button list__item-btn list__item-btn_2${props.permission === 'moder' && props.moderTabsActive === 1 ? ' list__item-btn_accept' : ' list__item-btn_edit'}`} onClick={() => {
                 props.showAddEditPointForm('edit', props.point.id);
-            }} key={1}>{props.permission === 'user' ? 'Редактировать' : 'Утвердить'}</button>
+            }} key={1}></button>
         );
     }
 
     return (
-        <div point-id={props.point.id} className="point">
+        <div className="point__container">
             {pointInform}
-            
-            <PointProperties point={props.point} permission={props.permission}/>
+            <div point-id={props.point.id} className="point list__item">   
+                <PointProperties point={props.point} permission={props.permission}/>
 
-            {editAcceptBtn}
+                {editAcceptBtn}
 
-            {delPointBtn}
+                {delPointBtn}
 
-            {refuseBtn}
+                {refuseBtn}
 
-            <div className="point__description">
-                {props.point.description}
+                <div className="point__description">
+                    {props.point.description}
+                    араорп паолполапо палоалопл оооллыыщп опаплпоал алпалплаоп аплоалпрарвоар щыоалвыыжыжлаороролалво оыыд оддооыд ды раррарлф
+                </div>
             </div>
-            <hr />
         </div>
     );
 }

@@ -6,6 +6,7 @@ let PointContainer = (id) => {
     let mapStateToProps = (state) => {
         return {
             point: state.pointsPageState.shortPoints[id],
+            moderTabsActive: state.pointsPageState.moderTabsActive,
         };
     }
 

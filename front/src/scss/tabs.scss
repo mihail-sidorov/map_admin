@@ -16,8 +16,17 @@
             padding: 30px;
             background-color: #F0AA87;
             border-radius: 10px;
+            cursor: pointer;
 
             &.active, &:hover {
+
+                background-color: #EB824D;
+            }
+        }
+
+        &_active {
+
+            .tabs__tab-link {
 
                 background-color: #EB824D;
             }

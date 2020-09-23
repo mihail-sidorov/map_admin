@@ -1,11 +1,12 @@
 import { connect } from 'react-redux';
 import { setAuthDataActionCreator } from '../../../redux/authReducer';
-import { getPoints, getPointsActionCreator, resetPaginationPointsActionCreator, resetPointsActionCreator, resetSearchPointsActionCreator } from '../../../redux/pointsPageReducer';
+import { getPoints, getPointsActionCreator, resetPaginationPointsActionCreator, resetPointsActionCreator, resetSearchPointsActionCreator, setModerTabsActiveActionCreator } from '../../../redux/pointsPageReducer';
 import ModerTabs from './ModerTabs';
 
 let ModerTabsContainer = connect(
     state => ({
         moderTabs: state.pointsPageState.moderTabs,
+        moderTabsActive: state.pointsPageState.moderTabsActive,
     }),
     dispatch => ({
         onGoToPoints: () => {
@@ -13,6 +14,7 @@ let ModerTabsContainer = connect(
             dispatch(resetSearchPointsActionCreator());
             dispatch(resetPointsActionCreator());
             dispatch(setAuthDataActionCreator({...window.store.getState().authState, permission: 'user'}));
+            dispatch(setModerTabsActiveActionCreator(2));
 
             getPoints('user')
                 .then((pointsArr) => {
@@ -27,6 +29,7 @@ let ModerTabsContainer = connect(
             dispatch(resetSearchPointsActionCreator());
             dispatch(resetPointsActionCreator());
             dispatch(setAuthDataActionCreator({...window.store.getState().authState, permission: 'moder'}));
+            dispatch(setModerTabsActiveActionCreator(1));
 
             getPoints('moder')
                 .then((pointsArr) => {

@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -76,11 +76,12 @@ let initialState = {
     },
     search: '',
     pagination: {
-        count: 2,
+        count: 5,
         currentPage: 1,
         pages: 0,
     },
     moderTabs: false,
+    moderTabsActive: 1,
 };
 
 // Запросы к API
@@ -252,6 +253,11 @@ export let resetModerTabsActionCreator = () => ({
     type: RESET_MODER_TABS,
 })
 
+export let setModerTabsActiveActionCreator = (index) => ({
+    type: SET_MODER_TABS_ACTIVE,
+    index: index,
+})
+
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -387,6 +393,11 @@ let pointsPageReducer = (state = initialState, action) => {
             return {
                 ...state,
                 moderTabs: false,
+            };
+        case SET_MODER_TABS_ACTIVE:
+            return {
+                ...state,
+                moderTabsActive: action.index,
             };
         default:
             return state;

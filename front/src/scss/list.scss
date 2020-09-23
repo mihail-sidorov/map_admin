@@ -48,9 +48,29 @@
             background-color: transparent;
             cursor: pointer;
 
+            &_2 {
+
+                right: 40px;
+            }
+
             &_edit {
 
                 background: url('../imgs/list__item-btn_edit.svg') no-repeat center;
+            }
+
+            &_accept {
+
+                background: url('../imgs/list__item-btn_accept.svg') no-repeat center;
+            }
+
+            &_delete {
+
+                background: url('../imgs/list__item-btn_delete.svg') no-repeat center;
+            }
+
+            &_refuse {
+
+                background: url('../imgs/list__item-btn_refuse.svg') no-repeat center;
             }
         }
     }
