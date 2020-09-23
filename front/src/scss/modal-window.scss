@@ -76,8 +76,7 @@
 
   width: 100%;
   max-width: 460px;
-  min-height: 440px;
-  border-radius: 0.25rem;
+  border-radius: 30px;
   background-color: #fff;
   padding: 50px;
   position: relative;
@@ -91,8 +90,8 @@
   position: absolute;
   width: 50px;
   height: 50px;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 10px;
   cursor: pointer;
 }
 .modal-window__close:hover {
@@ -123,6 +122,7 @@
   color: #343332;
   margin-bottom: 32px;
   font-size: 1.5rem;
+  text-align: center;
 }
 
 .modal-window.animate .modal-window__wrapper {

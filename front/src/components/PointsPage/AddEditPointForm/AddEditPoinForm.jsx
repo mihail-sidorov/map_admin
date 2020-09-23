@@ -7,66 +7,66 @@ let Form = (props) => {
     let formFields = [];
     if (props.permission === 'user') {
         formFields.push(
-            <div className="add-edit-point-form__form-fields" key={1}>
-                <div className="add-edit-point-form__form-lng">
-                    <label><Field name={'lng'} type={'text'} component={'input'} placeholder={'lng'} /></label>
+            <div className="add-edit-point-form__form-fields form__fields" key={1}>
+                <div className="add-edit-point-form__form-lng form__field">
+                    <label><Field name={'lng'} type={'text'} component={'input'} placeholder={'Координаты долгота'} /></label>
                 </div>
-                <div className="add-edit-point-form__form-lat">
-                    <label><Field name={'lat'} type={'text'} component={'input'} placeholder={'lat'} /></label>
+                <div className="add-edit-point-form__form-lat form__field">
+                    <label><Field name={'lat'} type={'text'} component={'input'} placeholder={'Координаты широта'} /></label>
                 </div>
-                <div className="add-edit-point-form__form-apartment">
-                    <label><Field name={'apartment'} type={'text'} component={'input'} placeholder={'apartment'} /></label>
+                <div className="add-edit-point-form__form-apartment form__field">
+                    <label><Field name={'apartment'} type={'text'} component={'input'} placeholder={'Этаж / Кабинет / Здание'} /></label>
                 </div>
-                <div className="add-edit-point-form__form-title">
-                    <label><Field name={'title'} type={'text'} component={'input'} placeholder={'title'} /></label>
+                <div className="add-edit-point-form__form-title form__field">
+                    <label><Field name={'title'} type={'text'} component={'input'} placeholder={'Наименование'} /></label>
                 </div>
-                <div className="add-edit-point-form__form-hours">
-                    <label><Field name={'hours'} type={'text'} component={'input'} placeholder={'hours'} /></label>
+                <div className="add-edit-point-form__form-hours form__field">
+                    <label><Field name={'hours'} type={'text'} component={'input'} placeholder={'Режим работы'} /></label>
                 </div>
-                <div className="add-edit-point-form__form-phone">
-                    <label><Field name={'phone'} type={'text'} component={'input'} placeholder={'phone'} /></label>
+                <div className="add-edit-point-form__form-phone form__field">
+                    <label><Field name={'phone'} type={'text'} component={'input'} placeholder={'Телефон'} /></label>
                 </div>
-                <div className="add-edit-point-form__form-site">
-                    <label><Field name={'site'} type={'text'} component={'input'} placeholder={'site'} /></label>
+                <div className="add-edit-point-form__form-site form__field">
+                    <label><Field name={'site'} type={'text'} component={'input'} placeholder={'Сайт'} /></label>
                 </div>
-                <div className="add-edit-point-form__form-description">
-                    <label><Field name={'description'} component={'textarea'} placeholder={'description'} /></label>
+                <div className="add-edit-point-form__form-description form__field">
+                    <label><Field name={'description'} component={'textarea'} placeholder={'Комментарий'} /></label>
                 </div>
-                <div className="add-edit-point-form__form-isActive">
-                    <label>Активна<Field name={'isActive'} type={'checkbox'} component={'input'} /></label>
+                <div className="add-edit-point-form__form-isActive form__field">
+                    <Field id="add-edit-point-form__form-isActive" name={'isActive'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isActive">Активна</label>
                 </div>
             </div>
         );
     }
     if (props.permission === 'moder') {
         formFields.push(
-            <div className="add-edit-point-form__form-fields" key={1}>
-                <div className="add-edit-point-form__form-full-city-name">
-                    <label><Field name={'full_city_name'} type={'text'} component={'input'} placeholder="full_city_name" /></label>
+            <div className="add-edit-point-form__form-fields form__fields" key={1}>
+                <div className="add-edit-point-form__form-full-city-name form__field">
+                    <label><Field name={'full_city_name'} type={'text'} component={'input'} placeholder="Регион, город" /></label>
                 </div>
-                <div className="add-edit-point-form__form-street">
-                    <label><Field name={'street'} type={'text'} component={'input'} placeholder="street" /></label>
+                <div className="add-edit-point-form__form-street form__field">
+                    <label><Field name={'street'} type={'text'} component={'input'} placeholder="Улица" /></label>
                 </div>
-                <div className="add-edit-point-form__form-house">
-                    <label><Field name={'house'} type={'text'} component={'input'} placeholder="house" /></label>
+                <div className="add-edit-point-form__form-house form__field">
+                    <label><Field name={'house'} type={'text'} component={'input'} placeholder="Дом" /></label>
                 </div>
-                <div className="add-edit-point-form__form-apartment">
-                    <label><Field name={'apartment'} type={'text'} component={'input'} placeholder="apartment" /></label>
+                <div className="add-edit-point-form__form-apartment form__field">
+                    <label><Field name={'apartment'} type={'text'} component={'input'} placeholder="Этаж / Кабинет / Здание" /></label>
                 </div>
-                <div className="add-edit-point-form__form-title">
-                    <label><Field name={'title'} type={'text'} component={'input'} placeholder="title" /></label>
+                <div className="add-edit-point-form__form-title form__field">
+                    <label><Field name={'title'} type={'text'} component={'input'} placeholder="Наименование" /></label>
                 </div>
-                <div className="add-edit-point-form__form-hours">
-                    <label><Field name={'hours'} type={'text'} component={'input'} placeholder="hours" /></label>
+                <div className="add-edit-point-form__form-hours form__field">
+                    <label><Field name={'hours'} type={'text'} component={'input'} placeholder="Режим работы" /></label>
                 </div>
-                <div className="add-edit-point-form__form-phone">
-                    <label><Field name={'phone'} type={'text'} component={'input'} placeholder="phone" /></label>
+                <div className="add-edit-point-form__form-phone form__field">
+                    <label><Field name={'phone'} type={'text'} component={'input'} placeholder="Телефон" /></label>
                 </div>
-                <div className="add-edit-point-form__form-site">
-                    <label><Field name={'site'} type={'text'} component={'input'} placeholder="site" /></label>
+                <div className="add-edit-point-form__form-site form__field">
+                    <label><Field name={'site'} type={'text'} component={'input'} placeholder="Сайт" /></label>
                 </div>
-                <div className="add-edit-point-form__form-isActive">
-                    <label>Активна<Field name={'isActive'} type={'checkbox'} component={'input'} /></label>
+                <div className="add-edit-point-form__form-isActive form__field">
+                    <Field id="add-edit-point-form__form-isActive" name={'isActive'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isActive">Активна</label>
                 </div>
             </div>
         );
@@ -74,20 +74,22 @@ let Form = (props) => {
 
     let submitBtn;
     if (props.permission === 'moder') {
-        submitBtn = 'Утвердить'
+        submitBtn = 'ОК'
     }
     if (props.permission === 'user') {
-        submitBtn = (props.action === 'add' ? 'Добавить' : 'Редактировать');
+        submitBtn = (props.action === 'add' ? 'ОК' : 'ОК');
     }
 
     return (
-        <form className="add-edit-point-form__form" onSubmit={props.handleSubmit(values => {props.addEditPoint(values, props.action, props.permission)})}>
+        <form className="add-edit-point-form__form form" onSubmit={props.handleSubmit(values => {props.addEditPoint(values, props.action, props.permission)})}>
             {formFields}
 
-            <button className="add-edit-point-form__form-submit-btn">{submitBtn}</button>
-            <button className="add-edit-point-form__form-cansel-btn" type="button" onClick={() => {
-                props.closeAddEditPointForm(null);
-            }}>Отмена</button>
+            <div className="add-edit-point-form__btns">
+                <button className="add-edit-point-form__form-submit-btn btn">{submitBtn}</button>
+                <button className="add-edit-point-form__form-cansel-btn btn" type="button" onClick={() => {
+                    props.closeAddEditPointForm(null);
+                }}>Отмена</button>
+            </div>
         </form>
     );
 }
