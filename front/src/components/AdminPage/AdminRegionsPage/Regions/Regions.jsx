@@ -3,9 +3,9 @@ import RegionContainer from './Region/RegionContainer';
 
 let Regions = (props) => {
     let addRegionBtn = [];
-    addRegionBtn.push(<button className="regions__add-region-btn" key={1} onClick={() => {
+    addRegionBtn.push(<button className="regions__add-region-btn btn" key={1} onClick={() => {
         props.onOpenAddRegionForm();
-    }}>Добавить</button>);
+    }}>Добавить регион</button>);
 
     let regionsArr = [];
 
@@ -15,9 +15,11 @@ let Regions = (props) => {
     }
 
     return (
-        <div className="regions">
+        <div className="regions list">
             {addRegionBtn}
-
+            <div className="regions__titles list__titles">
+                <div className="regions__title list__title">Регион</div>
+            </div>
             {regionsArr}
         </div>
     );

@@ -7,7 +7,7 @@ import SearchAdminRegionsContainer from './SearchAdminRegions/SearchAdminRegions
 
 let AdminRegionsPage = (props) => {
     return (
-        <div className="admin-regions-page">
+        <div className="admin-regions-page section">
             <SearchAdminRegionsContainer />
             <RegionsContainer />
             <PaginationContainer />

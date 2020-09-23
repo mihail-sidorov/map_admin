@@ -26,6 +26,11 @@
         box-sizing: border-box;
         margin-bottom: 21px;
 
+        &:last-child {
+
+            margin-bottom: 0;
+        }
+
         .list__item-part {
 
             flex-basis: 33.33%;

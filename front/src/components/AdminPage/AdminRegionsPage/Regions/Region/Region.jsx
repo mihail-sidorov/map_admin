@@ -2,12 +2,11 @@ import React from 'react';
 
 let Region = (props) => {
     return (
-        <div className="region">
-            <span className="region__name">{props.region.region}</span>
-            <button className="region__edit-btn" onClick={() => {
+        <div className="region list__item">
+            <span className="region__name list__item-part">{props.region.region}</span>
+            <button className="region__edit-btn list__item-btn list__item-btn_edit" onClick={() => {
                 props.onOpenEditRegionForm(props.region);
-            }}>Редактировать</button>
-            <hr />
+            }}></button>
         </div>
     );
 }

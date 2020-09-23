@@ -1,4 +1,4 @@
-.admin-users-page {
+.admin-regions-page {
 
     width: 100%;
     flex-grow: 1;
@@ -15,6 +15,22 @@
         button {
 
             margin-bottom: 50px;
+        }
+
+        .list__titles {
+
+            .list__title {
+
+                flex-basis: 100%;
+            }
+        }
+
+        .list__item {
+
+            .list__item-part {
+
+                flex-basis: 100%;
+            }
         }
     }
 
