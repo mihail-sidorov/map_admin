@@ -7,6 +7,7 @@ import DuplicateContainer from './Duplicate/DuplicateContainer';
 import { Route, Redirect } from 'react-router-dom';
 import ModerTabsContainer from './ModerTabs/ModerTabsContainer';
 import RefusePointFormContainer from './RefusePointForm/RefusePointFormContainer';
+import DelPointFormContainer from './DelPointForm/DelPointFormContainer';
 
 let PointsPage = (props) => {
     if (props.permission !== 'moder' && props.permission !== 'user') return <Redirect to="/" />
@@ -21,6 +22,7 @@ let PointsPage = (props) => {
             </div>
             <Route exact path="/points" render={() => <AddEditPointFormContainer permission={props.permission} />} />
             <Route exact path="/points" render={() => <RefusePointFormContainer />} />
+            <Route exact path="/points" render={() => <DelPointFormContainer />} />
             <Route exact path="/points/duplicate" render={() => <DuplicateContainer permission={props.permission} />} />
         </div>
     );

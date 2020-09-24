@@ -17,6 +17,9 @@ let RefusePointFormContainer = connect(
                     .then(() => {
                         dispatch(delPointActionCreator(values.id));
                         dispatch(closeRefusePointFormActionCreator());
+                    })
+                    .catch((error) => {
+                        console.log(error);
                     });
             }
         },

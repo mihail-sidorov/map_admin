@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { Field, reduxForm } from 'redux-form';
 import modalWindowHOC from '../../../HOC/modalWindowHOC';
 

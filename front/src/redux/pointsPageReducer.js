@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -85,7 +85,12 @@ let initialState = {
     refusePointForm: {
         open: false,
         id: null,
-    }
+    },
+    delPointForm: {
+        open: false,
+        id: null,
+        permission: null,
+    },
 };
 
 // Запросы к API
@@ -271,6 +276,16 @@ export let closeRefusePointFormActionCreator = () => ({
     type: CLOSE_REFUSE_POINT_FORM,
 })
 
+export let showDelPointFormActionCreator = (id, permission) => ({
+    type: SHOW_DEL_POINT_FORM,
+    id: id,
+    permission: permission,
+})
+
+export let closeDelPointFormActionCreator = () => ({
+    type: CLOSE_DEL_POINT_FORM,
+})
+
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -428,6 +443,26 @@ let pointsPageReducer = (state = initialState, action) => {
                     ...state.refusePointForm,
                     open: false,
                     id: null,
+                },
+            };
+        case SHOW_DEL_POINT_FORM:
+            return {
+                ...state,
+                delPointForm: {
+                    ...state.delPointForm,
+                    open: true,
+                    id: action.id,
+                    permission: action.permission,
+                },
+            };
+        case CLOSE_DEL_POINT_FORM:
+            return {
+                ...state,
+                delPointForm: {
+                    ...state.delPointForm,
+                    open: false,
+                    id: null,
+                    permission: null,
                 },
             };
         default:

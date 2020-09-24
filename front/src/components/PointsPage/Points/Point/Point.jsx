@@ -43,12 +43,6 @@ export let PointProperties = (props) => {
 let Point = (props) => {
     console.log('Point>>>');
 
-    let onDelPoint = () => {
-        if (window.confirm('Вы действительно хотите удалить точку?')) {
-            props.delPoint(props.point.id);
-        }
-    }
-
     let pointInform = [], moderStatus = '';
     if (props.permission === 'user') {
         if (props.point.moder_status === 'moderated') moderStatus = 'На модерации';
@@ -69,7 +63,9 @@ let Point = (props) => {
 
     let delPointBtn = [];
     if ((props.permission === 'user') || (props.permission === 'moder' && props.point.moder_status === 'delete')) {
-        delPointBtn.push(<button className={`point__del-button list__item-btn${props.permission === 'moder' && props.moderTabsActive === 1 ? ' list__item-btn_accept list__item-btn_2' : ' list__item-btn_delete'}`} onClick={onDelPoint} key={1}></button>);
+        delPointBtn.push(<button className={`point__del-button list__item-btn${props.permission === 'moder' && props.moderTabsActive === 1 ? ' list__item-btn_accept list__item-btn_2' : ' list__item-btn_delete'}`} onClick={() => {
+            props.onShowDelPointForm(props.point.id, props.permission);
+        }} key={1}></button>);
     }
 
     let refuseBtn = [];
