@@ -18,7 +18,7 @@ const Region = require("./model/orm/region")
 
 const yup = require('yup')
 const Ajv = require('ajv')
-const { checkTimeStamp } = require("./model/adminPanelApi/utilityFn")
+const { checkTimeStamp, getGeoData, throwDuplicate, hasPermissionToEdit } = require("./model/adminPanelApi/utilityFn")
 const Moder_status = require("./model/orm/moder_status")
 const Shop = require("./model/orm/shop")
 const ajv = new Ajv({ allErrors: false, coerceTypes: true, useDefaults: "empty" })
@@ -34,7 +34,7 @@ function validConstructor(ajvSchema, yupSchemaRaw, callback) {
             req.body = yupSchema.cast(req.body)
             await yupSchema.validate(req.body).catch((err => next(err.path + ": " + err.message)))
             if (typeof callback == "function") {
-                next(await callback(req))
+                next(await callback(req).catch((value) => next(value)))
             } else {
                 next()
             }
@@ -88,14 +88,28 @@ module.exports.validLoginAs = validConstructor(loginAsJson, {
 })
 module.exports.validSetPointRefuse = validConstructor(setPointRefuseJson)
 module.exports.validEditPointModer = validConstructor(editPointModerJson)
-module.exports.validDelPoint = validConstructor(delPointJson)
-module.exports.validAddPoint = validConstructor(addPointJson)
+module.exports.validDelPoint = validConstructor(delPointJson,undefined,() => {
+    if (!hasPermissionToEdit(req.user, +req.params.id)) return "point id not found"
+})
+module.exports.validAddPoint = validConstructor(addPointJson, undefined, async (req) => {
+    await getGeoData(req.body)
+    await throwDuplicate(req.body)
+})
 module.exports.validEditPointUser = validConstructor(editPointUserJson, undefined, async (req) => {
     const pointId = +req.params.id
+    if (!hasPermissionToEdit(req.user, pointId)) return "point id not found"
     const value = await checkTimeStamp(pointId, req.body.timeStamp)
     if (!value) {
         return "timeStamp: timeStamp does not match"
     } else {
-        req.body.timeStamp = undefined
+        delete(req.body.timeStamp)
     }
+    if (!req.body.lat || !req.body.lng) {
+        delete(req.body.lat)
+        delete(req.body.lat)
+        await getGeoData(req.body)
+        await throwDuplicate(req.body)
+    }
+
+    if (!req.body.description) delete(req.body.description) 
 })

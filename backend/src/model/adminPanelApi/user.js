@@ -1,14 +1,10 @@
 'use strict'
 const Shop = require("../orm/shop")
-
 const { throwDuplicate, markDuplicate, getPoint, getIdByModerStatus, getGeoData } = require("./utilityFn")
 const Moder_status = require("../orm/moder_status")
+const Region = require("../orm/region")
 
 async function addPoint(user, point, force) {
-    //добавляем street, house, full_city_name
-    await getGeoData(point)
-    await throwDuplicate(point,force)
-
     point.user_id = user.id
     point.moder_status_id = await Moder_status.getIdByModerStatus("moderated")
 
@@ -25,7 +21,27 @@ async function getPoints(user) {
     return getPoint(user)
 }
 
-async function delPoint(userId, pointId) {
+async function delPoint(user, pointId) {
+    const isMaster = isMasterPoint(pointId)
+    const { moder_status, isModerated } = await Shop.getModerStatusByPointId(pointId)
+    switch(moder_status) {
+        case "accept": 
+            if (isMaster) createDelChild()
+            //невозможный вариант обрабатываем на всякий случай
+            if (!isMaster) immediateDelete()
+            break
+        case "moderated":
+            if (isMaster) immediateDelete()
+            if (!isMaster) createDelChild()
+            break
+        case "delete":
+            thorw "point already has delete status"
+            break
+        case "refuse":
+            if (isMaster) immediateDelete()
+            if (!isMaster) createDelChild()
+            break       
+    }
     return Shop
         .query()
         .delete()
@@ -39,55 +55,65 @@ async function delPoint(userId, pointId) {
         })
 }
 
-/**
- * Функция редактирования точек пользоателем. Стауc меняется на moderated в случаях:
- * Меняются любые поля кроме isActive, description;
- * Меняется discription при статусе refuse
- * @param {number} user.id id пользователя
- * @param {string} user.permission[0].permission права пользователя
- * @param {number} pointId id точки
- * @param {object} point обьект с полями для редактирования см.  editPointUserRequest.v1.json
- * @return {object} данные добавленной точки в случае успеха см. {@link ../openApi/models/getPointsUser.v1.json} 
- * в случае дубликата (точка ближе чем ~200 метров к другой точке с базы) см. {@link ../openApi/models/duplicate.v1.json} 
- */
 
 async function editPoint(user, pointId, point, force) {
-    if (!point.lat || !point.lng) await getGeoData(point)
-    await throwDuplicate(point, force)
-    
+    const select = [
+        "lng",
+        "lat",
+        "title",
+        "apartment",
+        "hours",
+        "phone",
+        "site",
+        "description",
+        "force",
+        "isActive"]
+    let checkResult, shopCopy, insertData
     const { moder_status, isModerated } = await Shop.getModerStatusByPointId(pointId)
-    if (moder_status == "accept" ||
-        !req.body.description) {
-        delete (req.body.description)
+    const { description, ...checkData } = point
+    if (!Object.keys(point).length) return getPoint(user, pointId)
+
+    //проверка данных на изменение
+    //если все поля пустые, то ничего не изменилось
+
+    shopCopy = await Shop.query().findById(pointId).select(...select, "parent_id")
+    checkResult = shopCopy.$query().where(checkData)
+    if (checkResult && !checkResult.description) checkResult.description = undefined
+    const isDescChange = (checkResult.description == description)
+    const isDataChange = !checkResult
+    const isMaster = !shopCopy.parent_id
+    delete (shopCopy.parent_id)
+    if (!isDataChange && !isDescChange) return getPoint(user, pointId)
+
+    const editCurrentFn = async () => {
+        const newPoint = await Shop.query().findById(pointId).patch(point)
+        if (!newPoint) throw "fail"
+        return getPoint(user, pointId)
     }
 
-    const moderStatusRefuse = await Moder_status.getIdByModerStatus("refuse")
-    const moderStatusModerated = await Moder_status.getIdByModerStatus("moderated")
+    const createChildFn = async () => {
+        const { id, ...shopCopyWithoutId } = shopCopy
+        const newPoint = await Shop.query().insert(Object.assign(shopCopyWithoutId, point))
+        if (!newPoint) throw "fail"
+        return getPoint(user, newPoint.id)
+    }
 
-    const { description, ...checkData } = point
-    checkData.id = pointId
-    checkData.user_id = user.id
-
-    await Shop.query().skipUndefined().first().where(checkData).then((res) => {
-        //если хоть одно поле меняется кроме isActiv или description тогда ставим статуы moderated
-        //если меняется комментарии при статусе refuse тогда статус тоже ставим moderated
-        if (!res || (res.description != description && res.moder_status_id == moderStatusRefuse)) {
-            updateData.moder_status_id = moderStatusModerated
-            //если ничего не меняли при статусе не равном refuse и moderated то отчищаем комментарии
-        } else if (res.moder_status_id != moderStatusModerated) {
-            res.description = null
-        }
-    })
-
-    const isSuccess = await Shop
-        .query()
-        .where({ "id": pointId, "user_id": user.id })
-        .patch(updateData).then(Boolean)
-    if (isSuccess) {
-        markDuplicate(dupIds, pointId)
-        return getPoint(user, pointId)
-    } else {
-        throw "editing failed"
+    switch (moder_status) {
+        case "accept":
+            if (!isDataChange) return getPoint(user, pointId)
+            if (isDataChange) point = Moder_status.getIdByModerStatus("moderate")
+            if (isMaster) createChildFn()
+            break
+        case "refuse":
+            if (isDataChange || isDescChange) point = Moder_status.getIdByModerStatus("moderate")
+            if (isMaster || !isMaster) editCurrentFn()
+            break
+        case "delete":
+            if (!isDescChange) return getPoint(user, pointId)
+            if (isMaster || !isMaster) editCurrentFn()
+            break
+        case "moderated":
+            if (isMaster || !isMaster) editCurrentFn()
     }
 }
 

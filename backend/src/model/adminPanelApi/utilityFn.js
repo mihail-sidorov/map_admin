@@ -8,9 +8,24 @@ const { nanoid } = require("nanoid")
 const Region = require("../orm/region")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
-async function throwDuplicate(point, force) {
+async function hasPermissionToEdit(user, pointId) {
+    const res = await Shop
+        .query()
+        .joinRelated("user.region")
+        .select("users.id as userId", "region.id as regionId")
+        .where("shops.id", pointId)
+        .first()
+    if ((user.permission[0].permission == "moder" && res.regionId == user.region_id)
+        || (user.permission[0].permission == "user" && res.userId == user.id)) {
+        return true
+    } else {
+        return false
+    }
+}
+
+async function throwDuplicate(point) {
     const points = await getDuplicate(point)
-    if (points && !force) {
+    if (points && !point.force) {
         throw {
             "outputAsIs": true,
             "duplicate": {
@@ -29,6 +44,8 @@ async function throwDuplicate(point, force) {
                 }
             }
         }
+    } else if (!points && point.force) {
+        delete (point.force)
     }
 }
 
@@ -213,3 +230,4 @@ exports.checkTimeStamp = checkTimeStamp
 exports.throwDuplicate = throwDuplicate
 exports.markDuplicate = markDuplicate
 exports.getGeoData = getGeoData
+exports.hasPermissionToEdit = hasPermissionToEdit

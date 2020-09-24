@@ -87,8 +87,8 @@
       },
       "isActive": {
         "type": [
-          "integer",
-          "boolean"
+          "boolean",
+          "integer"
         ]
       }
     },

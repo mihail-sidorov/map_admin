@@ -157,14 +157,14 @@ module.exports = function (app) {
             res, next)
     })
 
-    app.post("/api/moder/editPoint/:id", checkAuth("moder"), async (req, res, next) => {    
+    app.post("/api/moder/editPoint/:id", checkAuth("moder"), async (req, res, next) => {
         await yup.number().integer()     //валидация point id
             .validate(req.params.id).catch((err => next("id: " + err.message)))
     }, validEditPointModer, async (req, res, next) => {
 
 
         modelPromiseToRes(
-            editPointModer(+req.params.id, {
+            editPointModer(req.user, +req.params.id, {
                 street: req.body.street,
                 house: req.body.house,
                 full_city_name: req.body.full_city_name,
@@ -174,7 +174,8 @@ module.exports = function (app) {
                 phone: req.body.phone,
                 site: req.body.site,
                 isActive: Boolean(req.body.isActive)
-            })
+            },
+                req.body.force)
             , res, next)
     })
 
@@ -186,7 +187,7 @@ module.exports = function (app) {
 
     app.post("/api/user/delPoint", checkAuth(["user", "moder"]), validDelPoint, (req, res, next) => {
         modelPromiseToRes(
-            delPoint(+req.user.id, +req.body.id),
+            delPoint(+req.user, +req.body.id),
             res, next)
     })
 

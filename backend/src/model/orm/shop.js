@@ -68,4 +68,8 @@ module.exports = class Shop extends Model {
     static async hasPointId(pointId) {
         return this.query().findById(pointId).then(Boolean)
     }
+
+    static async isMasterPoint(pointId) {
+        return this.query().findById(pointId).whereNotNull("parent_id").then(res => !res)
+    }
 }
