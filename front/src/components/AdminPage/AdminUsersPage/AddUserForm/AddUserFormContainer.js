@@ -16,8 +16,6 @@ let AddUserFormContainer = connect(
                 values.permission_id = values.permission;
                 values.region_id = values.region;
 
-                console.log(values);
-
                 addUser(values)
                     .then((user) => {
                         dispatch(closeAddUserFormActionCreator());
@@ -28,7 +26,7 @@ let AddUserFormContainer = connect(
                     });
             }
         },
-        getPermissions: () => {
+        onGetPermissions: () => {
             getPermissions()
                 .then((permissionsArr) => {
                     dispatch(setPermissionsActionCreator(permissionsArr));

@@ -4,37 +4,59 @@ import modalWindowHOC from '../../../../HOC/modalWindowHOC';
 
 let Form = (props) => {
     let permissions = [], regions = [];
+    permissions.push(<option value={0} key={0}>Уровень доступа</option>);
     props.permissions.forEach((permission, index) => {
-        permissions.push(<option value={permission.id} key={index}>{permission.permission}</option>);
+        let permissionName = '';
+        switch (permission.permission) {
+            case 'admin':
+                permissionName = 'Администратор';
+                break;
+            case 'moder':
+                permissionName = 'Модератор';
+                break;
+            case 'user':
+                permissionName = 'Пользователь';
+                break;
+            default:
+                break;
+        }
+        permissions.push(<option value={permission.id} key={index + 1}>{permissionName}</option>);
     });
+    regions.push(<option value={0} key={0}>Регион пользователя</option>);
     props.regions.forEach((region, index) => {
-        regions.push(<option value={region.id} key={index}>{region.region}</option>);
+        regions.push(<option value={region.id} key={index + 1}>{region.region}</option>);
     });
 
     return (
-        <form className="add-user-form__form" onSubmit={props.handleSubmit}>
-            <div className="add-user-form__form-fields">
-                <div className="add-user-form__form-email">
-                    <Field name="email" type="text" component="input" placeholder="email" />
+        <form className="add-user-form__form form" onSubmit={props.handleSubmit}>
+            <div className="add-user-form__form-fields form__fields">
+                <div className="add-user-form__form-email form__field">
+                    <label><Field name="email" type="text" component="input" placeholder="Логин" /></label>
                 </div>
-                <div className="add-user-form__form-password">
-                    <Field name="password" type="password" component="input" placeholder="password" />
+                <div className="add-user-form__form-password form__field">
+                    <label><Field name="password" type="password" component="input" placeholder="Пароль" /></label>
                 </div>
-                <div className="add-user-form__form-permission">
-                    <Field name="permission" component="select">
-                        {permissions}
-                    </Field>
+                <div className="add-user-form__form-permission form__field">
+                    <label>
+                        <Field name="permission" component="select">
+                            {permissions}
+                        </Field>
+                    </label>
                 </div>
-                <div className="add-user-form__form-region">
-                    <Field name="region" component="select">
-                        {regions}
-                    </Field>
+                <div className="add-user-form__form-region form__field">
+                    <label>
+                        <Field name="region" component="select">
+                            {regions}
+                        </Field>
+                    </label>
                 </div>
             </div>
-            <button className="add-user-form__submit-btn">Добавить</button>
-            <button className="add-user-form__cansel-btn" type="button" onClick={() => {
-                props.onCloseAddUserForm();
-            }}>Отмена</button>
+            <div className="add-user-form__btns">
+                <button className="add-user-form__submit-btn btn">Добавить</button>
+                <button className="add-user-form__cansel-btn btn" type="button" onClick={() => {
+                    props.onCloseAddUserForm();
+                }}>Отмена</button>
+            </div>
         </form>
     );
 }
@@ -45,32 +67,17 @@ Form = reduxForm({
 
 let AddUserForm = (props) => {
     console.log('AddUserForm');
-    let initialValues = {};
-
-    if (props.addUserForm.permissions.length > 0) {
-        let permission = props.addUserForm.permissions[0];
-
-        if (permission === undefined) {
-            permission = props.addUserForm.permissions[0];
-        }
-
-        initialValues.permission = permission.id;
-    }
-
-    if (props.addUserForm.regions.length > 0) {
-        initialValues.region = props.addUserForm.regions[0].id;
-    }
 
     return (
         <div className="add-user-form">
-            <Form permissions={props.addUserForm.permissions} regions={props.addUserForm.regions} initialValues={initialValues} onCloseAddUserForm={props.onCloseAddUserForm} onSubmit={props.onSubmit} />
+            <Form permissions={props.addUserForm.permissions} regions={props.addUserForm.regions} onCloseAddUserForm={props.onCloseAddUserForm} onSubmit={props.onSubmit} />
         </div>
     );
 }
 
 let AddUserFormRequest = class extends React.Component {
     componentDidMount() {
-        this.props.getPermissions();
+        this.props.onGetPermissions();
         this.props.onGetRegions();
     }
 
