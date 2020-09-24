@@ -110,41 +110,6 @@ function checkTimeStamp(pointId, timeStamp) {
         .then(Boolean)
 }
 
-async function hasUserId(userId) {
-    return await User.query()
-        .first()
-        .findById(userId)
-        .then(Boolean)
-}
-
-async function hasEmail(email) {
-    return await User.query()
-        .first()
-        .where("email", email)
-        .then(Boolean)
-}
-
-function getIdByPermission(permission) {
-    return Permission.query()
-        .first()
-        .where("permission", permission)
-        .then(result => {
-            if (result) {
-                return result.id
-            } else {
-                throw `${permission} permission not found`
-            }
-        })
-}
-
-function getIdByIsModerated(isModerated) {
-    return Moder_status.query().where("isModerated", isModerated).then(res => res.map(elem => elem.id))
-}
-
-function getIdByModerStatus(moderStatus) {
-    return Moder_status.query().where("moder_status", moderStatus).first().then(res => res.id)
-}
-
 /**
  * Получение геоданных
  * заполняет свойство street, house, city, full_city_name
@@ -199,13 +164,16 @@ async function getPoint(user, pointId) {
     if (user.permission[0].permission == "user") {
         userId = user.id
     }
+    if (!pointId) {
+        parent_id = "parentId"
+    }
 
     const regionUsers = await Region.query()
         .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
         .skipUndefined()
         .where({ "regions.id": user.region_id })
         .modifyGraph('user.shop', bulder => {
-            bulder.skipUndefined().where({ "shops.id": pointId, "user_id": userId }).select(...select)
+            bulder.skipUndefined().where({ "shops.id": pointId, "user_id": userId }).whereNull(parent_id).select(...select)
         })
         .first()
     if (!regionUsers) return []

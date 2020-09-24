@@ -1,8 +1,8 @@
 'use strict'
 const Shop = require("../orm/shop")
-const { throwDuplicate, markDuplicate, getPoint, getIdByModerStatus, getGeoData } = require("./utilityFn")
+const { markDuplicate, getPoint } = require("./utilityFn")
 const Moder_status = require("../orm/moder_status")
-const Region = require("../orm/region")
+const { knex } = require("../orm/region")
 
 async function addPoint(user, point, force) {
     point.user_id = user.id
@@ -22,26 +22,60 @@ async function getPoints(user) {
 }
 
 async function delPoint(user, pointId) {
-    const isMaster = isMasterPoint(pointId)
-    const { moder_status, isModerated } = await Shop.getModerStatusByPointId(pointId)
-    switch(moder_status) {
-        case "accept": 
-            if (isMaster) createDelChild()
+    const isMaster = await Shop.isMasterPoint(pointId)
+    const { moder_status } = await Shop.getModerStatusByPointId(pointId)
+
+    const createDelChild = async (trx) => {
+        const point = await Shop.query(trx).findById(pointId).select("*")
+        point.parent_id = point.id
+        point.moder_status_id = Moder_status.getIdByModerStatus("delete")
+        delete (point.id)
+        const insertPoint = await Shop.query(trx).insert(point)
+        if (insertPoint) {
+            return getPoint(user, insertPoint.id)
+        } else {
+            throw "fail"
+        }
+    }
+
+    const immediateDelete = async () => {
+        if (await Shop.query().deleteById(pointId)) {
+            return "OK"
+        } else {
+            return "fail"
+        }
+    }
+
+    const clearAndCreateDelChild = async () => {
+        await knex.transaction(async trx => {
+            if (await Shop.query(trx).delete().where("parent_id", pointId)) {
+                await createDelChild(trx)
+            } else {
+                throw "fail"
+            }   
+        })
+    }
+
+
+    switch (moder_status) {
+        case "accept":
+            if (isMaster) await createDelChild()
             //невозможный вариант обрабатываем на всякий случай
-            if (!isMaster) immediateDelete()
+            if (!isMaster) await immediateDelete()
             break
         case "moderated":
-            if (isMaster) immediateDelete()
-            if (!isMaster) createDelChild()
+            if (isMaster) await immediateDelete()
+            if (!isMaster) await clearAndCreateDelChild()
             break
         case "delete":
             thorw "point already has delete status"
             break
         case "refuse":
-            if (isMaster) immediateDelete()
-            if (!isMaster) createDelChild()
-            break       
+            if (isMaster) await immediateDelete()
+            if (!isMaster) await clearAndCreateDelChild()
+            break
     }
+
     return Shop
         .query()
         .delete()
@@ -69,7 +103,7 @@ async function editPoint(user, pointId, point, force) {
         "force",
         "isActive"]
     let checkResult, shopCopy, insertData
-    const { moder_status, isModerated } = await Shop.getModerStatusByPointId(pointId)
+    const { moder_status } = await Shop.getModerStatusByPointId(pointId)
     const { description, ...checkData } = point
     if (!Object.keys(point).length) return getPoint(user, pointId)
 
@@ -102,18 +136,18 @@ async function editPoint(user, pointId, point, force) {
         case "accept":
             if (!isDataChange) return getPoint(user, pointId)
             if (isDataChange) point = Moder_status.getIdByModerStatus("moderate")
-            if (isMaster) createChildFn()
+            if (isMaster) await createChildFn()
             break
         case "refuse":
             if (isDataChange || isDescChange) point = Moder_status.getIdByModerStatus("moderate")
-            if (isMaster || !isMaster) editCurrentFn()
+            if (isMaster || !isMaster) await editCurrentFn()
             break
         case "delete":
             if (!isDescChange) return getPoint(user, pointId)
-            if (isMaster || !isMaster) editCurrentFn()
+            if (isMaster || !isMaster) await editCurrentFn()
             break
         case "moderated":
-            if (isMaster || !isMaster) editCurrentFn()
+            if (isMaster || !isMaster) await editCurrentFn()
     }
 }
 

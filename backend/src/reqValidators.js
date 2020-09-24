@@ -86,10 +86,12 @@ module.exports.validLoginAs = validConstructor(loginAsJson, {
         async value => User.hasUserId(value)
     )
 })
-module.exports.validSetPointRefuse = validConstructor(setPointRefuseJson)
+module.exports.validSetPointRefuse = validConstructor(setPointRefuseJson, undefined, () => {
+    if (!hasPermissionToEdit(req.user, +req.body.id)) return "point id not found"
+})
 module.exports.validEditPointModer = validConstructor(editPointModerJson)
-module.exports.validDelPoint = validConstructor(delPointJson,undefined,() => {
-    if (!hasPermissionToEdit(req.user, +req.params.id)) return "point id not found"
+module.exports.validDelPoint = validConstructor(delPointJson, undefined, () => {
+    if (!hasPermissionToEdit(req.user, +req.body.id)) return "point id not found"
 })
 module.exports.validAddPoint = validConstructor(addPointJson, undefined, async (req) => {
     await getGeoData(req.body)
@@ -102,14 +104,14 @@ module.exports.validEditPointUser = validConstructor(editPointUserJson, undefine
     if (!value) {
         return "timeStamp: timeStamp does not match"
     } else {
-        delete(req.body.timeStamp)
+        delete (req.body.timeStamp)
     }
     if (!req.body.lat || !req.body.lng) {
-        delete(req.body.lat)
-        delete(req.body.lat)
+        delete (req.body.lat)
+        delete (req.body.lat)
         await getGeoData(req.body)
         await throwDuplicate(req.body)
     }
 
-    if (!req.body.description) delete(req.body.description) 
+    if (!req.body.description) delete (req.body.description)
 })
