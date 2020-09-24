@@ -75,7 +75,7 @@ let Point = (props) => {
     let refuseBtn = [];
     if (props.permission === 'moder') {
         refuseBtn.push(<button className="point__refuse-btn list__item-btn list__item-btn_refuse" key={1} onClick={() => {
-            props.onRefusePoint(props.point.id, prompt('Введите комментарий для пользователя', ''));
+            props.onShowRefusePointForm(props.point.id);
         }}></button>);
     }
 

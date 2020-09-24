@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -82,6 +82,10 @@ let initialState = {
     },
     moderTabs: false,
     moderTabsActive: 1,
+    refusePointForm: {
+        open: false,
+        id: null,
+    }
 };
 
 // Запросы к API
@@ -258,6 +262,15 @@ export let setModerTabsActiveActionCreator = (index) => ({
     index: index,
 })
 
+export let showRefusePointFormActionCreator = (id) => ({
+    type: SHOW_REFUSE_POINT_FORM,
+    id: id,
+})
+
+export let closeRefusePointFormActionCreator = () => ({
+    type: CLOSE_REFUSE_POINT_FORM,
+})
+
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -398,6 +411,24 @@ let pointsPageReducer = (state = initialState, action) => {
             return {
                 ...state,
                 moderTabsActive: action.index,
+            };
+        case SHOW_REFUSE_POINT_FORM:
+            return {
+                ...state,
+                refusePointForm: {
+                    ...state.refusePointForm,
+                    open: true,
+                    id: action.id,
+                },
+            };
+        case CLOSE_REFUSE_POINT_FORM:
+            return {
+                ...state,
+                refusePointForm: {
+                    ...state.refusePointForm,
+                    open: false,
+                    id: null,
+                },
             };
         default:
             return state;
