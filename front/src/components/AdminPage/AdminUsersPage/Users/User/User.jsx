@@ -5,7 +5,7 @@ let User = (props) => {
         <div className="user list__item">
             <span className="user__email list__item-part">{props.user.email}</span>
             <span className="user__permission list__item-part">{props.user.permission}</span>
-            <span className="user__permission list__item-part">Регион</span>
+            <span className="user__permission list__item-part">{props.user.region}</span>
             <button className="user__edit-btn list__item-btn list__item-btn_edit" onClick={() => {
                 props.onOpenEditUserForm(props.user.id);
             }}></button>
