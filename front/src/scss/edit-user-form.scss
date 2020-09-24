@@ -1,0 +1,20 @@
+.edit-user-form {
+
+    .edit-user-form__form {
+
+        .edit-user-form__fields {
+
+            margin-bottom: 20px;
+        }
+
+        .edit-user-form__btns {
+
+            text-align: center;
+
+            &>*:first-child {
+
+                margin-right: 13px;
+            }
+        }
+    }
+}
