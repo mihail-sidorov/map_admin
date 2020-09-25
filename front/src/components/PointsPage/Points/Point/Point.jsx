@@ -84,6 +84,16 @@ let Point = (props) => {
         );
     }
 
+    let pointDescription = [];
+    if (props.point.description) {
+        pointDescription.push(
+            <div className="point__description">
+                {props.point.description}
+                араорп паолполапо палоалопл оооллыыщп опаплпоал алпалплаоп аплоалпрарвоар щыоалвыыжыжлаороролалво оыыд оддооыд ды раррарлф
+            </div>
+        );
+    }
+
     return (
         <div className="point__container">
             {pointInform}
@@ -96,10 +106,7 @@ let Point = (props) => {
 
                 {refuseBtn}
 
-                <div className="point__description">
-                    {props.point.description}
-                    араорп паолполапо палоалопл оооллыыщп опаплпоал алпалплаоп аплоалпрарвоар щыоалвыыжыжлаороролалво оыыд оддооыд ды раррарлф
-                </div>
+                {pointDescription}
             </div>
         </div>
     );
