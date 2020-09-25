@@ -1,9 +1,10 @@
 'use strict'
 
 const Shop = require("../orm/shop")
-const { getIdByModerStatus, getIdByIsModerated } = require("./utilityFn")
 const Region = require("../orm/region")
 const Moder_status = require("../orm/moder_status")
+const { knex } = require("../orm/region")
+const { startFnIfModerStatus } = require("./utilityFn")
 
 /**
  * Получение точек для модерации по id региона
@@ -53,65 +54,62 @@ async function getPointsModer(regionId) {
     return (points)
 }
 
-async function setPointRefuse(user, pointId, description) {
-    if (!description) description=null 
+async function setPointRefuse(pointId, description) {
+    if (!description) description = null
+
+    await startFnByModerStatus(pointId, {
+        "moderated": async () => await Shop.setStatus(pointId, "refuse"),
+        "delete": 
+    })
+
     const { moder_status } = await Shop.getModerStatusByPointId(pointId)
     if (moder_status == "moderated") {
-        await Shop.query().findById(pointId).patch({ moder_status_id: await Moder_status.getIdByModerStatus("refuse"), description: description})
+        return await Shop.query()
+            .findById(pointId)
+            .patch({ moder_status_id: await Moder_status.getIdByModerStatus("refuse"), description: description })
+            .then(res => {
+                if (res) {
+                    return "OK"
+                } else {
+                    throw "fail"
+                }
+            })
     } else if (moder_status == "delete") {
-        await Shop.query().deleteById(pointId)
-    } 
+        return Shop.query().deleteById(pointId).then(res => {
+            if (res) {
+                return "OK"
+            } else {
+                throw "fail"
+            }
+        })
+
+    }
 }
 
 async function setPointAccept(pointId) {
-    pointId = +pointId
-    if (!pointId) throw "pointId must not be empty"
-    const isModerated = await getIdByIsModerated(1)
-    const moderStatus = await getIdByModerStatus("accept")
-    return Shop
-        .query()
-        .whereIn("moder_status_id", isModerated)
-        .andWhere("id", pointId)
-        .patch({ "moder_status_id": moderStatus, description: null })
-        .then(res => {
-            if (res) {
-                return pointId
-            } else {
-                throw "fail"
-            }
-        })
+    await startFnByModerStatus(pointId, {
+        "moderated": {
+            "child": async () => await Shop.setMaster(pointId),
+            "after": async () => await Shop.setStatus(pointId, "accept")
+        },
+        "delete": async () => await Shop.delPointGroup(pointId)
+    })
+
+    return "OK"
 }
-/**
- * Редактирование точки модератором, возможно редактировать только точки
- * с флагом moder_status = "moderated", после радактирования статус точки меняется на accept
- * @param {number} pointId id редактируемой точки 
- * @param {object} point объект содержащий свойства для добавления
- * @return {number} id отредактированной точки
- * @throws {"incorrect pointId"} pointId невозможно преобразовать к целочисленному типу
- * @throws {"fail"} редактирование не удалось
- */
+
 async function editPointModer(pointId, point) {
-
-    if (!pointId || !Number.isInteger(+pointId)) {
-        throw "incorrect pointId"
-    }
-    const moderStatusModerated = await getIdByModerStatus("moderated")
-    const moderStatusAccept = await getIdByModerStatus("accept")
-    point.description = null
-    point.moder_status_id = moderStatusAccept
-
-    return await Shop
-        .query()
-        .whereIn("moder_status_id", moderStatusModerated)
-        .andWhere({ "id": pointId })
-        .patch(point)
-        .then(res => {
-            if (res) {
-                return pointId
-            } else {
-                throw "fail"
+    await startFnByModerStatus(pointId, {
+        "moderated": {
+            child: async () => await Shop.setMaster(pointId),
+            after: async () => {
+                await Shop.patchData(pointId, point)
+                await Shop.setStatus(pointId, "accept")
             }
-        })
+        }
+    })
+
+    return "OK"
 }
 
 exports.getPointsModer = getPointsModer

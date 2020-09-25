@@ -7,6 +7,7 @@ const addRegionJson = require("../openApi/models/req/addRegion.json")
 const editRegionJson = require("../openApi/models/req/editRegion.json")
 const loginAsJson = require("../openApi/models/req/loginAs.json")
 const setPointRefuseJson = require("../openApi/models/req/setPointRefuse.json")
+const setPointAcceptJson = require("../openApi/models/req/setPointAccept.json")
 const editPointModerJson = require("../openApi/models/req/editPointModer.json")
 const delPointJson = require("../openApi/models/req/delPoint.json")
 const addPointJson = require("../openApi/models/req/addPoint.json")
@@ -18,14 +19,14 @@ const Region = require("./model/orm/region")
 
 const yup = require('yup')
 const Ajv = require('ajv')
-const { checkTimeStamp, getGeoData, throwDuplicate, hasPermissionToEdit } = require("./model/adminPanelApi/utilityFn")
+const { checkTimeStamp, getGeoData, throwDuplicate } = require("./model/adminPanelApi/utilityFn")
 const Moder_status = require("./model/orm/moder_status")
 const Shop = require("./model/orm/shop")
 const ajv = new Ajv({ allErrors: false, coerceTypes: true, useDefaults: "empty" })
 require('ajv-keywords')(ajv, ['transform'])
 
 
-function validConstructor(ajvSchema, yupSchemaRaw, callback) {
+function validConstructor(ajvSchema, yupSchemaRaw, ...callbacks) {
     const validate = ajv.compile(ajvSchema)
     const yupSchema = yup.object().shape(yupSchemaRaw).unknown(true)
     return async (req, res, next) => {
@@ -33,11 +34,16 @@ function validConstructor(ajvSchema, yupSchemaRaw, callback) {
         if (valid) {
             req.body = yupSchema.cast(req.body)
             await yupSchema.validate(req.body).catch((err => next(err.path + ": " + err.message)))
-            if (typeof callback == "function") {
-                next(await callback(req).catch((value) => next(value)))
-            } else {
-                next()
+            for (let callback of callbacks) {
+                if (typeof callback == "function") {
+                    try {
+                        next(await callback(req))
+                    } catch (callbackErr) {
+                        next(callbackErr)
+                    }
+                }
             }
+            next()
         } else {
             const error = validate.errors[0].dataPath.slice(1) + ": " + validate.errors[0].message
             next(error)
@@ -86,20 +92,16 @@ module.exports.validLoginAs = validConstructor(loginAsJson, {
         async value => User.hasUserId(value)
     )
 })
-module.exports.validSetPointRefuse = validConstructor(setPointRefuseJson, undefined, () => {
-    if (!hasPermissionToEdit(req.user, +req.body.id)) return "point id not found"
-})
-module.exports.validEditPointModer = validConstructor(editPointModerJson)
-module.exports.validDelPoint = validConstructor(delPointJson, undefined, () => {
-    if (!hasPermissionToEdit(req.user, +req.body.id)) return "point id not found"
-})
+module.exports.validSetPointRefuse = validConstructor(setPointRefuseJson, undefined, hasPermissionToEdit)
+module.exports.validSetPointAccept = validConstructor(setPointAcceptJson, undefined, hasPermissionToEdit)
+module.exports.validEditPointModer = validConstructor(editPointModerJson, undefined, hasPermissionToEdit)
+module.exports.validDelPoint = validConstructor(delPointJson, undefined, hasPermissionToEdit)
 module.exports.validAddPoint = validConstructor(addPointJson, undefined, async (req) => {
     await getGeoData(req.body)
     await throwDuplicate(req.body)
 })
-module.exports.validEditPointUser = validConstructor(editPointUserJson, undefined, async (req) => {
+module.exports.validEditPointUser = validConstructor(editPointUserJson, undefined, hasPermissionToEdit, async (req) => {
     const pointId = +req.params.id
-    if (!hasPermissionToEdit(req.user, pointId)) return "point id not found"
     const value = await checkTimeStamp(pointId, req.body.timeStamp)
     if (!value) {
         return "timeStamp: timeStamp does not match"
@@ -115,3 +117,18 @@ module.exports.validEditPointUser = validConstructor(editPointUserJson, undefine
 
     if (!req.body.description) delete (req.body.description)
 })
+
+
+async function hasPermissionToEdit(req) {
+    const pointId = req.params.id ? +req.params.id : +req.body.id
+    const res = await Shop
+        .query()
+        .joinRelated("user.region")
+        .select("users.id as userId", "region.id as regionId")
+        .where("shops.id", pointId)
+        .first()
+    if (!(req.user.permission[0].permission == "moder" && res.regionId == user.region_id) &&
+        !(req.user.permission[0].permission == "user" && res.userId == user.id)) {
+        throw "point id not found"
+    }
+}

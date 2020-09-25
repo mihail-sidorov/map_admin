@@ -1,0 +1,9 @@
+{
+  "title": "setPointAccept",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    }
+  }
+}

@@ -4,7 +4,6 @@ const dbConfig = require("../../../serverConfig").db
 
 const { Model } = require("objection")
 
-
 const knex = Knex(dbConfig)
 
 Model.knex(knex)
@@ -71,5 +70,46 @@ module.exports = class Shop extends Model {
 
     static async isMasterPoint(pointId) {
         return this.query().findById(pointId).whereNotNull("parent_id").then(res => !res)
+    }
+
+    static async getParentId(pointId) {
+        return this.query().findById(pointId).select("parent_id").then(res => res.parent_id)
+    }
+
+    static async setStatus(pointId, moder_status) {
+        return this.query()
+            .findById(pointId)
+            .patch({
+                moder_status_id: await require("./moder_status")
+                    .getIdByModerStatus(moder_status)
+            })
+    }
+
+    static async setMaster(pointId) {
+        const pointData = await this.query().findById(pointId)
+        this.transaction()
+        try {
+            return await Person.transaction(async trx => {
+                await this.query(trx).findById(pointId).patch({ "parent_id": null })
+                await this.query(trx).delete().where("id", pointData.parent_id).orWhere("parent_id", pointData.parent_id)
+                pointData.parent_id = null
+                return pointData
+            })
+        } catch (err) {
+            throw "fail"
+        }
+    }
+
+    static async patchData(pointId, data) {
+        return this.query().findById(pointId).patch(data)
+    }
+
+    static async delPointGroup(pointId) {
+        const pointData = await this.query().findById(pointId)
+        if (pointData.parent_id) {
+            await this.query().deleteById(pointData.parent_id)
+        }
+        await this.query().where("id", pointId).orWhere("parent_id", pointData.parent_id)
+        return "OK"
     }
 }

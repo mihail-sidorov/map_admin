@@ -6,21 +6,34 @@ const fetch = require('node-fetch')
 const Moder_status = require("../orm/moder_status")
 const { nanoid } = require("nanoid")
 const Region = require("../orm/region")
+const { knex } = require("../orm/permission")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
-async function hasPermissionToEdit(user, pointId) {
-    const res = await Shop
-        .query()
-        .joinRelated("user.region")
-        .select("users.id as userId", "region.id as regionId")
-        .where("shops.id", pointId)
-        .first()
-    if ((user.permission[0].permission == "moder" && res.regionId == user.region_id)
-        || (user.permission[0].permission == "user" && res.userId == user.id)) {
-        return true
-    } else {
-        return false
+async function startFnByModerStatus(pointId, moderStatusObject) {
+    let result = {}
+    const pointData = await Shop.query().findById(pointId)
+    const isMaster = !pointData.parant_id
+    const moder_status = await Moder_status.query().findById(pointData.moder_status_id)
+
+    const callback = moderStatusObject[moder_status]
+
+    async function run(fn) {
+        if (typeof fn === "function") return fn(pointData)
     }
+
+    if (typeof callback === "function") {
+        result[moder_status] = await callback(pointData)
+        return result
+    }
+
+    result.before = await run(callback.before)
+    if (isMaster) {
+        result.parent = await run(callback.parent)
+    } else {
+        result.child = await run(callback.child)
+    }
+    result.after = await run(callback.after)
+    return result
 }
 
 async function throwDuplicate(point) {
@@ -144,7 +157,7 @@ function getGeoData(point) { //должен содержать поля lat, lng
 
 async function getPoint(user, pointId) {
     const points = []
-    let userId
+    let userId, parent_id
     const select = [
         "id",
         "full_city_name",
@@ -165,7 +178,7 @@ async function getPoint(user, pointId) {
         userId = user.id
     }
     if (!pointId) {
-        parent_id = "parentId"
+        parent_id = "parent_id"
     }
 
     const regionUsers = await Region.query()
@@ -188,14 +201,9 @@ async function getPoint(user, pointId) {
     return points
 }
 
-exports.hasUserId = hasUserId
-exports.hasEmail = hasEmail
-exports.getIdByPermission = getIdByPermission
-exports.getIdByIsModerated = getIdByIsModerated
-exports.getIdByModerStatus = getIdByModerStatus
 exports.getPoint = getPoint
 exports.checkTimeStamp = checkTimeStamp
 exports.throwDuplicate = throwDuplicate
 exports.markDuplicate = markDuplicate
 exports.getGeoData = getGeoData
-exports.hasPermissionToEdit = hasPermissionToEdit
+exports.startFnByModerStatus = startFnByModerStatus

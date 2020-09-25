@@ -17,7 +17,8 @@ const {
     validDelPoint,
     validAddPoint,
     validEditPointModer,
-    validEditPointUser } = require("./reqValidators")
+    validEditPointUser, 
+    validSetPointAccept} = require("./reqValidators")
 const User = require("./model/orm/user")
 const Shop = require("./model/orm/shop")
 
@@ -147,13 +148,13 @@ module.exports = function (app) {
     app.post("/api/moder/setPointRefuse", checkAuth("moder"), validSetPointRefuse, (req, res, next) => {
         console.log(typeof req.body.description, req.body)
         modelPromiseToRes(
-            setPointRefuse(req.user, +req.body.id, req.body.description),
+            setPointRefuse(+req.body.id, req.body.description),
             res, next)
     })
 
-    app.post("/api/moder/setPointAccept", checkAuth("moder"), (req, res, next) => {
+    app.post("/api/moder/setPointAccept", checkAuth("moder"), validSetPointAccept, (req, res, next) => {
         modelPromiseToRes(
-            setPointAccept(req.body.id),
+            setPointAccept(+req.body.id),
             res, next)
     })
 

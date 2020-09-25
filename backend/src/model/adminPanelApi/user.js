@@ -68,7 +68,7 @@ async function delPoint(user, pointId) {
             if (!isMaster) await clearAndCreateDelChild()
             break
         case "delete":
-            thorw "point already has delete status"
+            throw "point already has delete status"
             break
         case "refuse":
             if (isMaster) await immediateDelete()
