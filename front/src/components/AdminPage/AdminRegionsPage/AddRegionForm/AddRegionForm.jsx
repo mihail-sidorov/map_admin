@@ -4,16 +4,18 @@ import modalWindowHOC from '../../../../HOC/modalWindowHOC';
 
 let Form = (props) => {
     return (
-        <form className="add-region-form__form" onSubmit={props.handleSubmit}>
-            <div className="add-region-form__fields">
-                <div className="add-region-form__region">
-                    <Field name="region" component="input" placeholder="region" />
+        <form className="add-region-form__form form" onSubmit={props.handleSubmit}>
+            <div className="add-region-form__fields form__fields">
+                <div className="add-region-form__region form__field">
+                    <label><Field name="region" type="text" component="input" placeholder="Регион" /></label>
                 </div>
             </div>
-            <button className="add-region-form__submit-btn">Добавить</button>
-            <button className="add-region-form__cansel-btn" type="button" onClick={() => {
-                props.onCanselAddRegion();
-            }}>Отмена</button>
+            <div className="add-region-form__btns">
+                <button className="add-region-form__submit-btn btn">Добавить</button>
+                <button className="add-region-form__cansel-btn btn" type="button" onClick={() => {
+                    props.onCanselAddRegion();
+                }}>Отмена</button>
+            </div>
         </form>
     );
 }
