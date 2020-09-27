@@ -112,4 +112,38 @@ module.exports = class Shop extends Model {
         await this.query().where("id", pointId).orWhere("parent_id", pointData.parent_id)
         return "OK"
     }
+
+    static async delPoint(pointId) {
+        return this.query().deleteById(pointId)
+    }
+
+    static async createChild(pointId, moderStatus) {
+        const pointData = await this.query().findById(pointId)
+        pointData.id = undefined
+        pointData.moder_status_id = await require("./moder_status").getIdByModerStatus(moderStatus)
+        pointData.parent_id = pointId
+        const newPointData = await this.query().insert(pointData)
+        return this.getPoint(newPointData.id)
+    }
+
+    static async getPoint (pointId) {
+        const select = [
+            "shops.id",
+            "full_city_name",
+            "street",
+            "house",
+            "title",
+            "lng",
+            "lat",
+            "apartment",
+            "hours",
+            "phone",
+            "site",
+            "isActive",
+            "description",
+            "timeStamp",
+            "moder_status"]
+
+        return this.query().findById(pointId).joinRelated("moder_status").select(...select).then(res => [res])
+    }
 }

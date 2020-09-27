@@ -5,6 +5,7 @@ const { getPoints, addPoint, delPoint } = require("../../../src/model/adminPanel
 
 const getPointsUserJson = require("../../../openApi/models/res/getPointsUser.json")
 const duplicateJson = require("../../../openApi/models/res/duplicate.json")
+const { getGeoData } = require("../../../src/model/adminPanelApi/utilityFn")
 
 expect.extend(matchers)
 
@@ -16,8 +17,10 @@ test("Добавление и получение точки в том числе
     async function testPoint(pointData, force) {
         // генерируем случайное имя, по которому потом тестовые точки будут удалятся
         pointData.title = getTitle("user")
+        await getGeoData(pointData)
         //добавление точки только с полученными даными
         let addPointData = await addPoint(user, pointData,force)
+
         //получение добавленной точки из базы
         let pointFromDb = await Shop.query().where({
             lng: pointData.lng,
@@ -81,12 +84,6 @@ test("Добавление и получение точки в том числе
         isActive: false
     })
 
-    addPointData = addPoint(user,{
-        lng: 10,
-        lat: 10,
-        title: getTitle("user")
-    }) 
-    await expect(addPointData).rejects.toEqual("failed to get geodata")
     //добавляем дубликат
     await testPoint({ //принудительное добавление дубликата
         lng: 54.407203,
@@ -140,12 +137,10 @@ test("Удаление точек delPoint", async () => {
     await addPoint(user,{ title: getTitle("user"), lat: 24.109677, lng: 56.954095 })
     //получаем список добавленных точек
     const points = await getPoints(user)
-    //исключения
-    await expect(delPoint(-21232, points[0].id)).rejects.toBe("point id not found")
-    await expect(delPoint(userId, -324234)).rejects.toBe("point id not found")
+    console.log(points)
     //удаляем все точки
     for (let elem of points) {
-        await delPoint(userId, elem.id)
+        await delPoint(elem.id)
     }
     //проверяем что не получаем точек
     expect(await getPoints(user)).toEqual([])

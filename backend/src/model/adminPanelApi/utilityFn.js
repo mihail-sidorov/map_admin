@@ -1,39 +1,53 @@
 'use strict'
-const User = require("../orm/user")
 const Shop = require("../orm/shop")
-const Permission = require("../orm/permission")
 const fetch = require('node-fetch')
 const Moder_status = require("../orm/moder_status")
 const { nanoid } = require("nanoid")
 const Region = require("../orm/region")
-const { knex } = require("../orm/permission")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
 async function startFnByModerStatus(pointId, moderStatusObject) {
-    let result = {}
-    const pointData = await Shop.query().findById(pointId)
-    const isMaster = !pointData.parant_id
-    const moder_status = await Moder_status.query().findById(pointData.moder_status_id)
+    if (!moderStatusObject) {
+        throw "moderStatusObject must be not empty"
+    }
 
-    const callback = moderStatusObject[moder_status]
+    let result, callback
+    const pointData = await Shop.query().findById(pointId)
+    const isMaster = !pointData.parent_id
+    const {moder_status} = await Moder_status.query().findById(pointData.moder_status_id)
+
+    for(let key in moderStatusObject) {
+        if (key.includes(moder_status)) {
+            callback = moderStatusObject[key]
+        }
+    }
+
+    if (!callback) {
+        return
+    }
 
     async function run(fn) {
         if (typeof fn === "function") return fn(pointData)
     }
 
     if (typeof callback === "function") {
-        result[moder_status] = await callback(pointData)
-        return result
+        return callback(pointData)
     }
 
-    result.before = await run(callback.before)
-    if (isMaster) {
-        result.parent = await run(callback.parent)
-    } else {
-        result.child = await run(callback.child)
+    if (typeof callback.before == "function" && (result = callback.before(pointData))) {
+        return result
     }
-    result.after = await run(callback.after)
-    return result
+    result=[]
+    if (isMaster) {
+        result[0] = await run(callback.parent)
+    } else {
+        result[1] = await run(callback.child)
+    }
+    result[2] = await run(callback.after)
+
+    for (let value of result.reverse()) {
+        if (value) return value
+    }
 }
 
 async function throwDuplicate(point) {

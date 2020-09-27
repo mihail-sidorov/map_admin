@@ -17,10 +17,9 @@ const {
     validDelPoint,
     validAddPoint,
     validEditPointModer,
-    validEditPointUser, 
-    validSetPointAccept} = require("./reqValidators")
+    validEditPointUser,
+    validSetPointAccept } = require("./reqValidators")
 const User = require("./model/orm/user")
-const Shop = require("./model/orm/shop")
 
 module.exports = function (app) {
 
@@ -188,7 +187,7 @@ module.exports = function (app) {
 
     app.post("/api/user/delPoint", checkAuth(["user", "moder"]), validDelPoint, (req, res, next) => {
         modelPromiseToRes(
-            delPoint(+req.user, +req.body.id),
+            delPoint(+req.body.id),
             res, next)
     })
 
@@ -213,8 +212,7 @@ module.exports = function (app) {
         await yup.number().integer()
             .validate(req.params.id).catch((err => next("id: " + err.message)))
         modelPromiseToRes(
-            editPoint(req.user,
-                +req.params.id, {
+            editPoint(+req.params.id, {
                 lng: +req.body.lng,
                 lat: +req.body.lat,
                 title: req.body.title,

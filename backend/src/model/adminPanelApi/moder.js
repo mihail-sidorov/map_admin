@@ -2,9 +2,7 @@
 
 const Shop = require("../orm/shop")
 const Region = require("../orm/region")
-const Moder_status = require("../orm/moder_status")
-const { knex } = require("../orm/region")
-const { startFnIfModerStatus } = require("./utilityFn")
+const { startFnByModerStatus } = require("./utilityFn")
 
 /**
  * Получение точек для модерации по id региона
@@ -59,31 +57,10 @@ async function setPointRefuse(pointId, description) {
 
     await startFnByModerStatus(pointId, {
         "moderated": async () => await Shop.setStatus(pointId, "refuse"),
-        "delete": 
+        "delete": async () => await Shop.delPoint(pointId)
     })
 
-    const { moder_status } = await Shop.getModerStatusByPointId(pointId)
-    if (moder_status == "moderated") {
-        return await Shop.query()
-            .findById(pointId)
-            .patch({ moder_status_id: await Moder_status.getIdByModerStatus("refuse"), description: description })
-            .then(res => {
-                if (res) {
-                    return "OK"
-                } else {
-                    throw "fail"
-                }
-            })
-    } else if (moder_status == "delete") {
-        return Shop.query().deleteById(pointId).then(res => {
-            if (res) {
-                return "OK"
-            } else {
-                throw "fail"
-            }
-        })
-
-    }
+    return "OK"
 }
 
 async function setPointAccept(pointId) {

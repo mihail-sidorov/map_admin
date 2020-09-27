@@ -1,8 +1,7 @@
 'use strict'
 const Shop = require("../orm/shop")
-const { markDuplicate, getPoint } = require("./utilityFn")
+const { markDuplicate, getPoint, startFnByModerStatus } = require("./utilityFn")
 const Moder_status = require("../orm/moder_status")
-const { knex } = require("../orm/region")
 
 async function addPoint(user, point, force) {
     point.user_id = user.id
@@ -21,134 +20,73 @@ async function getPoints(user) {
     return getPoint(user)
 }
 
-async function delPoint(user, pointId) {
-    const isMaster = await Shop.isMasterPoint(pointId)
-    const { moder_status } = await Shop.getModerStatusByPointId(pointId)
-
-    const createDelChild = async (trx) => {
-        const point = await Shop.query(trx).findById(pointId).select("*")
-        point.parent_id = point.id
-        point.moder_status_id = Moder_status.getIdByModerStatus("delete")
-        delete (point.id)
-        const insertPoint = await Shop.query(trx).insert(point)
-        if (insertPoint) {
-            return getPoint(user, insertPoint.id)
-        } else {
-            throw "fail"
-        }
-    }
-
-    const immediateDelete = async () => {
-        if (await Shop.query().deleteById(pointId)) {
-            return "OK"
-        } else {
-            return "fail"
-        }
-    }
-
-    const clearAndCreateDelChild = async () => {
-        await knex.transaction(async trx => {
-            if (await Shop.query(trx).delete().where("parent_id", pointId)) {
-                await createDelChild(trx)
-            } else {
-                throw "fail"
-            }   
-        })
-    }
-
-
-    switch (moder_status) {
-        case "accept":
-            if (isMaster) await createDelChild()
-            //невозможный вариант обрабатываем на всякий случай
-            if (!isMaster) await immediateDelete()
-            break
-        case "moderated":
-            if (isMaster) await immediateDelete()
-            if (!isMaster) await clearAndCreateDelChild()
-            break
-        case "delete":
-            throw "point already has delete status"
-            break
-        case "refuse":
-            if (isMaster) await immediateDelete()
-            if (!isMaster) await clearAndCreateDelChild()
-            break
-    }
-
-    return Shop
-        .query()
-        .delete()
-        .where({ "id": pointId, "user_id": userId })
-        .then(res => {
-            if (res) {
-                return "OK"
-            } else {
-                throw "point id not found"
+async function delPoint(pointId) {
+    const result = await startFnByModerStatus(pointId, {
+        "moderated, refuse": {
+            "parent": async () => { await Shop.delPoint(pointId) },
+            "child": async (pointData) => {
+                await Shop.delPoint(pointId)
+                return Shop.createChild(pointData.parent_id, "delete")
             }
-        })
+        },
+        "delete": () => { throw "point already has delete status" },
+        "accept": {
+            "parent": async () => {
+                return Shop.createChild(pointId, "delete")
+            },
+            "child": async () => { await Shop.delPoint(pointId) }
+        }
+    })
+
+    if (result) {
+        return result
+    } else {
+        return "OK"
+    }
 }
 
 
-async function editPoint(user, pointId, point, force) {
-    const select = [
-        "lng",
-        "lat",
-        "title",
-        "apartment",
-        "hours",
-        "phone",
-        "site",
-        "description",
-        "force",
-        "isActive"]
-    let checkResult, shopCopy, insertData
-    const { moder_status } = await Shop.getModerStatusByPointId(pointId)
-    const { description, ...checkData } = point
-    if (!Object.keys(point).length) return getPoint(user, pointId)
+async function editPoint(pointId, point) {
+
+    const { description, ...data } = point
+    if (!description) description = null
+    if (!Object.keys(point).length) return Shop.getPoint(pointId)
 
     //проверка данных на изменение
     //если все поля пустые, то ничего не изменилось
 
-    shopCopy = await Shop.query().findById(pointId).select(...select, "parent_id")
-    checkResult = shopCopy.$query().where(checkData)
-    if (checkResult && !checkResult.description) checkResult.description = undefined
-    const isDescChange = (checkResult.description == description)
+    let checkResult = await Shop.query().where("id",pointId).andWhere(data).first()
+    if (checkResult && !checkResult.description) checkResult.description = null
+    const isDescChange = (checkResult.description != description)
     const isDataChange = !checkResult
-    const isMaster = !shopCopy.parent_id
-    delete (shopCopy.parent_id)
-    if (!isDataChange && !isDescChange) return getPoint(user, pointId)
+    
+    if (!isDataChange && !isDescChange) return Shop.getPoint(pointId)
 
-    const editCurrentFn = async () => {
-        const newPoint = await Shop.query().findById(pointId).patch(point)
-        if (!newPoint) throw "fail"
-        return getPoint(user, pointId)
-    }
+    return await startFnByModerStatus(pointId, {
+        "accept": async () => {
+            if (!isDataChange) return Shop.getPoint(pointId)
+            const childPointData = await Shop.createChild(pointId, "moderated")
+            await Shop.patchData(childPointData.id, point)
+            return Shop.getPoint(childPointData.id)
+        },
+        "refuse": async () => {
+            await Shop.setStatus(pointId, "moderated")
+            await Shop.patchData(pointId, point)
+            return Shop.getPoint(pointId)
+        },
+        "moderated": async () => {
+            await Shop.patchData(pointId, point)
+            return Shop.getPoint(pointId)
+        },
+        "delete": async () => {
+            if (!isDescChange) return Shop.getPoint(pointId)
+            //при удалении меняем только комментарии
+            await Shop.patchData(pointId, {description:point.description})
+            return Shop.getPoint(pointId)
+        }
 
-    const createChildFn = async () => {
-        const { id, ...shopCopyWithoutId } = shopCopy
-        const newPoint = await Shop.query().insert(Object.assign(shopCopyWithoutId, point))
-        if (!newPoint) throw "fail"
-        return getPoint(user, newPoint.id)
-    }
+    })
 
-    switch (moder_status) {
-        case "accept":
-            if (!isDataChange) return getPoint(user, pointId)
-            if (isDataChange) point = Moder_status.getIdByModerStatus("moderate")
-            if (isMaster) await createChildFn()
-            break
-        case "refuse":
-            if (isDataChange || isDescChange) point = Moder_status.getIdByModerStatus("moderate")
-            if (isMaster || !isMaster) await editCurrentFn()
-            break
-        case "delete":
-            if (!isDescChange) return getPoint(user, pointId)
-            if (isMaster || !isMaster) await editCurrentFn()
-            break
-        case "moderated":
-            if (isMaster || !isMaster) await editCurrentFn()
-    }
 }
 
 exports.addPoint = addPoint
