@@ -13,8 +13,19 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
 
     let result, callback
     const pointData = await Shop.query().findById(pointId)
-    const isHasChild = pointData.child_id
+    const child = await Shop.query().where("parent_id", pointId).first()
+    const isHasChild = Boolean(child)
+
+    if (pointData.parent_id) {
+        throw "only the main point can be edited"
+    }
+
     const {moder_status} = await Moder_status.query().findById(pointData.moder_status_id)
+
+    if (isHasChild && moder_status == "accept") {
+        await Shop.delPoint(child.id)
+        throw "parent and child has accept status"
+    }
 
     for(let key in moderStatusObject) {
         if (key.includes(moder_status)) {
@@ -39,9 +50,9 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
     }
     result=[]
     if (isHasChild) {
-        result[0] = await run(callback.hasChild)
+        result[0] = await run(callback.hasAcceptCopy)
     } else {
-        result[1] = await run(callback.notHasChild)
+        result[1] = await run(callback.notHasAcceptCopy)
     }
     result[2] = await run(callback.after)
 

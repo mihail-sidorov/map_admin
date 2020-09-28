@@ -115,7 +115,7 @@ module.exports = class Shop extends Model {
 
     static async delPoint(pointId) {
         if (await this.query().deleteById(pointId)) {
-            return {delete: true}
+            return { delete: true }
         }
     }
 
@@ -127,7 +127,7 @@ module.exports = class Shop extends Model {
         return await this.query().insert(pointData)
     }
 
-    static async getPoint (pointId) {
+    static async getPoint(pointId) {
         const select = [
             "shops.id",
             "full_city_name",
@@ -148,9 +148,30 @@ module.exports = class Shop extends Model {
         return this.query().findById(pointId).joinRelated("moder_status").select(...select).then(res => [res])
     }
 
-    static async setValidCopyToMaster (pointId) {
-        this.query().deleteById(pointId)
-        this.query().where("parent_id", pointId).first()
+    static async returnAcceptCopyToMaster(pointId) {
+        const child = await this.query().where("parent_id", pointId).first()
+        if (child) {
+            await this.transaction((trx) => {
+                await this.query(trx).deleteById(child.id)
+                child.id = undefined
+                child.parent_id = null
+                await this.query(trx).findById(pointId).patch(child)
+            })
+        } else {
+            throw "fail"
+        }
+    }
+
+    static async createNewMasterWithStatus(pointId, moderStatus) {
+        const masterPoint = await this.query().findById(pointId)
+        if (masterPoint.parent_id) {
+            throw "fail"
+        }
+        const moder_status_id = await require("./moder_status").getIdByModerStatus(moderStatus)
+        await this.query().findById(pointId).patch({ moder_status_id, parent_id: null })
+        masterPoint.id = undefined
+        masterPoint.parent_id = pointId
+        await this.query().insert(masterPoint)
     }
 
     // static async getPoints(user) {
@@ -170,11 +191,11 @@ module.exports = class Shop extends Model {
     //         "isActive",
     //         "description",
     //         "timeStamp"]
-    
+
     //     if (user.permission[0].permission == "user") {
     //         userId = user.id
     //     }
- 
+
     //     this.query().withGraphJoined()
     //     const regionUsers = await Region.query()
     //         .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
@@ -188,11 +209,11 @@ module.exports = class Shop extends Model {
     //     for (let regionUser of regionUsers.user) {
     //         points.push(...regionUser.shop)
     //     }
-    
+
     //     points.forEach(elem => {
     //         elem.moder_status = elem.moder_status[0].moder_status
     //     })
-    
+
     //     return points
     // }
 }

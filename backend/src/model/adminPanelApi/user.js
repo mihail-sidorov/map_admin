@@ -24,17 +24,17 @@ async function delPoint(pointId) {
     return await startFnByModerStatus(pointId, {
         "moderated, refuse": {
             "notHasAcceptCopy": async () => await Shop.delPoint(pointId),
-            "hasAcceptCopy": async (pointData) => {
-                await Shop.setValidCopyToMaster(pointId)
-                await Shop.createNewMasterWithStatus(pointId,"delete")
-                return {delete: false}
+            "hasAcceptCopy": async () => {
+                await Shop.returnAcceptCopyToMaster(pointId)
+                await Shop.createNewMasterWithStatus(pointId, "delete")
+                return { delete: false }
             }
         },
         "delete": () => { throw "point already has delete status" },
         "accept": async () => {
-            await Shop.createNewMasterWithStatus(pointId,"delete")
-            return {delete: false}
-    }
+            await Shop.createNewMasterWithStatus(pointId, "delete")
+            return { delete: false }
+        }
     })
 }
 
@@ -48,19 +48,19 @@ async function editPoint(pointId, point) {
     //проверка данных на изменение
     //если все поля пустые, то ничего не изменилось
 
-    let checkResult = await Shop.query().where("id",pointId).andWhere(data).first()
+    let checkResult = await Shop.query().where("id", pointId).andWhere(data).first()
     if (checkResult && !checkResult.description) checkResult.description = null
     const isDescChange = (checkResult.description != description)
     const isDataChange = !checkResult
-    
+
     if (!isDataChange && !isDescChange) return Shop.getPoint(pointId)
 
     return await startFnByModerStatus(pointId, {
         "accept": async () => {
             if (!isDataChange) return Shop.getPoint(pointId)
-            const childPointData = await Shop.createChild(pointId, "moderated")
-            await Shop.patchData(childPointData.id, point)
-            return Shop.getPoint(childPointData.id)
+            await Shop.createNewMasterWithStatus(pointId, "moderated")
+            await Shop.patchData(pointId, point)
+            return Shop.getPoint(pointId)
         },
         "refuse": async () => {
             await Shop.setStatus(pointId, "moderated")
@@ -74,7 +74,7 @@ async function editPoint(pointId, point) {
         "delete": async () => {
             if (!isDescChange) return Shop.getPoint(pointId)
             //при удалении меняем только комментарии
-            await Shop.patchData(pointId, {description:point.description})
+            await Shop.patchData(pointId, { description: point.description })
             return Shop.getPoint(pointId)
         }
 

@@ -57,7 +57,7 @@ async function setPointRefuse(pointId, description) {
 
     await startFnByModerStatus(pointId, {
         "moderated": async () => await Shop.setStatus(pointId, "refuse"),
-        "delete": async () => await Shop.delPoint(pointId)
+        "delete": async () => await Shop.returnAcceptCopyToMaster(pointId)
     })
 
     return "OK"
