@@ -19,11 +19,11 @@ let PointsPage = (props) => {
                 <Route exact path="/points" render={() => <SearchPointsContainer />} />
                 <Route exact path="/points" render={() => <PointsContainer permission={props.permission} />} />
                 <Route exact path="/points" render={() => <PaginationContainer />} />
+                <Route exact path="/points/duplicate" render={() => <DuplicateContainer permission={props.permission} />} />
             </div>
             <Route exact path="/points" render={() => <AddEditPointFormContainer permission={props.permission} />} />
             <Route exact path="/points" render={() => <RefusePointFormContainer />} />
             <Route exact path="/points" render={() => <DelPointFormContainer />} />
-            <Route exact path="/points/duplicate" render={() => <DuplicateContainer permission={props.permission} />} />
         </div>
     );
 }
