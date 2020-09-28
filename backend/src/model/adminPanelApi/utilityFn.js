@@ -13,7 +13,7 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
 
     let result, callback
     const pointData = await Shop.query().findById(pointId)
-    const isMaster = !pointData.parent_id
+    const isHasChild = pointData.child_id
     const {moder_status} = await Moder_status.query().findById(pointData.moder_status_id)
 
     for(let key in moderStatusObject) {
@@ -38,10 +38,10 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
         return result
     }
     result=[]
-    if (isMaster) {
-        result[0] = await run(callback.parent)
+    if (isHasChild) {
+        result[0] = await run(callback.hasChild)
     } else {
-        result[1] = await run(callback.child)
+        result[1] = await run(callback.notHasChild)
     }
     result[2] = await run(callback.after)
 

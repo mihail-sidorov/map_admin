@@ -34,15 +34,6 @@ module.exports = class Shop extends Model {
                     from: "moder_statuses.id",
                     to: "shops.moder_status_id"
                 }
-            },
-
-            parent: {
-                relation: Model.BelongsToOneRelation,
-                modelClass: Shop,
-                join: {
-                    from: "shops.parent_id",
-                    to: "shops.id"
-                }
             }
         }
     }
@@ -155,6 +146,11 @@ module.exports = class Shop extends Model {
             "moder_status"]
 
         return this.query().findById(pointId).joinRelated("moder_status").select(...select).then(res => [res])
+    }
+
+    static async setValidCopyToMaster (pointId) {
+        this.query().deleteById(pointId)
+        this.query().where("parent_id", pointId).first()
     }
 
     // static async getPoints(user) {
