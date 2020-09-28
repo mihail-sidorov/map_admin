@@ -34,6 +34,15 @@ module.exports = class Shop extends Model {
                     from: "moder_statuses.id",
                     to: "shops.moder_status_id"
                 }
+            },
+
+            parent: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: Shop,
+                join: {
+                    from: "shops.parent_id",
+                    to: "shops.id"
+                }
             }
         }
     }
@@ -114,7 +123,9 @@ module.exports = class Shop extends Model {
     }
 
     static async delPoint(pointId) {
-        return this.query().deleteById(pointId)
+        if (await this.query().deleteById(pointId)) {
+            return {delete: true}
+        }
     }
 
     static async createChild(pointId, moderStatus) {
@@ -122,8 +133,7 @@ module.exports = class Shop extends Model {
         pointData.id = undefined
         pointData.moder_status_id = await require("./moder_status").getIdByModerStatus(moderStatus)
         pointData.parent_id = pointId
-        const newPointData = await this.query().insert(pointData)
-        return this.getPoint(newPointData.id)
+        return await this.query().insert(pointData)
     }
 
     static async getPoint (pointId) {
@@ -146,4 +156,47 @@ module.exports = class Shop extends Model {
 
         return this.query().findById(pointId).joinRelated("moder_status").select(...select).then(res => [res])
     }
+
+    // static async getPoints(user) {
+
+    //     const select = [
+    //         "id",
+    //         "full_city_name",
+    //         "street",
+    //         "house",
+    //         "title",
+    //         "lng",
+    //         "lat",
+    //         "apartment",
+    //         "hours",
+    //         "phone",
+    //         "site",
+    //         "isActive",
+    //         "description",
+    //         "timeStamp"]
+    
+    //     if (user.permission[0].permission == "user") {
+    //         userId = user.id
+    //     }
+ 
+    //     this.query().withGraphJoined()
+    //     const regionUsers = await Region.query()
+    //         .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
+    //         .skipUndefined()
+    //         .where({ "regions.id": user.region_id })
+    //         .modifyGraph('user.shop', bulder => {
+    //             bulder.skipUndefined().where({ "shops.id": pointId, "user_id": userId }).whereNull(parent_id).select(...select)
+    //         })
+    //         .first()
+    //     if (!regionUsers) return []
+    //     for (let regionUser of regionUsers.user) {
+    //         points.push(...regionUser.shop)
+    //     }
+    
+    //     points.forEach(elem => {
+    //         elem.moder_status = elem.moder_status[0].moder_status
+    //     })
+    
+    //     return points
+    // }
 }

@@ -33,15 +33,17 @@ function validConstructor(ajvSchema, yupSchemaRaw, ...callbacks) {
         if (valid) {
             req.body = yupSchema.cast(req.body)
             await yupSchema.validate(req.body).catch((err => next(err.path + ": " + err.message)))
-            for (let callback of callbacks) {
-                if (typeof callback == "function") {
-                    try {
-                        next(await callback(req))
-                    } catch (callbackErr) {
-                        next(callbackErr)
+            try {
+                for (let callback of callbacks) {
+                    if (typeof callback == "function") {
+                        const result = await callback(req)
+                        if (result) next(result)
                     }
                 }
+            } catch (callbackErr) {
+                next(callbackErr)
             }
+
             next()
         } else {
             const error = validate.errors[0].dataPath.slice(1) + ": " + validate.errors[0].message
@@ -119,15 +121,17 @@ module.exports.validEditPointUser = validConstructor(editPointUserJson, undefine
 
 
 async function hasPermissionToEdit(req) {
-    const pointId = req.params.id ? +req.params.id : +req.body.id
+    let pointId = req.params.id ? req.params.id : req.body.id
+    await yup.number().integer().validate(pointId).catch(err => { throw ("id: " + err.message) })
     const res = await Shop
         .query()
         .joinRelated("user.region")
-        .select("users.id as userId", "region.id as regionId")
-        .where("shops.id", pointId)
+        .select("user_id", "region_id", "shops.id")
+        .where("shops.id", +pointId)
         .first()
-    if (!(req.user.permission[0].permission == "moder" && res.regionId == user.region_id) &&
-        !(req.user.permission[0].permission == "user" && res.userId == user.id)) {
+    if (!res ||
+        !(req.user.permission[0].permission == "moder" && res.region_id == req.user.region_id) &&
+        !(req.user.permission[0].permission == "user" && res.user_id == req.user.id)) {
         throw "point id not found"
     }
 }

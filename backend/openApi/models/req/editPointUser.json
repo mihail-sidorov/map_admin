@@ -41,7 +41,8 @@
       "default": 1
     },
     "timeStamp": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [

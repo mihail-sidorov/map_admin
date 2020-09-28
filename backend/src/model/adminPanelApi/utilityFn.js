@@ -131,6 +131,7 @@ async function markDuplicate(point, force, pointId) {
 }
 
 function checkTimeStamp(pointId, timeStamp) {
+    timeStamp = timeStamp.replace(/T/, " ").slice(0,19)
     return Shop.query()
         .first()
         .where({ "id": pointId, "timeStamp": timeStamp })

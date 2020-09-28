@@ -157,10 +157,7 @@ module.exports = function (app) {
             res, next)
     })
 
-    app.post("/api/moder/editPoint/:id", checkAuth("moder"), async (req, res, next) => {
-        await yup.number().integer()     //валидация point id
-            .validate(req.params.id).catch((err => next("id: " + err.message)))
-    }, validEditPointModer, async (req, res, next) => {
+    app.post("/api/moder/editPoint/:id", checkAuth("moder"), validEditPointModer, async (req, res, next) => {
 
 
         modelPromiseToRes(
@@ -209,8 +206,6 @@ module.exports = function (app) {
     })
 
     app.post("/api/user/editPoint/:id", checkAuth(["user", "moder"]), validEditPointUser, async (req, res, next) => {
-        await yup.number().integer()
-            .validate(req.params.id).catch((err => next("id: " + err.message)))
         modelPromiseToRes(
             editPoint(+req.params.id, {
                 lng: +req.body.lng,
@@ -232,7 +227,6 @@ module.exports = function (app) {
     })
 
     app.use(function (err, req, res, next) {
-        //console.log(err)
-        res.status(200).json(jsonResPattern(err, true))
+        res.json(jsonResPattern(err, true))
     })
 }

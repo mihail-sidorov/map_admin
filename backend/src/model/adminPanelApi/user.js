@@ -21,28 +21,21 @@ async function getPoints(user) {
 }
 
 async function delPoint(pointId) {
-    const result = await startFnByModerStatus(pointId, {
+    return await startFnByModerStatus(pointId, {
         "moderated, refuse": {
-            "parent": async () => { await Shop.delPoint(pointId) },
+            "parent": async () => await Shop.delPoint(pointId),
             "child": async (pointData) => {
                 await Shop.delPoint(pointId)
-                return Shop.createChild(pointData.parent_id, "delete")
+                await Shop.createChild(pointData.parent_id, "delete")
+                return {delete: false}
             }
         },
         "delete": () => { throw "point already has delete status" },
-        "accept": {
-            "parent": async () => {
-                return Shop.createChild(pointId, "delete")
-            },
-            "child": async () => { await Shop.delPoint(pointId) }
-        }
-    })
-
-    if (result) {
-        return result
-    } else {
-        return "OK"
+        "accept": async () => {
+            Shop.createChild(pointId, "delete")
+            return {delete: false}
     }
+    })
 }
 
 
