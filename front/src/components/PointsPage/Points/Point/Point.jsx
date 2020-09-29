@@ -48,6 +48,7 @@ let Point = (props) => {
         if (props.point.moder_status === 'moderated') moderStatus = 'На модерации';
         if (props.point.moder_status === 'refuse') moderStatus = 'Отклонено';
         if (props.point.moder_status === 'accept') moderStatus = 'Допущена к публикации';
+        if (props.point.moder_status === 'delete') moderStatus = 'На удалении';
     }
     else {
         if (props.point.moder_status === 'moderated') moderStatus = 'На утверждение';

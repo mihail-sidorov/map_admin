@@ -14,7 +14,7 @@ let Form = (props) => {
                 </div>
             </div>
             <div className="edit-user-form__btns">
-                <button className="edit-user-form__submit-btn btn">Редактировать</button>
+                <button className="edit-user-form__submit-btn btn">ОК</button>
                 <button className="edit-user-form__cansel-btn btn" type="button" onClick={() => {
                     props.onCloseEditUserForm();
                 }}>Отмена</button>

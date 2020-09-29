@@ -52,7 +52,7 @@ let Form = (props) => {
                 </div>
             </div>
             <div className="add-user-form__btns">
-                <button className="add-user-form__submit-btn btn">Добавить</button>
+                <button className="add-user-form__submit-btn btn">ОК</button>
                 <button className="add-user-form__cansel-btn btn" type="button" onClick={() => {
                     props.onCloseAddUserForm();
                 }}>Отмена</button>

@@ -11,7 +11,7 @@ let Form = (props) => {
                 </div>
             </div>
             <div className="add-region-form__btns">
-                <button className="add-region-form__submit-btn btn">Добавить</button>
+                <button className="add-region-form__submit-btn btn">ОК</button>
                 <button className="add-region-form__cansel-btn btn" type="button" onClick={() => {
                     props.onCanselAddRegion();
                 }}>Отмена</button>

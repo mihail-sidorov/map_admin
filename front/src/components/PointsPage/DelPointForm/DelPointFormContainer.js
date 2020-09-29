@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { closeDelPointFormActionCreator } from '../../../redux/pointsPageReducer';
+import { acceptPoint, changePointStatusActionCreator, closeDelPointFormActionCreator, delPoint, delPointActionCreator } from '../../../redux/pointsPageReducer';
 import DelPointFormModalWindow from './DelPointForm';
 
 let DelPointFormContainer = connect(
@@ -11,8 +11,32 @@ let DelPointFormContainer = connect(
             dispatch(closeDelPointFormActionCreator());
         },
         onDelPoint: (id, permission) => {
-            console.log(id);
-            console.log(permission);
+            if (permission === 'user') {
+                delPoint(id)
+                    .then((res) => {
+                        if (res.delete) {
+                            dispatch(delPointActionCreator(id));
+                        }
+                        else {
+                            dispatch(changePointStatusActionCreator(id, 'delete'));
+                        }
+                        dispatch(closeDelPointFormActionCreator());
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+
+            if (permission === 'moder') {
+                acceptPoint(id)
+                    .then(() => {
+                        dispatch(delPointActionCreator(id));
+                        dispatch(closeDelPointFormActionCreator());
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
         }
     })
 )(DelPointFormModalWindow);
