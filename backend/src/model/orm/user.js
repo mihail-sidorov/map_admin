@@ -100,19 +100,9 @@ module.exports = class User extends Password(Model) {
         if (userId === null || (userId !== undefined && !Number.isInteger(+userId))) {
             throw "incorrect userId"
         }
-        
-        return this.query()
-            .withGraphJoined("[permission, region]")
-            .select("users.id", "email")
-            .skipUndefined()
-            .where("users.id", userId)
-            .then(res => {
-                res.forEach(elem => {
-                    elem.region = elem.region[0].region
-                    elem.permission = elem.permission[0].permission
-                })
-                return res
-            })
+        return this.query().leftJoinRelated("[permission, region]").select("users.id", "email","permission","region")
+        .skipUndefined()
+        .where("users.id", userId)
     }
 
     static async hasUserId(userId) {

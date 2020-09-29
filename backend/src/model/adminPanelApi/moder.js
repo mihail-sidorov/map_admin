@@ -56,37 +56,46 @@ async function setPointRefuse(pointId, description) {
     if (!description) description = null
 
     await startFnByModerStatus(pointId, {
-        "moderated": async () => await Shop.setStatus(pointId, "refuse"),
-        "delete": async () => await Shop.returnAcceptCopyToMaster(pointId)
+        moderated: async () => await Shop.setStatus(pointId, "refuse"),
+        delete: async () => await Shop.returnAcceptCopyToMaster(pointId),
+        other: () => {throw "fail"}
     })
 
-    return "OK"
+    return pointId
 }
 
 async function setPointAccept(pointId) {
     await startFnByModerStatus(pointId, {
-        "moderated": {
-            "child": async () => await Shop.setMaster(pointId),
-            "after": async () => await Shop.setStatus(pointId, "accept")
+        moderated: {
+            notHasAcceptCopy: async () => await Shop.setStatus(pointId, "accept"),
+            hasAcceptCopy: async (child) => {
+                await Shop.delPoint(child.id)
+                await Shop.setStatus(pointId, "accept")
+            }
         },
-        "delete": async () => await Shop.delPointGroup(pointId)
+        delete: {
+            hasAcceptCopy: async (child) => await Shop.delPoint(child.id),
+            after: async () => await Shop.delPoint(pointId)
+        },
+        other: () => {throw "fail"}
     })
 
-    return "OK"
+    return pointId
 }
 
 async function editPointModer(pointId, point) {
     await startFnByModerStatus(pointId, {
-        "moderated": {
-            child: async () => await Shop.setMaster(pointId),
+        moderated: {
             after: async () => {
                 await Shop.patchData(pointId, point)
                 await Shop.setStatus(pointId, "accept")
-            }
-        }
+            },
+            hasAcceptCopy: async (child) => await Shop.delPoint(child.id),
+        },
+        other: () => {throw "fail"}
     })
 
-    return "OK"
+    return pointId
 }
 
 exports.getPointsModer = getPointsModer

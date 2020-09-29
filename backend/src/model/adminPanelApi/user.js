@@ -13,11 +13,40 @@ async function addPoint(user, point, force) {
         .then(res => res.id)
 
     await markDuplicate(point, force, pointId)
-    return getPoint(user, pointId)
+    return Shop.getPoint(pointId)
 }
 
 async function getPoints(user) {
-    return getPoint(user)
+    let userId
+    const select = [
+        "shops.id",
+        "full_city_name",
+        "street",
+        "house",
+        "title",
+        "lng",
+        "lat",
+        "apartment",
+        "hours",
+        "phone",
+        "site",
+        "isActive",
+        "description",
+        "timeStamp",
+        "moder_status",
+        "email"
+    ]
+
+    if (user.permission[0].permission == "user") {
+        userId = user.id
+    }
+
+    return Shop.query()
+        .joinRelated("[user,moder_status]")
+        .whereNull("parent_id")
+        .skipUndefined()
+        .andWhere({ "user_id": userId, "region_id": user.region_id })
+        .select(...select)
 }
 
 async function delPoint(pointId) {
@@ -39,23 +68,24 @@ async function delPoint(pointId) {
 }
 
 
-async function editPoint(pointId, point) {
+async function editPoint(pointId, point, force) {
 
-    const { description, ...data } = point
+    let { description, ...data } = point
     if (!description) description = null
     if (!Object.keys(point).length) return Shop.getPoint(pointId)
 
     //проверка данных на изменение
     //если все поля пустые, то ничего не изменилось
 
-    let checkResult = await Shop.query().where("id", pointId).andWhere(data).first()
-    if (checkResult && !checkResult.description) checkResult.description = null
-    const isDescChange = (checkResult.description != description)
+    let currentPointData = await Shop.query().findById(pointId)
+    let checkResult = await currentPointData.$query().skipUndefined().andWhere(data)
+    if (!currentPointData.description) currentPointData.description = null
+    const isDescChange = (currentPointData.description != description)
     const isDataChange = !checkResult
 
     if (!isDataChange && !isDescChange) return Shop.getPoint(pointId)
 
-    return await startFnByModerStatus(pointId, {
+    const response = await startFnByModerStatus(pointId, {
         "accept": async () => {
             if (!isDataChange) return Shop.getPoint(pointId)
             await Shop.createNewMasterWithStatus(pointId, "moderated")
@@ -79,6 +109,10 @@ async function editPoint(pointId, point) {
         }
 
     })
+
+    await markDuplicate(pointId, point, force)
+
+    return response
 
 }
 

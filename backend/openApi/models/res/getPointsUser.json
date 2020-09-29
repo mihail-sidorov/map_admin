@@ -76,6 +76,10 @@
       },
       "moder_status": {
         "type": "string"
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
       }
     },
     "required": [
@@ -93,7 +97,8 @@
       "isActive",
       "description",
       "timeStamp",
-      "moder_status"
+      "moder_status",
+      "email"
     ]
   }
 }

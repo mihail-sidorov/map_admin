@@ -58,17 +58,25 @@ module.exports.validAddUser = validConstructor(addUserJson, {
         'this email is already in use',
         async value => !(await User.hasEmail(value))
     ),
-    permission_id: yup.number().test(
-        'permission_id',
-        "this permission_id not found",
-        async value => Permission.hasPermission(value)
-    ),
-    region_id: yup.number().test(
-        'region_id',
-        "this region_id not found",
-        async value => Region.hasRegion(value)
-    )
-
+    permission_id: yup.number()
+        .test(
+            'permission_id',
+            "this permission_id not found",
+            async value => Permission.hasPermission(value)
+        )
+}, async (req) => {
+    const permissionAdminId = await Permission.getIdByPermission("admin")
+    if (req.body.permission_id === permissionAdminId) {
+        req.body.region_id = null
+    } else if (!req.body.region_id) {
+        throw "region_id: null is not allowed for non-admin"
+    } else {
+        await yup.number().test(
+            'region_id',
+            "this region_id not found",
+            async value => Region.hasRegion(value)
+        ).validate(req.body.region_id).catch(err => { throw ("region.id: " + err.message) })
+    }
 })
 
 module.exports.validEditUser = validConstructor(editUserJson, {
@@ -112,8 +120,9 @@ module.exports.validEditPointUser = validConstructor(editPointUserJson, undefine
     if (!req.body.lat || !req.body.lng) {
         delete (req.body.lat)
         delete (req.body.lat)
+    } else {
         await getGeoData(req.body)
-        await throwDuplicate(req.body)
+        await throwDuplicate(req.body,pointId)
     }
 
     if (!req.body.description) delete (req.body.description)

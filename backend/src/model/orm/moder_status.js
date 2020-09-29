@@ -75,9 +75,9 @@ module.exports = class Moder_status extends Model {
     }
 
     static async getIdByModerStatus (moderStatus) {
-        const res = await this.query().whereIn("moder_status", [moderStatus]).first().select("id").then(res => res.id)
+        const res = await this.query().whereIn("moder_status", [moderStatus]).first().select("id")
         if (res) {
-            return res  
+            return res.id
         } else {
             throw "this moderStatus not found"
         }

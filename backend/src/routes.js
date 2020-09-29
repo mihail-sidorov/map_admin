@@ -80,8 +80,8 @@ module.exports = function (app) {
 
     app.get("/api/admin/getUsers", checkAuth("admin"), (req, res, next) => {
         modelPromiseToRes(
-            getUsers(),
-            res, next)
+            getUsers()
+            , res, next)
     })
 
     app.post("/api/admin/editRegion", checkAuth("admin"), validEditRegion, (req, res, next) => {
@@ -153,15 +153,15 @@ module.exports = function (app) {
 
     app.post("/api/moder/setPointAccept", checkAuth("moder"), validSetPointAccept, (req, res, next) => {
         modelPromiseToRes(
-            setPointAccept(+req.body.id),
-            res, next)
+            setPointAccept(+req.body.id)
+            , res, next)
     })
 
     app.post("/api/moder/editPoint/:id", checkAuth("moder"), validEditPointModer, async (req, res, next) => {
 
 
         modelPromiseToRes(
-            editPointModer(req.user, +req.params.id, {
+            editPointModer(+req.params.id, {
                 street: req.body.street,
                 house: req.body.house,
                 full_city_name: req.body.full_city_name,
@@ -191,6 +191,9 @@ module.exports = function (app) {
     app.post("/api/user/addPoint", checkAuth(["user", "moder"]), validAddPoint, (req, res, next) => {
         modelPromiseToRes(
             addPoint(req.user, {
+                full_city_name: req.body.full_city_name,
+                street: req.body.street,
+                house: req.body.house,
                 lng: +req.body.lng,
                 lat: +req.body.lat,
                 title: req.body.title,
@@ -216,9 +219,8 @@ module.exports = function (app) {
                 phone: req.body.phone,
                 site: req.body.site,
                 description: req.body.description,
-                force: Boolean(req.body.force),
                 isActive: Boolean(req.body.isActive),
-            })
+            }, Boolean(req.body.force))
             , res, next)
     })
 

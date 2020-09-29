@@ -20,35 +20,37 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
         throw "only the main point can be edited"
     }
 
-    const {moder_status} = await Moder_status.query().findById(pointData.moder_status_id)
+    const { moder_status } = await Moder_status.query().findById(pointData.moder_status_id)
 
     if (isHasChild && moder_status == "accept") {
         await Shop.delPoint(child.id)
         throw "parent and child has accept status"
     }
 
-    for(let key in moderStatusObject) {
+    for (let key in moderStatusObject) {
         if (key.includes(moder_status)) {
             callback = moderStatusObject[key]
         }
     }
 
-    if (!callback) {
+    if (!callback && moderStatusObject.other) {
+        return run(moderStatusObject.other)
+    } else if (!callback) {
         return
     }
 
     async function run(fn) {
-        if (typeof fn === "function") return fn(pointData)
+        if (typeof fn === "function") return fn(child, pointData)
     }
 
     if (typeof callback === "function") {
-        return callback(pointData)
+        return callback(child, pointData)
     }
 
-    if (typeof callback.before == "function" && (result = callback.before(pointData))) {
+    if (typeof callback.before == "function" && (result = callback.before(child, pointData))) {
         return result
     }
-    result=[]
+    result = []
     if (isHasChild) {
         result[0] = await run(callback.hasAcceptCopy)
     } else {
@@ -61,8 +63,8 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
     }
 }
 
-async function throwDuplicate(point) {
-    const points = await getDuplicate(point)
+async function throwDuplicate(point, pointId) {
+    const points = await getDuplicate(point, pointId)
     if (points && !point.force) {
         throw {
             "outputAsIs": true,
@@ -79,6 +81,7 @@ async function throwDuplicate(point) {
                     city: point.city,
                     street: point.street,
                     house: point.house,
+                    apartment: point.apartment
                 }
             }
         }
@@ -87,13 +90,14 @@ async function throwDuplicate(point) {
     }
 }
 
-async function getDuplicate(point) {
+async function getDuplicate(point, pointId) {
     const pointAccuratyMeter = 200
     const pointAccuratyDegrees = 0.00000900900900900901 * pointAccuratyMeter
     const select = ["shops.id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "email as user"]
     const dupCoord = await Shop.query().select(...select, "duplicateGroup").joinRelated("user")
         .whereBetween("lat", [+point.lat - pointAccuratyDegrees, +point.lat + pointAccuratyDegrees])
         .andWhereBetween("lng", [+point.lng - pointAccuratyDegrees, +point.lng + pointAccuratyDegrees])
+        .skipUndefined().andWhereNot("shops.id", pointId)
 
     if (!dupCoord[0]) {
         return false
@@ -121,9 +125,10 @@ async function getDuplicate(point) {
         .joinRelated("user")
         .whereIn("shops.id", dupIds)
         .orWhereIn("duplicateGroup", dupGroup)
+        .skipUndefined().andWhereNot("shops.id", pointId)
 }
 
-async function markDuplicate(point, force, pointId) {
+async function markDuplicate(pointId, point, force) {
     if (!point || !point.lat || !point.lng) {
         return
     }
@@ -142,7 +147,7 @@ async function markDuplicate(point, force, pointId) {
 }
 
 function checkTimeStamp(pointId, timeStamp) {
-    timeStamp = timeStamp.replace(/T/, " ").slice(0,19)
+    timeStamp = timeStamp.replace(/T/, " ").slice(0, 19)
     return Shop.query()
         .first()
         .where({ "id": pointId, "timeStamp": timeStamp })
@@ -181,53 +186,6 @@ function getGeoData(point) { //должен содержать поля lat, lng
         })
 }
 
-async function getPoint(user, pointId) {
-    const points = []
-    let userId, parent_id
-    const select = [
-        "id",
-        "full_city_name",
-        "street",
-        "house",
-        "title",
-        "lng",
-        "lat",
-        "apartment",
-        "hours",
-        "phone",
-        "site",
-        "isActive",
-        "description",
-        "timeStamp"]
-
-    if (user.permission[0].permission == "user") {
-        userId = user.id
-    }
-    if (!pointId) {
-        parent_id = "parent_id"
-    }
-
-    const regionUsers = await Region.query()
-        .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
-        .skipUndefined()
-        .where({ "regions.id": user.region_id })
-        .modifyGraph('user.shop', bulder => {
-            bulder.skipUndefined().where({ "shops.id": pointId, "user_id": userId }).whereNull(parent_id).select(...select)
-        })
-        .first()
-    if (!regionUsers) return []
-    for (let regionUser of regionUsers.user) {
-        points.push(...regionUser.shop)
-    }
-
-    points.forEach(elem => {
-        elem.moder_status = elem.moder_status[0].moder_status
-    })
-
-    return points
-}
-
-exports.getPoint = getPoint
 exports.checkTimeStamp = checkTimeStamp
 exports.throwDuplicate = throwDuplicate
 exports.markDuplicate = markDuplicate

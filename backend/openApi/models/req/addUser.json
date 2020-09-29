@@ -24,7 +24,12 @@
       "maxLength": 72
     },
     "region_id": {
-      "type": "integer"
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "null доступно только для администратора, это же значение по умолчанию",
+      "default": null
     },
     "permission_id": {
       "type": "integer"

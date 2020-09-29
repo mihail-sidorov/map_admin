@@ -804,7 +804,7 @@ paths:
                     isError: true
                     response: fail
       operationId: get-moder-setPointAccept
-      description: 'Модератор помечает точку как подтвержденную(accept). '
+      description: Модератор подтверждает изменения точки. Работает только с точками со статусами accept и moderated.
       requestBody:
         content:
           application/x-www-form-urlencoded:
