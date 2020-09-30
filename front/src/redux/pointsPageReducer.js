@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM', CHANGE_POINT_STATUS = 'CHANGE_POINT_STATUS';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -301,12 +301,6 @@ export let closeDelPointFormActionCreator = () => ({
     type: CLOSE_DEL_POINT_FORM,
 })
 
-export let changePointStatusActionCreator = (id, status) => ({
-    type: CHANGE_POINT_STATUS,
-    id: id,
-    status: status,
-})
-
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -490,15 +484,6 @@ let pointsPageReducer = (state = initialState, action) => {
                     permission: null,
                 },
             };
-        case CHANGE_POINT_STATUS:
-            newState = {...state};
-            newState.points[action.id] = {
-                ...newState.points[action.id],
-                moder_status: action.status,
-            };
-            newState.shortPoints[action.id] = newState.points[action.id];
-
-            return newState;
         default:
             return state;
     }
