@@ -56,7 +56,7 @@ async function delPoint(pointId) {
             "hasAcceptCopy": async () => {
                 await Shop.returnAcceptCopyToMaster(pointId)
                 await Shop.createNewMasterWithStatus(pointId, "delete")
-                return { delete: false }
+                return { delete: false, point: (await Shop.getPoint(pointId))[0] }
             }
         },
         "delete": () => { throw "point already has delete status" },

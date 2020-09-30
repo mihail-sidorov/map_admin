@@ -145,7 +145,6 @@ module.exports = function (app) {
     })
 
     app.post("/api/moder/setPointRefuse", checkAuth("moder"), validSetPointRefuse, (req, res, next) => {
-        console.log(typeof req.body.description, req.body)
         modelPromiseToRes(
             setPointRefuse(+req.body.id, req.body.description),
             res, next)

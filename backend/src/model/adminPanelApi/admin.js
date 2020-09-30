@@ -18,18 +18,12 @@ const Region = require("../orm/region")
  * @throw {"fail"} не удалось отредактировать пользователя
  */
 async function editUser(userId, email, password) {
-    return User
+    await User
         .query()
         .findById(userId)
         .first()
         .patch({ email, password })
-        .then(res => {
-            if (res) {
-                return User.getUserById(userId)
-            } else {
-                throw "fail"
-            }
-        })
+    return User.getUserById(userId)
 }
 
 /**

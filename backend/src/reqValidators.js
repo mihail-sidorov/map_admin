@@ -82,14 +82,23 @@ module.exports.validAddUser = validConstructor(addUserJson, {
 module.exports.validEditUser = validConstructor(editUserJson, {
     "password": yup.mixed().transform((value) => {
         return (value == "") ? undefined : value
-    }),
-    "email": yup.mixed().transform((value) => {
-        return (value == "") ? undefined : value
-    }).test("email",
-        "this email is already in use",
-        async (value) => {
-            return !(await User.hasEmail(value))
-        })
+    })
+}, async (req) => {
+    const edituser = await User.query().findById(req.body.id)
+    if (!edituser) {
+        throw "this user id not found"
+    }
+    if ((req.body.email === edituser.email) || req.body.email === "") {
+        req.body.email = undefined
+    } else {
+        await yup.mixed()
+            .test("email",
+                "this email is already in use",
+                async (value) => {
+                    return !(await User.hasEmail(value))
+                })
+            .validate(req.body.email).catch(err => { throw ("email: " + err.message) })
+    }
 })
 module.exports.validLogin = validConstructor(loginJson)
 module.exports.validAddRegion = validConstructor(addRegionJson)
@@ -122,7 +131,7 @@ module.exports.validEditPointUser = validConstructor(editPointUserJson, undefine
         delete (req.body.lat)
     } else {
         await getGeoData(req.body)
-        await throwDuplicate(req.body,pointId)
+        await throwDuplicate(req.body, pointId)
     }
 
     if (!req.body.description) delete (req.body.description)

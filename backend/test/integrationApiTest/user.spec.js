@@ -1,17 +1,21 @@
-var chakram = require('chakram')
+const axios = require('axios').default
+const axiosCookieJarSupport = require('axios-cookiejar-support').default
+const tough = require('tough-cookie')
 
-describe("userApi", async function  () {
-    
-    await chakram.post("http://localhost:3000/api/login", {
-        login:"user@user.user",
-        password:"useruser"
-    })
+axiosCookieJarSupport(axios)
 
-    it("getPoints", async function () {
-       
-        const a =  await chakram.get("http://localhost:3000/api/user/getPoints")
-        console.log(a.body)
-    })
+axios.defaults.baseURL = "http://127.0.0.1:3000"
+axios.defaults.withCredentials = true
+const cookieJar = new tough.CookieJar()
+axios.defaults.jar = cookieJar
+
+
+
+it("getPoints", async function () {
+    await axios.post("/api/login", { login: "user@user.user", password: "useruser" })
+    const getPoints = await axios.get("/api/user/getPoints")
+    console.log(getPoints.data.response)
+    return
 })
 
 // describe("HTTP assertions", function () {
