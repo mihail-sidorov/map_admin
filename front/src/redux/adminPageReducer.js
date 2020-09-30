@@ -12,7 +12,14 @@ let makeShortUsers = (state) => {
 
             for (let property in state.users[id]) {
                 if (state.users[id][property] !== undefined && state.users[id][property] !== null && state.users[id][property] !== '') {
-                    searchStr += state.users[id][property];
+                    if (property === 'permission') {
+                        if (state.users[id][property] === 'admin') searchStr += 'Администратор';
+                        if (state.users[id][property] === 'moder') searchStr += 'Модератор';
+                        if (state.users[id][property] === 'user') searchStr += 'Пользователь';
+                    }
+                    else {
+                        searchStr += state.users[id][property];
+                    }
                 }
             }
 
