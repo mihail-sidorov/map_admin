@@ -11,8 +11,12 @@ let makeShortPoints = (state) => {
             let pattern = new RegExp(state.search.toLowerCase()), searchStr = '';
 
             for (let property in state.points[id]) {
-                if (state.points[id][property] !== undefined && state.points[id][property] !== null && state.points[id][property] !== '') {
-                    searchStr += state.points[id][property];
+                if (property === 'apartment' || property === 'full_city_name' || property === 'hours' || property === 'house' || property === 'lat' 
+                    || property === 'lng' || property === 'phone' || property === 'site' || property === 'street' || property === 'title')
+                {
+                    if (state.points[id][property] !== undefined && state.points[id][property] !== null && state.points[id][property] !== '') {
+                        searchStr += state.points[id][property];
+                    }
                 }
             }
 

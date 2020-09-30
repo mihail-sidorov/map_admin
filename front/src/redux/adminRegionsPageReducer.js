@@ -11,8 +11,10 @@ let makeShortRegions = (state) => {
             let pattern = new RegExp(state.search.toLowerCase()), searchStr = '';
 
             for (let property in state.regions[id]) {
-                if (state.regions[id][property] !== undefined && state.regions[id][property] !== null && state.regions[id][property] !== '') {
-                    searchStr += state.regions[id][property];
+                if (property === 'region') {
+                    if (state.regions[id][property] !== undefined && state.regions[id][property] !== null && state.regions[id][property] !== '') {
+                        searchStr += state.regions[id][property];
+                    }
                 }
             }
 
