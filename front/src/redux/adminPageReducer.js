@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from "../serverName";
 
-const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER', RESET_PAGINATION_ADMIN = 'RESET_PAGINATION_ADMIN', RESET_SEARCH_ADMIN = 'RESET_SEARCH_ADMIN', SET_REGIONS_TO_ADD_USER_FORM = 'SET_REGIONS_TO_ADD_USER_FORM';
+const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER', RESET_PAGINATION_ADMIN = 'RESET_PAGINATION_ADMIN', RESET_SEARCH_ADMIN = 'RESET_SEARCH_ADMIN', SET_REGIONS_TO_ADD_USER_FORM = 'SET_REGIONS_TO_ADD_USER_FORM', CHANGE_USER_ON_ADD_USER_FORM = 'CHANGE_USER_ON_ADD_USER_FORM';
 
 let makeShortUsers = (state) => {
     let searchUsers = {}, shortUsers = {};
@@ -70,6 +70,12 @@ let initialState = {
         newUser: false,
         permissions: [],
         regions: [],
+        user: {
+            email: '',
+            password: '',
+            permission: 0,
+            region: 0,
+        },
     },
     editUserForm: {
         open: false,
@@ -205,6 +211,11 @@ export let setRegionsToAddUserFormActionCreator = (regionsArr) => ({
     regionsArr: regionsArr,
 })
 
+export let changeUserOnAddUserFormActionCreator = (user) => ({
+    type: CHANGE_USER_ON_ADD_USER_FORM,
+    user: user,
+})
+
 let adminPageReducer = (state = initialState, action) => {
     let newState, makeShortUsersResult;
 
@@ -259,6 +270,12 @@ let adminPageReducer = (state = initialState, action) => {
                 addUserForm: {
                     ...state.addUserForm,
                     open: false,
+                    user: {
+                        email: '',
+                        password: '',
+                        permission: 0,
+                        region: 0,
+                    },
                 },
             };
         case SET_PERMISSIONS:
@@ -327,6 +344,14 @@ let adminPageReducer = (state = initialState, action) => {
                 addUserForm: {
                     ...state.addUserForm,
                     regions: action.regionsArr,
+                },
+            };
+        case CHANGE_USER_ON_ADD_USER_FORM:
+            return {
+                ...state,
+                addUserForm: {
+                    ...state.addUserForm,
+                    user: action.user,
                 },
             };
         default:

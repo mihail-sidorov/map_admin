@@ -12,6 +12,8 @@ let DuplicateContainer = connect(
             let point = window.store.getState().pointsPageState.addEditPointForm.point;
             point.force = true;
 
+            console.log(action);
+
             if (action === 'add') {
                 addPoint(point)
                     .then((response) => {

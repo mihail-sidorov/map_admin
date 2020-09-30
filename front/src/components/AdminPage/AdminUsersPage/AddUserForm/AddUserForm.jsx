@@ -38,18 +38,25 @@ let Form = (props) => {
                 </div>
                 <div className="add-user-form__form-permission form__field">
                     <label>
-                        <Field name="permission" component="select">
+                        <Field name="permission" component="select" onChange={(e) => {
+                            props.onChangePermission(e.currentTarget.value);
+                        }}>
                             {permissions}
                         </Field>
                     </label>
                 </div>
-                <div className="add-user-form__form-region form__field">
-                    <label>
-                        <Field name="region" component="select">
-                            {regions}
-                        </Field>
-                    </label>
-                </div>
+                {
+                    props.region !== null &&
+                    (
+                        <div className="add-user-form__form-region form__field">
+                            <label>
+                                <Field name="region" component="select">
+                                    {regions}
+                                </Field>
+                            </label>
+                        </div>
+                    )
+                }
             </div>
             <div className="add-user-form__btns">
                 <button className="add-user-form__submit-btn btn">ОК</button>
@@ -63,14 +70,17 @@ let Form = (props) => {
 
 Form = reduxForm({
     form: 'addUserForm',
+    enableReinitialize: true,
 })(Form);
 
 let AddUserForm = (props) => {
     console.log('AddUserForm');
 
+    let initialValues = props.addUserForm.user;
+
     return (
         <div className="add-user-form">
-            <Form permissions={props.addUserForm.permissions} regions={props.addUserForm.regions} onCloseAddUserForm={props.onCloseAddUserForm} onSubmit={props.onSubmit} />
+            <Form region={props.addUserForm.user.region} onChangePermission={props.onChangePermission} initialValues={initialValues} permissions={props.addUserForm.permissions} regions={props.addUserForm.regions} onCloseAddUserForm={props.onCloseAddUserForm} onSubmit={props.onSubmit} />
         </div>
     );
 }

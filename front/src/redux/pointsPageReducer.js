@@ -401,9 +401,7 @@ let pointsPageReducer = (state = initialState, action) => {
             newState = {...state};
             newState.duplicate = {...action.duplicate};
             newState.addEditPointForm = {
-                action: null,
-                point: {},
-                newPoint: false,
+                ...newState.addEditPointForm,
                 open: false,
             };
 
