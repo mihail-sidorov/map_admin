@@ -2,7 +2,7 @@ import {connect} from 'react-redux';
 import Login from './Login';
 import { login, getAuthData, setAuthDataActionCreator } from '../../redux/authReducer';
 import { resetPaginationAdminActionCreator, resetSearchAdminActionCreator } from '../../redux/adminPageReducer';
-import { resetPaginationPointsActionCreator, resetSearchPointsActionCreator, resetPointsActionCreator } from '../../redux/pointsPageReducer';
+import { resetPaginationPointsActionCreator, resetSearchPointsActionCreator, resetPointsActionCreator, setModerTabsActionCreator } from '../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -20,6 +20,9 @@ let mapDispatchToProps = (dispatch) => {
                         return getAuthData();
                     })
                     .then((data) => {
+                        if (data.permission === 'moder') {
+                            dispatch(setModerTabsActionCreator());
+                        }
                         dispatch(setAuthDataActionCreator(data));
                         dispatch(resetPaginationAdminActionCreator());
                         dispatch(resetSearchAdminActionCreator());

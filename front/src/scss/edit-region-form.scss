@@ -1,0 +1,16 @@
+.edit-region-form {
+
+    .edit-region-form__form {
+
+        .edit-region-form__btns {
+
+            text-align: center;
+            margin-top: 20px;
+
+            &>*:first-child {
+
+                margin-right: 13px;
+            }
+        }
+    }
+}

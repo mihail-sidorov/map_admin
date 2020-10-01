@@ -14,14 +14,14 @@ let Duplicate = (props) => {
 
     if (props.duplicate.point) {
         point.push(
-            <div className="duplicate__add-point" key={1}>
+            <div className="duplicate__add-point list__item" key={1}>
                 <PointProperties point={props.duplicate.point} permission={props.permission} />
-                <button className="duplicate__add-point-accept-btn" onClick={() => {
+                <button className="duplicate__add-point-accept-btn list__item-btn list__item-btn_accept list__item-btn_2" onClick={() => {
                     props.addEditPoint(props.action);
-                }}>{props.action === 'add' ? 'Добавить' : 'Редактировать'}</button>
-                <button className="duplicate__add-point-refuse-btn" onClick={() => {
+                }}></button>
+                <button className="duplicate__add-point-refuse-btn list__item-btn list__item-btn_refuse" onClick={() => {
                     props.cansel();
-                }}>Отмена</button>
+                }}></button>
             </div>
         );
     }
@@ -29,7 +29,7 @@ let Duplicate = (props) => {
     if (props.duplicate.points) {
         props.duplicate.points.forEach((point, index) => {
             points.push(
-                <div className="duplicate__point" key={index}>
+                <div className="duplicate__point list__item" key={index}>
                     <PointProperties point={point} permission={props.permission} />
                 </div>
             );
@@ -38,9 +38,10 @@ let Duplicate = (props) => {
 
     return (
         <div className="duplicate">
-            {point}
-            <hr />
-            <div className="duplicate__points">
+            <h2 className="duplicate__title">Найдены похожие точки</h2>
+            <div className="duplicate__list list">
+                {point}
+                
                 {points}
             </div>
         </div>

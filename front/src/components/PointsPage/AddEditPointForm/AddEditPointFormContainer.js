@@ -19,7 +19,7 @@ let mapDispatchToProps = (dispatch) => {
 
             let point = null;
 
-            if (!values.apartments) values.apartments = '';
+            if (!values.apartment) values.apartment = '';
 
             if (permission === 'user') {
                 if (values.lng && values.lat && values.title && values.hours && values.phone && values.site) {

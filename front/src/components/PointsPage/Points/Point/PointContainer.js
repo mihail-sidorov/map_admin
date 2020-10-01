@@ -1,38 +1,25 @@
 import { connect } from 'react-redux';
-import {delPointActionCreator, showAddEditPointFormActionCreator, delPoint, refusePoint} from '../../../../redux/pointsPageReducer';
+import {delPointActionCreator, showAddEditPointFormActionCreator, delPoint, refusePoint, showRefusePointFormActionCreator, showDelPointFormActionCreator} from '../../../../redux/pointsPageReducer';
 import Point from './Point';
 
 let PointContainer = (id) => {
     let mapStateToProps = (state) => {
         return {
             point: state.pointsPageState.shortPoints[id],
+            moderTabsActive: state.pointsPageState.moderTabsActive,
         };
     }
 
     let mapDispatchToProps = (dispatch) => {
         return {
-            delPoint: (id) => {
-                delPoint(id)
-                .then((id) => {
-                    dispatch(delPointActionCreator(id));
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            onShowDelPointForm: (id, permission) => {
+                dispatch(showDelPointFormActionCreator(id, permission));
             },
             showAddEditPointForm: (action, id) => {
                 dispatch(showAddEditPointFormActionCreator(action, id));
             },
-            onRefusePoint: (id, description) => {
-                if (description) {
-                    refusePoint({id: id, description: description})
-                        .then((id) => {
-                            dispatch(delPointActionCreator(id));
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                        });
-                }
+            onShowRefusePointForm: (id) => {
+                dispatch(showRefusePointFormActionCreator(id));
             },
         };
     }

@@ -1,31 +1,29 @@
 import * as axios from 'axios';
 import serverName from "../serverName";
 
-const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER', RESET_PAGINATION_ADMIN = 'RESET_PAGINATION_ADMIN', RESET_SEARCH_ADMIN = 'RESET_SEARCH_ADMIN';
+const CHANGE_PAGE_ADMIN = 'CHANGE_PAGE_ADMIN', CHANGE_SEARCH_ADMIN = 'CHANGE_SEARCH_ADMIN', GET_USERS = 'GET_USERS', OPEN_ADD_USER_FORM = 'OPEN_ADD_USER_FORM', CLOSE_ADD_USER_FORM = 'CLOSE_ADD_USER_FORM', SET_PERMISSIONS = 'SET_PERMISSIONS', ADD_USER = 'ADD_USER', OPEN_EDIT_USER_FORM = 'OPEN_EDIT_USER_FORM', CLOSE_EDIT_USER_FORM = 'CLOSE_EDIT_USER_FORM', EDIT_USER = 'EDIT_USER', RESET_PAGINATION_ADMIN = 'RESET_PAGINATION_ADMIN', RESET_SEARCH_ADMIN = 'RESET_SEARCH_ADMIN', SET_REGIONS_TO_ADD_USER_FORM = 'SET_REGIONS_TO_ADD_USER_FORM', CHANGE_USER_ON_ADD_USER_FORM = 'CHANGE_USER_ON_ADD_USER_FORM';
 
 let makeShortUsers = (state) => {
     let searchUsers = {}, shortUsers = {};
 
     if (state.search !== '') {
         for (let id in state.users) {
-            let pattern = new RegExp(state.search.toLowerCase());
-            let email, permission;
-
+            let pattern = new RegExp(state.search.toLowerCase()), searchStr = '';
 
             for (let property in state.users[id]) {
-                switch (property) {
-                    case 'email':
-                        email = state.users[id][property];
-                        break;
-                    case 'permission':
-                        permission = state.users[id][property];
-                        break;
-                    default:
-                        break;
+                if (property === 'email' || property === 'permission' || property === 'region') {
+                    if (state.users[id][property] !== undefined && state.users[id][property] !== null && state.users[id][property] !== '') {
+                        if (property === 'permission') {
+                            if (state.users[id][property] === 'admin') searchStr += 'Администратор';
+                            if (state.users[id][property] === 'moder') searchStr += 'Модератор';
+                            if (state.users[id][property] === 'user') searchStr += 'Пользователь';
+                        }
+                        else {
+                            searchStr += state.users[id][property];
+                        }
+                    }
                 }
             }
-
-            let searchStr = email + permission;
 
             if (searchStr.toLowerCase().match(pattern)) {
                 searchUsers[id] = state.users[id];
@@ -46,6 +44,8 @@ let makeShortUsers = (state) => {
     if (currentPage > pages || state.addUserForm.newUser === true) {
         currentPage = pages;
     }
+
+    if (currentPage === 0) currentPage = 1;
 
     let left = (currentPage - 1) * paginationCount + 1;
     let right = left + paginationCount - 1;
@@ -70,7 +70,7 @@ let initialState = {
     shortUsers: {},
     search: '',
     pagination: {
-        count: 2,
+        count: 10,
         currentPage: 1,
         pages: 0,
     },
@@ -78,6 +78,13 @@ let initialState = {
         open: false,
         newUser: false,
         permissions: [],
+        regions: [],
+        user: {
+            email: '',
+            password: '',
+            permission: 0,
+            region: 0,
+        },
     },
     editUserForm: {
         open: false,
@@ -208,6 +215,16 @@ export let resetSearchAdminActionCreator = () => ({
     type: RESET_SEARCH_ADMIN,
 })
 
+export let setRegionsToAddUserFormActionCreator = (regionsArr) => ({
+    type: SET_REGIONS_TO_ADD_USER_FORM,
+    regionsArr: regionsArr,
+})
+
+export let changeUserOnAddUserFormActionCreator = (user) => ({
+    type: CHANGE_USER_ON_ADD_USER_FORM,
+    user: user,
+})
+
 let adminPageReducer = (state = initialState, action) => {
     let newState, makeShortUsersResult;
 
@@ -262,6 +279,12 @@ let adminPageReducer = (state = initialState, action) => {
                 addUserForm: {
                     ...state.addUserForm,
                     open: false,
+                    user: {
+                        email: '',
+                        password: '',
+                        permission: 0,
+                        region: 0,
+                    },
                 },
             };
         case SET_PERMISSIONS:
@@ -323,6 +346,22 @@ let adminPageReducer = (state = initialState, action) => {
             return {
                 ...state,
                 search: '',
+            };
+        case SET_REGIONS_TO_ADD_USER_FORM:
+            return {
+                ...state,
+                addUserForm: {
+                    ...state.addUserForm,
+                    regions: action.regionsArr,
+                },
+            };
+        case CHANGE_USER_ON_ADD_USER_FORM:
+            return {
+                ...state,
+                addUserForm: {
+                    ...state.addUserForm,
+                    user: action.user,
+                },
             };
         default:
             return state;

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import Header from './Header';
 import { logout, getAuthData, setAuthDataActionCreator } from '../../redux/authReducer';
-import { showAddEditPointFormActionCreator } from '../../redux/pointsPageReducer';
+import { resetModerTabsActionCreator, setModerTabsActiveActionCreator, showAddEditPointFormActionCreator } from '../../redux/pointsPageReducer';
 import { closeAddUserFormActionCreator, closeEditUserFormActionCreator, returnToAdmin } from '../../redux/adminPageReducer';
 
 let mapStateToProps = (state) => {
@@ -21,6 +21,8 @@ let mapDispatchToProps = (dispatch) => {
                     .then((data) => {
                         dispatch(showAddEditPointFormActionCreator(null));
                         dispatch(setAuthDataActionCreator(data));
+                        dispatch(resetModerTabsActionCreator());
+                        dispatch(setModerTabsActiveActionCreator(1));
                     })
                     .catch((error) => {
                         console.log(error);
@@ -36,6 +38,8 @@ let mapDispatchToProps = (dispatch) => {
                         dispatch(closeAddUserFormActionCreator());
                         dispatch(closeEditUserFormActionCreator());
                         dispatch(setAuthDataActionCreator(data));
+                        dispatch(resetModerTabsActionCreator());
+                        dispatch(setModerTabsActiveActionCreator(1));
                     })
                     .catch((error) => {
                         console.log(error);

@@ -1,0 +1,35 @@
+.login-form {
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .login-form__container {
+
+        width: 100%;
+        max-width: 480px;
+        padding: 50px;
+        box-sizing: border-box;
+        background-color: #F6F2F1;
+        border-radius: 15px;
+
+        .login-form__fields {
+
+            margin-bottom: 20px;
+
+            .form__field {
+
+                input {
+
+                    background-color: #F6F2F1;
+                }
+            }
+        }
+
+        .login-form__btns {
+
+            text-align: center;
+        }
+    }
+}

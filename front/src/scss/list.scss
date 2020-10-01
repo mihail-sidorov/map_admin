@@ -1,0 +1,78 @@
+.list {
+
+    .list__titles {
+
+        padding-right: 80px;
+        display: flex;
+        margin-bottom: 5px;
+
+        .list__title {
+
+            flex-basis: 33.33%;
+            text-transform: uppercase;
+            color: #777777;
+        }
+    }
+
+    .list__item {
+
+        padding-right: 80px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        display: flex;
+        position: relative;
+        border-top: 1px solid #C6C6C6;
+        border-bottom: 1px solid #C6C6C6;
+        box-sizing: border-box;
+        margin-bottom: 21px;
+
+        &:last-child {
+
+            margin-bottom: 0;
+        }
+
+        .list__item-part {
+
+            flex-basis: 33.33%;
+        }
+
+        .list__item-btn {
+
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            top: 50%;
+            margin-top: -15px;
+            right: 0;
+            border: 0;
+            background-color: transparent;
+            cursor: pointer;
+            outline: none;
+
+            &_2 {
+
+                right: 40px;
+            }
+
+            &_edit {
+
+                background: url('../imgs/list__item-btn_edit.svg') no-repeat center;
+            }
+
+            &_accept {
+
+                background: url('../imgs/list__item-btn_accept.svg') no-repeat center;
+            }
+
+            &_delete {
+
+                background: url('../imgs/list__item-btn_delete.svg') no-repeat center;
+            }
+
+            &_refuse {
+
+                background: url('../imgs/list__item-btn_refuse.svg') no-repeat center;
+            }
+        }
+    }
+}

@@ -1,55 +1,24 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
 
     if (state.search !== '') {
         for (let id in state.points) {
-            let pattern = new RegExp(state.search.toLowerCase());
-            let full_city_name, street, house, apartment, lng, lat, title, hours, phone, site;
-
+            let pattern = new RegExp(state.search.toLowerCase()), searchStr = '';
 
             for (let property in state.points[id]) {
-                switch (property) {
-                    case 'full_city_name':
-                        full_city_name = state.points[id][property];
-                        break;
-                    case 'street':
-                        street = state.points[id][property];
-                        break;
-                    case 'house':
-                        house = state.points[id][property];
-                        break;
-                    case 'apartment':
-                        apartment = state.points[id][property];
-                        break;
-                    case 'lng':
-                        lng = state.points[id][property];
-                        break;
-                    case 'lat':
-                        lat = state.points[id][property];
-                        break;
-                    case 'title':
-                        title = state.points[id][property];
-                        break;
-                    case 'hours':
-                        hours = state.points[id][property];
-                        break;
-                    case 'phone':
-                        phone = state.points[id][property];
-                        break;
-                    case 'site':
-                        site = state.points[id][property];
-                        break;
-                    default:
-                        break;
+                if (property === 'apartment' || property === 'full_city_name' || property === 'hours' || property === 'house' || property === 'lat' 
+                    || property === 'lng' || property === 'phone' || property === 'site' || property === 'street' || property === 'title')
+                {
+                    if (state.points[id][property] !== undefined && state.points[id][property] !== null && state.points[id][property] !== '') {
+                        searchStr += state.points[id][property];
+                    }
                 }
             }
-
-            let searchStr = full_city_name + street + house + apartment + lng + lat + title + hours + phone + site;
 
             if (searchStr.toLowerCase().match(pattern)) {
                 searchPoints[id] = state.points[id];
@@ -111,9 +80,20 @@ let initialState = {
     },
     search: '',
     pagination: {
-        count: 2,
+        count: 5,
         currentPage: 1,
         pages: 0,
+    },
+    moderTabs: false,
+    moderTabsActive: 1,
+    refusePointForm: {
+        open: false,
+        id: null,
+    },
+    delPointForm: {
+        open: false,
+        id: null,
+        permission: null,
     },
 };
 
@@ -182,7 +162,7 @@ export let getPoints = (permission) => {
 export let delPoint = (id) => {
     return axios.post(`${serverName}/api/user/delPoint`, {id: id}, {withCredentials: true}).then((response) => {
         if (!response.data.isError) {
-            return id;
+            return response.data.response;
         }
         else {
             throw 'Не удалось удалить точку!';
@@ -197,6 +177,17 @@ export let refusePoint = (data) => {
         }
         else {
             throw 'Не удалось отклонить точку!';
+        }
+    });
+}
+
+export let acceptPoint = (id) => {
+    return axios.post(`${serverName}/api/moder/setPointAccept`, {id: id}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось подтвердить точку!';
         }
     });
 }
@@ -276,6 +267,38 @@ export let resetPointsActionCreator = () => ({
 
 export let resetSearchPointsActionCreator = () => ({
     type: RESET_SEARCH_POINTS,
+})
+
+export let setModerTabsActionCreator = () => ({
+    type: SET_MODER_TABS,
+})
+
+export let resetModerTabsActionCreator = () => ({
+    type: RESET_MODER_TABS,
+})
+
+export let setModerTabsActiveActionCreator = (index) => ({
+    type: SET_MODER_TABS_ACTIVE,
+    index: index,
+})
+
+export let showRefusePointFormActionCreator = (id) => ({
+    type: SHOW_REFUSE_POINT_FORM,
+    id: id,
+})
+
+export let closeRefusePointFormActionCreator = () => ({
+    type: CLOSE_REFUSE_POINT_FORM,
+})
+
+export let showDelPointFormActionCreator = (id, permission) => ({
+    type: SHOW_DEL_POINT_FORM,
+    id: id,
+    permission: permission,
+})
+
+export let closeDelPointFormActionCreator = () => ({
+    type: CLOSE_DEL_POINT_FORM,
 })
 
 let pointsPageReducer = (state = initialState, action) => {
@@ -375,6 +398,10 @@ let pointsPageReducer = (state = initialState, action) => {
         case ADD_DUPLICATE:
             newState = {...state};
             newState.duplicate = {...action.duplicate};
+            newState.addEditPointForm = {
+                ...newState.addEditPointForm,
+                open: false,
+            };
 
             newState.addEditPointForm.point = {...action.point};
             
@@ -403,6 +430,59 @@ let pointsPageReducer = (state = initialState, action) => {
             return {
                 ...state,
                 search: '',
+            };
+        case SET_MODER_TABS:
+            return {
+                ...state,
+                moderTabs: true,
+            };
+        case RESET_MODER_TABS:
+            return {
+                ...state,
+                moderTabs: false,
+            };
+        case SET_MODER_TABS_ACTIVE:
+            return {
+                ...state,
+                moderTabsActive: action.index,
+            };
+        case SHOW_REFUSE_POINT_FORM:
+            return {
+                ...state,
+                refusePointForm: {
+                    ...state.refusePointForm,
+                    open: true,
+                    id: action.id,
+                },
+            };
+        case CLOSE_REFUSE_POINT_FORM:
+            return {
+                ...state,
+                refusePointForm: {
+                    ...state.refusePointForm,
+                    open: false,
+                    id: null,
+                },
+            };
+        case SHOW_DEL_POINT_FORM:
+            return {
+                ...state,
+                delPointForm: {
+                    ...state.delPointForm,
+                    open: true,
+                    id: action.id,
+                    permission: action.permission,
+                },
+            };
+        case CLOSE_DEL_POINT_FORM:
+            return {
+                ...state,
+                delPointForm: {
+                    ...state.delPointForm,
+                    open: false,
+                    id: null,
+                    permission: null,
+                },
             };
         default:
             return state;

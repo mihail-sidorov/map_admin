@@ -1,0 +1,20 @@
+.add-user-form {
+
+    .add-user-form__form {
+
+        .add-user-form__form-fields {
+
+            margin-bottom: 20px;
+        }
+
+        .add-user-form__btns {
+
+            text-align: center;
+
+            &>*:first-child {
+
+                margin-right: 13px;
+            }
+        }
+    }
+}

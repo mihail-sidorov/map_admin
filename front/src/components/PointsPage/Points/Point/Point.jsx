@@ -43,57 +43,72 @@ export let PointProperties = (props) => {
 let Point = (props) => {
     console.log('Point>>>');
 
-    let onDelPoint = () => {
-        if (window.confirm('Вы действительно хотите удалить точку?')) {
-            props.delPoint(props.point.id);
-        }
-    }
-
-    let pointInform = [];
+    let pointInform = [], moderStatus = '';
     if (props.permission === 'user') {
-        let moderStatus = '';
         if (props.point.moder_status === 'moderated') moderStatus = 'На модерации';
         if (props.point.moder_status === 'refuse') moderStatus = 'Отклонено';
         if (props.point.moder_status === 'accept') moderStatus = 'Допущена к публикации';
-
-        pointInform.push(
-            <div className="point__inform" key={1}>
-                <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>***
-                <span className="point__moder-status">{moderStatus}</span>
-            </div>
-        );
+        if (props.point.moder_status === 'delete') moderStatus = 'На удалении';
+    }
+    else {
+        if (props.point.moder_status === 'moderated') moderStatus = 'На утверждение';
+        if (props.point.moder_status === 'delete') moderStatus = 'На удаление';
     }
 
+    pointInform.push(
+        <div className="point__inform" key={1}>
+            <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>&nbsp;/&nbsp;
+            <span className="point__moder-status">{moderStatus}</span>
+        </div>
+    );
+
     let delPointBtn = [];
-    if (props.permission === 'user') {
-        delPointBtn.push(<button className="point__del-button" onClick={onDelPoint} key={1}>Удалить</button>);
+    if ((props.permission === 'user') || (props.permission === 'moder' && props.point.moder_status === 'delete')) {
+        delPointBtn.push(<button className={`point__del-button list__item-btn${props.permission === 'moder' && props.moderTabsActive === 1 ? ' list__item-btn_accept list__item-btn_2' : ' list__item-btn_delete'}`} onClick={() => {
+            props.onShowDelPointForm(props.point.id, props.permission);
+        }} key={1}></button>);
     }
 
     let refuseBtn = [];
     if (props.permission === 'moder') {
-        refuseBtn.push(<button className="point__refuse-btn" key={1} onClick={() => {
-            props.onRefusePoint(props.point.id, prompt('Введите комментарий для пользователя', ''));
-        }}>Отклонить</button>);
+        refuseBtn.push(<button className="point__refuse-btn list__item-btn list__item-btn_refuse" key={1} onClick={() => {
+            props.onShowRefusePointForm(props.point.id);
+        }}></button>);
+    }
+
+    let editAcceptBtn = [];
+    if ((props.permission === 'user') || (props.permission === 'moder' && props.point.moder_status === 'moderated')) {
+        editAcceptBtn.push(
+            <button className={`point__edit-button list__item-btn list__item-btn_2${props.permission === 'moder' && props.moderTabsActive === 1 ? ' list__item-btn_accept' : ' list__item-btn_edit'}`} onClick={() => {
+                props.showAddEditPointForm('edit', props.point.id);
+            }} key={1}></button>
+        );
+    }
+
+    let pointDescription = [];
+    if (props.point.description) {
+        pointDescription.push(
+            <div className="point__description">
+                {props.point.description}
+                араорп паолполапо палоалопл оооллыыщп опаплпоал алпалплаоп аплоалпрарвоар щыоалвыыжыжлаороролалво оыыд оддооыд ды раррарлф
+            </div>
+        );
     }
 
     return (
-        <div point-id={props.point.id} className="point">
+        <div className="point__container">
             {pointInform}
-            
-            <PointProperties point={props.point} permission={props.permission}/>
+            <div point-id={props.point.id} className="point list__item">   
+                <PointProperties point={props.point} permission={props.permission}/>
 
-            <button className="point__edit-button" onClick={() => {
-                props.showAddEditPointForm('edit', props.point.id);
-            }}>{props.permission === 'user' ? 'Редактировать' : 'Утвердить'}</button>
+                {editAcceptBtn}
 
-            {refuseBtn}
+                {delPointBtn}
 
-            {delPointBtn}
+                {refuseBtn}
 
-            <div className="point__description">
-                {props.point.description}
+                {pointDescription}
             </div>
-            <hr />
         </div>
     );
 }

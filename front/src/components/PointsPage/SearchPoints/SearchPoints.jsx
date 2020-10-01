@@ -6,8 +6,8 @@ let SearchPoints = (props) => {
     }
 
     return (
-        <div className="search-points">
-            <input type="text" className="search-points__input" value={props.search} onChange={onChangeSearch} />
+        <div className="search-points search">
+            <input type="text" className="search-points__input search__input" value={props.search} onChange={onChangeSearch} />
         </div>
     );
 }

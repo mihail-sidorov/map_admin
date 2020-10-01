@@ -4,14 +4,20 @@ import { Redirect } from 'react-router-dom';
 
 let LoginForm = (props) => {
     return (
-        <form className="login-form" onSubmit={props.handleSubmit}>
-            <div className="login-form__login">
-                <label>Логин: <Field name={'login'} type={'text'} component={'input'} /></label>
+        <form className="login-form form" onSubmit={props.handleSubmit}>
+            <div className="login-form__container">
+                <div className="login-form__fields form__fields">
+                    <div className="login-form__login form__field">
+                        <label><Field name={'login'} type={'text'} component={'input'} placeholder="Логин" /></label>
+                    </div>
+                    <div className="login-form__password form__field">
+                        <label><Field name={'password'} type={'password'} component={'input'} placeholder="Пароль" /></label>
+                    </div>
+                </div>
+                <div className="login-form__btns">
+                    <button className="btn">Войти</button>
+                </div>
             </div>
-            <div className="login-form__password">
-                <label>Пароль: <Field name={'password'} type={'password'} component={'input'} /></label>
-            </div>
-            <button>Войти</button>
         </form>
     );
 }
