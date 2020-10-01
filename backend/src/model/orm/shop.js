@@ -47,7 +47,7 @@ module.exports = class Shop extends Model {
                 lng: { "type": "number" },
                 lat: { "type": "number" },
                 user_id: { "type": "integer" },
-                isActive: { "type": "boolean" }
+                isActive: { "type": "boolean,integer" }
             }
         }
     }

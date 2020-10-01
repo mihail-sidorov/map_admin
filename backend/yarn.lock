@@ -991,6 +991,11 @@ chai-as-promised@5.x.x:
   resolved "https://registry.yarnpkg.com/chai-as-promised/-/chai-as-promised-5.3.0.tgz#09d7a402908aa70dfdbead53e5853fc79d3ef21c"
   integrity sha1-CdekApCKpw39vq1T5YU/x50+8hw=
 
+chai-json-schema-ajv@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/chai-json-schema-ajv/-/chai-json-schema-ajv-5.1.0.tgz#bf862385899c32f2af2816da507d8c3d6ccbdaa4"
+  integrity sha512-HuPu3kNy8D7znpumTve99vCOeCDe1jVnl80XUuBeALScFY1rBTxPy+umGn+BNGr9uOYAXOPBjthsvgc5OcSJbg==
+
 chai-subset@1.x.x:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/chai-subset/-/chai-subset-1.6.0.tgz#a5d0ca14e329a79596ed70058b6646bd6988cfe9"
