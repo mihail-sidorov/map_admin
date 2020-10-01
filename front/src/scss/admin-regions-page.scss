@@ -1,0 +1,41 @@
+.admin-regions-page {
+
+    width: 100%;
+    flex-grow: 1;
+    background-color: #fff;
+    padding: 50px 29px;
+
+    .search {
+
+        margin-bottom: 50px;
+    }
+
+    .list {
+
+        button {
+
+            margin-bottom: 50px;
+        }
+
+        .list__titles {
+
+            .list__title {
+
+                flex-basis: 100%;
+            }
+        }
+
+        .list__item {
+
+            .list__item-part {
+
+                flex-basis: 100%;
+            }
+        }
+    }
+
+    .pagination {
+
+        margin-top: 20px;
+    }
+}

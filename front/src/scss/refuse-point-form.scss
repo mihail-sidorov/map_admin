@@ -1,0 +1,16 @@
+.refuse-point-form {
+
+    .refuse-point-form__form {
+
+        .refuse-point-form__btns {
+
+            margin-top: 20px;
+            text-align: center;
+
+            &>*:first-child {
+
+                margin-right: 13px;
+            }
+        }
+    }
+}

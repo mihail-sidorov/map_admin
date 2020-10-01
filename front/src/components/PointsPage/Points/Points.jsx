@@ -15,14 +15,14 @@ let Points = (props) => {
     let addPointBtn = [];
     if (props.permission === 'user') {
         addPointBtn.push(
-            <button className="points__add-point-btn" onClick={() => {
+            <button className="points__add-point-btn btn" onClick={() => {
                 props.showAddEditPointForm('add');
-            }} key={1}>Добавить</button>
+            }} key={1}>Добавить точку</button>
         );
     }
 
     return (
-        <div className="points">
+        <div className="points list">
             {addPointBtn}
             
             {pointsArr}

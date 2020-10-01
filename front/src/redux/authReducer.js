@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const SET_AUTH_DATA = 'SET_AUTH_DATA', CHANGE_HEADER_LOGIN = 'CHANGE_HEADER_LOGIN';
+const SET_AUTH_DATA = 'SET_AUTH_DATA', CHANGE_HEADER_LOGIN = 'CHANGE_HEADER_LOGIN', RESET_MODER_TABS = 'RESET_MODER_TABS';
 
 let initialState = {
     login: null,
@@ -54,7 +54,6 @@ let authReducer = (state = initialState, action) => {
     switch (action.type) {
         case SET_AUTH_DATA:
             return {
-                ...state,
                 ...action.data,
             };
         case CHANGE_HEADER_LOGIN:

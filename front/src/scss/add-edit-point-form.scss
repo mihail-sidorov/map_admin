@@ -1,0 +1,20 @@
+.add-edit-point-form {
+
+    .add-edit-point-form__form {
+
+        .add-edit-point-form__form-fields {
+
+            margin-bottom: 20px;
+        }
+
+        .add-edit-point-form__btns {
+
+            text-align: center;
+
+            &>*:first-child {
+
+                margin-right: 13px;
+            }
+        }
+    }
+}

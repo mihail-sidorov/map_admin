@@ -1,0 +1,32 @@
+.duplicate {
+
+    .duplicate__title {
+
+        text-align: center;
+    }
+
+    .duplicate__list {
+
+        .duplicate__add-point {
+
+            border-color: #EB824D;
+            background-color: rgba(235, 130, 77, 0.2);
+        }
+
+        .list__item {
+
+            .point__properties {
+
+                &>* {
+
+                    margin-right: 20px;
+                }
+
+                &>*:last-child {
+
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+}
