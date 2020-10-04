@@ -4,15 +4,15 @@ const { markDuplicate, getPoint, startFnByModerStatus } = require("./utilityFn")
 const Moder_status = require("../orm/moder_status")
 
 async function addPoint(user, point, force) {
+
     point.user_id = user.id
     point.moder_status_id = await Moder_status.getIdByModerStatus("moderated")
-
     const pointId = await Shop
         .query()
         .insert(point)
         .then(res => res.id)
 
-    await markDuplicate(point, force, pointId)
+    await markDuplicate(pointId, point, force)
     return Shop.getPoint(pointId)
 }
 

@@ -129,6 +129,7 @@ async function getDuplicate(point, pointId) {
 }
 
 async function markDuplicate(pointId, point, force) {
+
     if (!point || !point.lat || !point.lng) {
         return
     }
@@ -139,6 +140,7 @@ async function markDuplicate(pointId, point, force) {
     const dupIds = duplicate.map((elem) => {
         return elem.id
     })
+    
     if (dupIds.length == 1) {
         return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": null })
     } else if (dupIds.length > 1) {
