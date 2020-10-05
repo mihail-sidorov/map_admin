@@ -65,7 +65,7 @@ module.exports = function (app) {
                 req.body.email,
                 req.body.password,
                 +req.body.permission_id,
-                +req.body.region_id),
+                req.body.region_id),
             res, next)
     })
 
