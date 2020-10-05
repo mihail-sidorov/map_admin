@@ -36,7 +36,7 @@
     "nanoid": "^3.1.12",
     "node-fetch": "^2.6.0",
     "objection": "^2.2.3",
-    "objection-password": "^2.0.0",
+    "objection-password": "^3.0.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "session-file-store": "^1.4.0",
