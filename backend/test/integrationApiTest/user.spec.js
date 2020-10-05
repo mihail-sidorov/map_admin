@@ -224,6 +224,11 @@ describe("user", function () {
 
     })
 
+    describe("editPoint", function () {
+        describe("Тестирование редактирование точек с разными статусами", function () {
+
+        })
+    })
 
     after(async function () {
         await Shop.query().delete().whereIn("user_id", [user.id, moder.id])
