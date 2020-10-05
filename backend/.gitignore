@@ -2,3 +2,4 @@ node_modules
 sessions
 /serverConfig.js
 /package-lock.json
+/src/tmp
