@@ -226,7 +226,13 @@ describe("user", function () {
 
     describe("editPoint", function () {
         describe("Тестирование редактирование точек с разными статусами", function () {
+            describe("Точка не имеет подтвержденую копию/новая точка", function () {
+                
+            })
 
+            describe("Точка имеет подтвержденную копию", function () {
+
+            })
         })
     })
 

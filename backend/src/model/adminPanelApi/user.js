@@ -2,6 +2,13 @@
 const Shop = require("../orm/shop")
 const { markDuplicate, getPoint, startFnByModerStatus } = require("./utilityFn")
 const Moder_status = require("../orm/moder_status")
+const User = require("../orm/user")
+const Region = require("../orm/region")
+
+async function getPointsModerator(user) {
+    user.region_id
+    Region.query().joinRelated("user.[shop,permission]").where({region_id: user.region_id, permission: "moder"})
+}
 
 async function addPoint(user, point, force) {
 

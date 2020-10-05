@@ -175,6 +175,12 @@ module.exports = function (app) {
             , res, next)
     })
 
+    app.get("/api/user/getPointsModerator", checkAuth(["user", "moder"]), (req, res, next) => {
+        modelPromiseToRes(
+            getPointsModerator(req.user)
+            , res, next)
+    })
+
     app.get("/api/user/getPoints", checkAuth(["user", "moder"]), (req, res, next) => {
         modelPromiseToRes(
             getPoints(req.user)
