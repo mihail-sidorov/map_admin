@@ -124,6 +124,41 @@ describe("user", function () {
         })
     })
 
+    describe("getPointsFree", function () {
+        before(async () => {
+            await Shop.query().insert({
+                lng: 88,
+                lat: 88,
+                full_city_name: 88,
+                moder_status_id: await Moder_status.getIdByModerStatus("return")
+            })
+            await axios.post("/api/login", { login: "nanoid@nanoid.nanoiduser", password: "testtest" })
+            getPointsFree = await axios.get("/api/user/getPointsFree")
+        })
+
+        it("Json matching", async function () {
+            expect(getPointsFree.data.response).to.be.jsonSchema(getPointJson)
+        })
+
+        it("Amount point", async function () {
+            expect(getPointsFree.data.response.length).to.be.equal(8)
+        })
+
+        it("Amount accept point", async function () {
+            const sum = _.reduce(getPointsFree.data.response, (sum, elem) => {
+                return elem.moder_status === "accept" ? sum + 1 : sum
+            }, 0)
+            expect(sum).to.be.equal(2)
+        })
+
+        it("Amount return point", async function () {
+            const sum = _.reduce(getPointsFree.data.response, (sum, elem) => {
+                return elem.moder_status === "return" ? sum + 1 : sum
+            }, 0)
+            expect(sum).to.be.equal(1)
+        })
+    })
+
     describe("addPoint", function () {
 
         describe("user", async function () {
@@ -135,7 +170,7 @@ describe("user", function () {
                 const data = {
                     lng: 54.407203,
                     lat: 24.016567,
-                    title: "title", 
+                    title: "title",
                     apartment: "apartment",
                     hours: "hours",
                     phone: "phone",
@@ -151,12 +186,12 @@ describe("user", function () {
                 expect(getPoints).to.deep.include(point[0])
             })
 
-            it("Тест дубликатов", async function() {
+            it("Тест дубликатов", async function () {
                 const data = {
                     //удаление ~150 метров
                     lng: 54.408203,
                     lat: 24.017567,
-                    title: "title", 
+                    title: "title",
                     apartment: "apartment",
                     hours: "hours",
                     phone: "phone",
@@ -170,12 +205,12 @@ describe("user", function () {
                 expect(point.isError).to.be.equal(true)
             })
 
-            it("Принудительное добавление дубликата, проверка группы дубликата", async function() {
+            it("Принудительное добавление дубликата, проверка группы дубликата", async function () {
                 const data = {
                     //удаление ~150 метров
                     lng: 54.408203,
                     lat: 24.017567,
-                    title: "title", 
+                    title: "title",
                     apartment: "apartment",
                     hours: "hours",
                     phone: "phone",
@@ -187,7 +222,7 @@ describe("user", function () {
 
                 const point = (await axios.post("/api/user/addPoint", data)).data.response
                 expect(point).to.be.jsonSchema(getPointJson)
-                delete(data.force)
+                delete (data.force)
                 const pointDB = (await Shop.query().where(data).first())
                 expect(pointDB.duplicateGroup).to.not.be.null
             })
@@ -203,7 +238,7 @@ describe("user", function () {
                 const data = {
                     lng: 50.866683,
                     lat: 20.634994,
-                    title: "title", 
+                    title: "title",
                     apartment: "apartment",
                     hours: "hours",
                     phone: "phone",
@@ -227,7 +262,7 @@ describe("user", function () {
     describe("editPoint", function () {
         describe("Тестирование редактирование точек с разными статусами", function () {
             describe("Точка не имеет подтвержденую копию/новая точка", function () {
-                
+
             })
 
             describe("Точка имеет подтвержденную копию", function () {

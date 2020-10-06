@@ -6,6 +6,20 @@ const { nanoid } = require("nanoid")
 const Region = require("../orm/region")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
+/**
+ * Функция исполняет колбеки при различных статусах точки(moder_status)
+ * @param {number} pointId ID точки
+ * @param {object} moderStatusObject Объект с колбеками 
+ * {"%moder_status%":
+ *  {
+ *      before: callback, //если колбек вернет результат true то выполнение функций дальше остановится, а выводом будут этот результат
+ *      hasAcceptCopy: callback,
+ *      notHasAcceptCopy: callback, 
+ *      after: callback 
+ *  },
+ *  "%moder_status1%": callback
+ * }
+ */
 async function startFnByModerStatus(pointId, moderStatusObject) {
     if (!moderStatusObject) throw "moderStatusObject must be not empty"
 
@@ -61,20 +75,19 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
         return callback(child, pointData)
     }
     //если before вернет true, то дальше ничего выполнятся не будет, а просто выведется возвращенный результат
-    if (typeof callback.before == "function" && (result = callback.before(child, pointData))) {
+    if (typeof callback.before === "function" && (result = callback.before(child, pointData))) {
         return result
     }
-    result = []
+ 
     if (isHasChild) {
-        result[0] = await run(callback.hasAcceptCopy)
+        result = await run(callback.hasAcceptCopy)
     } else {
-        result[1] = await run(callback.notHasAcceptCopy)
+        result = await run(callback.notHasAcceptCopy)
     }
-    result[2] = await run(callback.after)
 
-    for (let value of result.reverse()) {
-        if (value) return value
-    }
+    const returnAfter = await run(callback.after)
+
+    return returnAfter ? returnAfter: result
 }
 
 async function throwDuplicate(point, pointId) {

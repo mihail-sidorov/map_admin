@@ -2,42 +2,43 @@
 const Shop = require("../orm/shop")
 const { markDuplicate, getPoint, startFnByModerStatus } = require("./utilityFn")
 const Moder_status = require("../orm/moder_status")
-const User = require("../orm/user")
-const Region = require("../orm/region")
 const { getPointSelect } = require("../globalValue")
 
 async function getPointsFree(user) {
+
     return Shop.query()
         .joinRelated("[user.permission, moder_status]")
-        .whereIn("permission",["moder"])
-        .andWhere({region_id: user.region_id, moder_status: "accept", parent_id: null})
+        .whereIn("permission", ["moder"])
+        .where({ region_id: user.region_id, moder_status: "accept", parent_id: null })
+        .orWhere({ moder_status: "return", "user_id": user.id })
         .select(...getPointSelect)
 }
 
 async function takePoint(pointId, userId) {
     await Shop.createNewMasterWithStatus(pointId, "take")
-    patchPoint = await Shop.query().findById(pointId).patch({"user_id": userId})
+    patchPoint = await Shop.query().findById(pointId).patch({ "user_id": userId })
     const newPointId = (await Shop.getPoint(pointId)).id
     return Shop.getPoint(newPointId)
 }
 
-async function returnPoint(pointId, userId) {
-    startFnByModerStatus(pointId, {
+async function returnPoint(pointId) {
+    await startFnByModerStatus(pointId, {
         accept: {
-            notHasAcceptCopy: () =>{
-                
+            notHasAcceptCopy: async () => {
+                await Shop.createNewMasterWithStatus(pointId, "return")
+                return { delete: false, point: (await Shop.getPoint(pointId))[0] }
             }
         },
         take: {
-            hasAcceptCopy: () => {
+            hasAcceptCopy: async () => {
                 await Shop.returnAcceptCopyToMaster(pointId)
+                return { delete: true }
             }
+        },
+        other: () => {
+            throw "fail"
         }
-    }
-    Shop.createNewMasterWithStatus(pointId, "return")
-    patchPoint = await Shop.query().findById(pointId).patch({"user_id": userId})
-    const newPointId = (await Shop.getPoint(pointId)).id
-    return Shop.getPoint(newPointId)
+    })
 }
 
 async function addPoint(user, point, force) {
@@ -141,3 +142,4 @@ exports.delPoint = delPoint
 exports.editPoint = editPoint
 exports.getPointsFree = getPointsFree
 exports.takePoint = takePoint
+exports.returnPoint = returnPoint
