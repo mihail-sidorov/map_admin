@@ -7,24 +7,21 @@ const Region = require("../orm/region")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
 
 async function startFnByModerStatus(pointId, moderStatusObject) {
-    if (!moderStatusObject) {
-        throw "moderStatusObject must be not empty"
-    }
+    if (!moderStatusObject) throw "moderStatusObject must be not empty"
 
     let result, callback
+
     const pointData = await Shop.query().findById(pointId)
+    if (pointData.parent_id) throw "only the main point can be edited"
+
     const child = await Shop.query().where("parent_id", pointId).first()
     const isHasChild = Boolean(child)
-
-    if (pointData.parent_id) {
-        throw "only the main point can be edited"
-    }
 
     const { moder_status } = await Moder_status.query().findById(pointData.moder_status_id)
 
     if (isHasChild && moder_status == "accept") {
         await Shop.delPoint(child.id)
-        throw "parent and child has accept status"
+        throw "only non-accept point can have an copy"
     }
 
     for (let key in moderStatusObject) {
@@ -33,7 +30,24 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
         }
     }
 
-    if (!callback && moderStatusObject.other) {
+    //условия для выполнение other, что нет функции для выполнения в данном случае
+    if (
+        (
+            !callback
+            ||
+            !(
+                callback.after
+                ||
+                callback.before
+                ||
+                (isHasChild && callback.hasAcceptCopy)
+                ||
+                (!isHasChild && callback.notHasAcceptCopy)
+            )
+        )
+        &&
+        moderStatusObject.other
+    ) {
         return run(moderStatusObject.other)
     } else if (!callback) {
         return
@@ -46,7 +60,7 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
     if (typeof callback === "function") {
         return callback(child, pointData)
     }
-
+    //если before вернет true, то дальше ничего выполнятся не будет, а просто выведется возвращенный результат
     if (typeof callback.before == "function" && (result = callback.before(child, pointData))) {
         return result
     }
@@ -93,7 +107,7 @@ async function throwDuplicate(point, pointId) {
 async function getDuplicate(point, pointId) {
     const pointAccuratyMeter = 200
     const pointAccuratyDegrees = 0.00000900900900900901 * pointAccuratyMeter
-    const select = ["shops.id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "email as user"]
+    const select = ["shops.id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "email"]
     const dupCoord = await Shop.query().select(...select, "duplicateGroup").joinRelated("user")
         .whereBetween("lat", [+point.lat - pointAccuratyDegrees, +point.lat + pointAccuratyDegrees])
         .andWhereBetween("lng", [+point.lng - pointAccuratyDegrees, +point.lng + pointAccuratyDegrees])
@@ -140,7 +154,7 @@ async function markDuplicate(pointId, point, force) {
     const dupIds = duplicate.map((elem) => {
         return elem.id
     })
-    
+
     if (dupIds.length == 1) {
         return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": null })
     } else if (dupIds.length > 1) {

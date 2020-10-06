@@ -3,6 +3,7 @@ const Knex = require("knex")
 const dbConfig = require("../../../serverConfig").db
 
 const { Model } = require("objection")
+const { getPointSelect } = require("../globalValue")
 
 const knex = Knex(dbConfig)
 
@@ -64,14 +65,6 @@ module.exports = class Shop extends Model {
         return this.query().findById(pointId).joinRelated("moder_status").select("moder_status", "isModerated")
     }
 
-    static async hasPointId(pointId) {
-        return this.query().findById(pointId).then(Boolean)
-    }
-
-    static async getParentId(pointId) {
-        return this.query().findById(pointId).select("parent_id").then(res => res.parent_id)
-    }
-
     static async setStatus(pointId, moder_status) {
         return this.query()
             .findById(pointId)
@@ -85,10 +78,6 @@ module.exports = class Shop extends Model {
         return this.query().findById(pointId).patch(data)
     }
 
-    static async delParentAndChild(pointId) {
-        return await this.query().delete().where("parent_id", pointId).orWhere("id", pointId)
-    }
-
     static async delPoint(pointId) {
         if (await this.query().deleteById(pointId)) {
             return { delete: true }
@@ -96,25 +85,10 @@ module.exports = class Shop extends Model {
     }
 
     static async getPoint(pointId) {
-        const select = [
-            "shops.id",
-            "full_city_name",
-            "street",
-            "house",
-            "title",
-            "lng",
-            "lat",
-            "apartment",
-            "hours",
-            "phone",
-            "site",
-            "isActive",
-            "description",
-            "timeStamp",
-            "moder_status",
-            "email"]
-
-        return this.query().findById(pointId).joinRelated("[moder_status,user]").select(...select).then(res => [res])
+        return this.query()
+            .findById(pointId)
+            .joinRelated("[moder_status,user]")
+            .select(...getPointSelect).then(res => [res])
     }
 
     static async returnAcceptCopyToMaster(pointId) {
@@ -140,6 +114,6 @@ module.exports = class Shop extends Model {
         await this.query().findById(pointId).patch({ moder_status_id, parent_id: null })
         masterPoint.id = undefined
         masterPoint.parent_id = pointId
-        await this.query().insert(masterPoint)
+        return this.query().insert(masterPoint)
     }
 }

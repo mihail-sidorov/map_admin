@@ -2,7 +2,7 @@
 const passport = require("passport")
 const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
 const { checkAuth } = require("./middlewares/passport")
-const { delPoint, addPoint, getPoints, editPoint } = require("./model/adminPanelApi/user")
+const { delPoint, addPoint, getPoints, editPoint, getPointsFree, takePoint } = require("./model/adminPanelApi/user")
 const { addUser, editUser, getUsers, getPermission, getRegions, editRegion, addRegion } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 const yup = require('yup')
@@ -18,7 +18,8 @@ const {
     validAddPoint,
     validEditPointModer,
     validEditPointUser,
-    validSetPointAccept } = require("./reqValidators")
+    validSetPointAccept, 
+    validTakePoint} = require("./reqValidators")
 const User = require("./model/orm/user")
 
 module.exports = function (app) {
@@ -175,11 +176,18 @@ module.exports = function (app) {
             , res, next)
     })
 
-    app.get("/api/user/getPointsModerator", checkAuth(["user", "moder"]), (req, res, next) => {
+    app.get("/api/user/getPointsFree", checkAuth("user"), (req, res, next) => {
         modelPromiseToRes(
-            getPointsModerator(req.user)
+            getPointsFree(req.user)
             , res, next)
     })
+
+    app.post("/api/user/takePoint", checkAuth("user"), validTakePoint, (req, res, next) => {
+        modelPromiseToRes(
+            takePoint(req.body.id)
+            , res, next)
+    })
+
 
     app.get("/api/user/getPoints", checkAuth(["user", "moder"]), (req, res, next) => {
         modelPromiseToRes(

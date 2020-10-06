@@ -128,7 +128,7 @@
                   "null"
                 ]
               },
-              "user": {
+              "email": {
                 "type": "string",
                 "description": "email владельца точки"
               }
@@ -144,7 +144,7 @@
               "hours",
               "phone",
               "site",
-              "user"
+              "email"
             ]
           }
         }

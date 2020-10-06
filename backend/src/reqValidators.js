@@ -12,6 +12,7 @@ const editPointModerJson = require("../openApi/models/req/editPointModer.json")
 const delPointJson = require("../openApi/models/req/delPoint.json")
 const addPointJson = require("../openApi/models/req/addPoint.json")
 const editPointUserJson = require("../openApi/models/req/editPointUser.json")
+const takePointJson = require("../openApi/models/req/takePoint.json")
 
 const Permission = require("./model/orm/permission")
 const User = require("./model/orm/user")
@@ -21,6 +22,7 @@ const yup = require('yup')
 const Ajv = require('ajv')
 const { checkTimeStamp, getGeoData, throwDuplicate } = require("./model/adminPanelApi/utilityFn")
 const Shop = require("./model/orm/shop")
+const { getPointsModerator } = require("./model/adminPanelApi/user")
 const ajv = new Ajv({ allErrors: false, coerceTypes: true, useDefaults: "empty" })
 require('ajv-keywords')(ajv, ['transform'])
 
@@ -49,6 +51,22 @@ function validConstructor(ajvSchema, yupSchemaRaw, ...callbacks) {
             const error = validate.errors[0].dataPath.slice(1) + ": " + validate.errors[0].message
             next(error)
         }
+    }
+}
+
+async function hasPermissionToEdit(req) {
+    let pointId = req.params.id ? req.params.id : req.body.id
+    await yup.number().integer().validate(pointId).catch(err => { throw ("id: " + err.message) })
+    const res = await Shop
+        .query()
+        .joinRelated("user.region")
+        .select("user_id", "region_id", "shops.id")
+        .where("shops.id", +pointId)
+        .first()
+    if (!res ||
+        !(req.user.permission[0].permission == "moder" && res.region_id == req.user.region_id) &&
+        !(req.user.permission[0].permission == "user" && res.user_id == req.user.id)) {
+        throw "point id not found"
     }
 }
 
@@ -101,8 +119,11 @@ module.exports.validEditUser = validConstructor(editUserJson, {
     }
 })
 module.exports.validLogin = validConstructor(loginJson)
+
 module.exports.validAddRegion = validConstructor(addRegionJson)
+
 module.exports.validEditRegion = validConstructor(editRegionJson)
+
 module.exports.validLoginAs = validConstructor(loginAsJson, {
     "id": yup.number().test(
         "id",
@@ -111,13 +132,29 @@ module.exports.validLoginAs = validConstructor(loginAsJson, {
     )
 })
 module.exports.validSetPointRefuse = validConstructor(setPointRefuseJson, undefined, hasPermissionToEdit)
+
 module.exports.validSetPointAccept = validConstructor(setPointAcceptJson, undefined, hasPermissionToEdit)
+
 module.exports.validEditPointModer = validConstructor(editPointModerJson, undefined, hasPermissionToEdit)
+
 module.exports.validDelPoint = validConstructor(delPointJson, undefined, hasPermissionToEdit)
+
 module.exports.validAddPoint = validConstructor(addPointJson, undefined, async (req) => {
     await getGeoData(req.body)
     await throwDuplicate(req.body)
 })
+
+module.exports.validTakePoint = validConstructor(takePointJson, undefined, async (req) => {
+    const points = await getPointsModerator(req.user)
+    for (let key=0; key<points.length; key++) {
+        if (points[key].id == req.body.id) {
+            return
+        }
+    }
+    throw "this id not found"
+    
+})
+
 module.exports.validEditPointUser = validConstructor(editPointUserJson, undefined, hasPermissionToEdit, async (req) => {
     const pointId = +req.params.id
     const value = await checkTimeStamp(pointId, req.body.timeStamp)
@@ -136,20 +173,3 @@ module.exports.validEditPointUser = validConstructor(editPointUserJson, undefine
 
     if (!req.body.description) delete (req.body.description)
 })
-
-
-async function hasPermissionToEdit(req) {
-    let pointId = req.params.id ? req.params.id : req.body.id
-    await yup.number().integer().validate(pointId).catch(err => { throw ("id: " + err.message) })
-    const res = await Shop
-        .query()
-        .joinRelated("user.region")
-        .select("user_id", "region_id", "shops.id")
-        .where("shops.id", +pointId)
-        .first()
-    if (!res ||
-        !(req.user.permission[0].permission == "moder" && res.region_id == req.user.region_id) &&
-        !(req.user.permission[0].permission == "user" && res.user_id == req.user.id)) {
-        throw "point id not found"
-    }
-}

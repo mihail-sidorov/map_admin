@@ -1,0 +1,9 @@
+{
+  "title": "takePoint",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    }
+  }
+}

@@ -4,10 +4,40 @@ const { markDuplicate, getPoint, startFnByModerStatus } = require("./utilityFn")
 const Moder_status = require("../orm/moder_status")
 const User = require("../orm/user")
 const Region = require("../orm/region")
+const { getPointSelect } = require("../globalValue")
 
-async function getPointsModerator(user) {
-    user.region_id
-    Region.query().joinRelated("user.[shop,permission]").where({region_id: user.region_id, permission: "moder"})
+async function getPointsFree(user) {
+    return Shop.query()
+        .joinRelated("[user.permission, moder_status]")
+        .whereIn("permission",["moder"])
+        .andWhere({region_id: user.region_id, moder_status: "accept", parent_id: null})
+        .select(...getPointSelect)
+}
+
+async function takePoint(pointId, userId) {
+    await Shop.createNewMasterWithStatus(pointId, "take")
+    patchPoint = await Shop.query().findById(pointId).patch({"user_id": userId})
+    const newPointId = (await Shop.getPoint(pointId)).id
+    return Shop.getPoint(newPointId)
+}
+
+async function returnPoint(pointId, userId) {
+    startFnByModerStatus(pointId, {
+        accept: {
+            notHasAcceptCopy: () =>{
+                
+            }
+        },
+        take: {
+            hasAcceptCopy: () => {
+                await Shop.returnAcceptCopyToMaster(pointId)
+            }
+        }
+    }
+    Shop.createNewMasterWithStatus(pointId, "return")
+    patchPoint = await Shop.query().findById(pointId).patch({"user_id": userId})
+    const newPointId = (await Shop.getPoint(pointId)).id
+    return Shop.getPoint(newPointId)
 }
 
 async function addPoint(user, point, force) {
@@ -25,24 +55,6 @@ async function addPoint(user, point, force) {
 
 async function getPoints(user) {
     let userId
-    const select = [
-        "shops.id",
-        "full_city_name",
-        "street",
-        "house",
-        "title",
-        "lng",
-        "lat",
-        "apartment",
-        "hours",
-        "phone",
-        "site",
-        "isActive",
-        "description",
-        "timeStamp",
-        "moder_status",
-        "email"
-    ]
 
     if (user.permission[0].permission == "user") {
         userId = user.id
@@ -53,7 +65,7 @@ async function getPoints(user) {
         .whereNull("parent_id")
         .skipUndefined()
         .andWhere({ "user_id": userId, "region_id": user.region_id })
-        .select(...select)
+        .select(...getPointSelect)
 }
 
 async function delPoint(pointId) {
@@ -127,3 +139,5 @@ exports.addPoint = addPoint
 exports.getPoints = getPoints
 exports.delPoint = delPoint
 exports.editPoint = editPoint
+exports.getPointsFree = getPointsFree
+exports.takePoint = takePoint
