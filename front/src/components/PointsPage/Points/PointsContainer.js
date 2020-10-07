@@ -1,11 +1,12 @@
 import { connect } from 'react-redux';
 import PointsClassComponent from './Points';
-import { showAddEditPointFormActionCreator, getPoints, getPointsActionCreator } from '../../../redux/pointsPageReducer';
+import { showAddEditPointFormActionCreator, getPoints, getPointsActionCreator, showTakePointsActionCreator } from '../../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
         points: state.pointsPageState.shortPoints,
         duplicate: state.pointsPageState.duplicate,
+        moderTabs: state.pointsPageState.moderTabs,
     };
 }
 
@@ -22,6 +23,9 @@ let mapDispatchToProps = (dispatch) => {
             .catch((error) => {
                 console.log(error);
             });
+        },
+        onShowTakePoints: () => {
+            dispatch(showTakePointsActionCreator());
         },
     };
 }
