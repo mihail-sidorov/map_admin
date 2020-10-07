@@ -9,10 +9,9 @@ const loginAsJson = require("../openApi/models/req/loginAs.json")
 const setPointRefuseJson = require("../openApi/models/req/setPointRefuse.json")
 const setPointAcceptJson = require("../openApi/models/req/setPointAccept.json")
 const editPointModerJson = require("../openApi/models/req/editPointModer.json")
-const delPointJson = require("../openApi/models/req/delPoint.json")
 const addPointJson = require("../openApi/models/req/addPoint.json")
 const editPointUserJson = require("../openApi/models/req/editPointUser.json")
-const takePointJson = require("../openApi/models/req/takePoint.json")
+const pointIdJson = require("../openApi/models/req/pointId.json")
 
 const Permission = require("./model/orm/permission")
 const User = require("./model/orm/user")
@@ -22,7 +21,7 @@ const yup = require('yup')
 const Ajv = require('ajv')
 const { checkTimeStamp, getGeoData, throwDuplicate } = require("./model/adminPanelApi/utilityFn")
 const Shop = require("./model/orm/shop")
-const { getPointsModerator } = require("./model/adminPanelApi/user")
+const { getPointsFree } = require("./model/adminPanelApi/user")
 const ajv = new Ajv({ allErrors: false, coerceTypes: true, useDefaults: "empty" })
 require('ajv-keywords')(ajv, ['transform'])
 
@@ -137,15 +136,15 @@ module.exports.validSetPointAccept = validConstructor(setPointAcceptJson, undefi
 
 module.exports.validEditPointModer = validConstructor(editPointModerJson, undefined, hasPermissionToEdit)
 
-module.exports.validDelPoint = validConstructor(delPointJson, undefined, hasPermissionToEdit)
+module.exports.validDelPoint = validConstructor(pointIdJson, undefined, hasPermissionToEdit)
 
 module.exports.validAddPoint = validConstructor(addPointJson, undefined, async (req) => {
     await getGeoData(req.body)
     await throwDuplicate(req.body)
 })
 
-module.exports.validTakePoint = validConstructor(takePointJson, undefined, async (req) => {
-    const points = await getPointsModerator(req.user)
+module.exports.validTakePoint = validConstructor(pointIdJson, undefined, async (req) => {
+    const points = await getPointsFree(req.user)
     for (let key=0; key<points.length; key++) {
         if (points[key].id == req.body.id) {
             return
@@ -154,6 +153,8 @@ module.exports.validTakePoint = validConstructor(takePointJson, undefined, async
     throw "this id not found"
     
 })
+
+module.exports.validReturnPoint = validConstructor(pointIdJson, undefined, hasPermissionToEdit)
 
 module.exports.validEditPointUser = validConstructor(editPointUserJson, undefined, hasPermissionToEdit, async (req) => {
     const pointId = +req.params.id

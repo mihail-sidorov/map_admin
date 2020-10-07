@@ -14,11 +14,25 @@ async function getPointsFree(user) {
         .select(...getPointSelect)
 }
 
-async function takePoint(pointId, userId) {
-    await Shop.createNewMasterWithStatus(pointId, "take")
-    patchPoint = await Shop.query().findById(pointId).patch({ "user_id": userId })
-    const newPointId = (await Shop.getPoint(pointId)).id
-    return Shop.getPoint(newPointId)
+async function takePoint(pointId, user) { 
+    await startFnByModerStatus(pointId, {
+        accept: {
+            notHasAcceptCopy: async () => {
+                await Shop.createNewMasterWithStatus(pointId, "take")
+                await Shop.patchData(pointId, { user_id: user.id })
+            }
+        },
+        return: {
+            hasAcceptCopy: async () => {
+                await Shop.returnAcceptCopyToMaster(pointId)
+            }
+        },
+        other: () => {
+            throw "fail"
+        }
+    })
+
+    return Shop.getPoint(pointId)
 }
 
 async function returnPoint(pointId) {

@@ -26,11 +26,13 @@ axios.defaults.jar = cookieJar
 
 describe("user", function () {
 
-    let getPoints, user, moder, insertPoints
+    let getPoints, user, moder, insertPoints, userOther, moderOther, insertPointsOther
     before(async function () {
 
         user = (await addUser("nanoid@nanoid.nanoiduser", "testtest", await Permission.getIdByPermission("user"), (await Region.query().first()).id))[0]
         moder = (await addUser("nanoid@nanoid.nanoidmoder", "testtest", await Permission.getIdByPermission("moder"), (await Region.query().first()).id))[0]
+        userOther = (await addUser("nanoid@nanoid.nanoiduserOther", "testtest", await Permission.getIdByPermission("user"), (await Region.query())[1].id))[0]
+        moderOther = (await addUser("nanoid@nanoid.nanoidmoderOther", "testtest", await Permission.getIdByPermission("moder"), (await Region.query())[1].id))[0]
         insertPoints = _.map(new Array(5), (elem, key) => {
             return {
                 title: key,
@@ -63,18 +65,32 @@ describe("user", function () {
         insertPoints[4].moder_status_id = acceptStatusId
         insertPoints[4].user_id = moder.id
 
+        insertPointsOther = _.cloneDeep(insertPoints)
+        insertPointsOther[0].user_id = userOther.id
+        insertPointsOther[1].user_id = userOther.id
+        insertPointsOther[2].user_id = userOther.id
+        insertPointsOther[3].user_id = userOther.id
+        insertPointsOther[4].user_id = moderOther.id
+
+
         for (let key = 0; key < insertPoints.length; key++) {
             await Shop.query().insert(insertPoints[key])
+            await Shop.query().insert(insertPointsOther[key])
         }
 
-        insertPoints[0].moder_status_id = moderatedStatusId
-        insertPoints[4].moder_status_id = moderatedStatusId
+        insertPoints[0].moder_status_id = insertPointsOther[0].moder_status_id = moderatedStatusId
+        insertPoints[4].moder_status_id = insertPointsOther[4].moder_status_id = moderatedStatusId
 
         for (let key = 0; key < insertPoints.length; key++) {
-            const point = await Shop.query().insert(insertPoints[key])
+            let point = await Shop.query().insert(insertPoints[key])
             insertPoints[key].moder_status_id = acceptStatusId
             insertPoints[key].parent_id = point.id
             await Shop.query().insert(insertPoints[key])
+
+            point = await Shop.query().insert(insertPointsOther[key])
+            insertPointsOther[key].moder_status_id = acceptStatusId
+            insertPointsOther[key].parent_id = point.id
+            await Shop.query().insert(insertPointsOther[key])
         }
     })
 
@@ -126,12 +142,42 @@ describe("user", function () {
 
     describe("getPointsFree", function () {
         before(async () => {
+
+
+            let point = await Shop.query().insert({
+                lng: 88,
+                lat: 88,
+                full_city_name: 88,
+                moder_status_id: await Moder_status.getIdByModerStatus("return"),
+                user_id: user.id
+            })
+
             await Shop.query().insert({
                 lng: 88,
                 lat: 88,
                 full_city_name: 88,
-                moder_status_id: await Moder_status.getIdByModerStatus("return")
+                moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                user_id: user.id,
+                parent_id: point.id
             })
+
+            point = await Shop.query().insert({
+                lng: 88,
+                lat: 88,
+                full_city_name: 88,
+                moder_status_id: await Moder_status.getIdByModerStatus("return"),
+                user_id: userOther.id
+            })
+
+            await Shop.query().insert({
+                lng: 88,
+                lat: 88,
+                full_city_name: 88,
+                moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                user_id: userOther.id,
+                parent_id: point.id
+            })
+
             await axios.post("/api/login", { login: "nanoid@nanoid.nanoiduser", password: "testtest" })
             getPointsFree = await axios.get("/api/user/getPointsFree")
         })
@@ -141,14 +187,14 @@ describe("user", function () {
         })
 
         it("Amount point", async function () {
-            expect(getPointsFree.data.response.length).to.be.equal(8)
+            expect(getPointsFree.data.response.length).to.be.equal(2)
         })
 
         it("Amount accept point", async function () {
             const sum = _.reduce(getPointsFree.data.response, (sum, elem) => {
                 return elem.moder_status === "accept" ? sum + 1 : sum
             }, 0)
-            expect(sum).to.be.equal(2)
+            expect(sum).to.be.equal(1)
         })
 
         it("Amount return point", async function () {
@@ -156,6 +202,137 @@ describe("user", function () {
                 return elem.moder_status === "return" ? sum + 1 : sum
             }, 0)
             expect(sum).to.be.equal(1)
+        })
+
+        after(async () => {
+            await Shop.query().delete().where({
+                lng: 88,
+                lat: 88,
+                full_city_name: 88
+            })
+        })
+    })
+
+    describe.only("takePoint and returnPoint", function () {
+        let pointReturn, pointTake, pointAcceptUser, pointAcceptModer
+        before(async () => {
+            pointReturn = await Shop.query().insert({
+                lng: 88,
+                lat: 88,
+                full_city_name: 88,
+                moder_status_id: await Moder_status.getIdByModerStatus("return"),
+                user_id: user.id
+            })
+
+            await Shop.query().insert({
+                lng: 88,
+                lat: 88,
+                full_city_name: 88,
+                moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                user_id: user.id,
+                parent_id: pointReturn.id
+            })
+
+            pointTake = await Shop.query().insert({
+                lng: 99,
+                lat: 99,
+                full_city_name: 99,
+                moder_status_id: await Moder_status.getIdByModerStatus("take"),
+                user_id: user.id
+            })
+
+            await Shop.query().insert({
+                lng: 99,
+                lat: 99,
+                full_city_name: 99,
+                moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                user_id: moder.id,
+                parent_id: pointTake.id
+            })
+
+            pointAcceptUser = await Shop.query().insert({
+                lng: 55,
+                lat: 55,
+                full_city_name: 55,
+                moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                user_id: user.id
+            })
+
+            pointAcceptModer = await Shop.query().insert({
+                lng: 66,
+                lat: 66,
+                full_city_name: 66,
+                moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                user_id: moder.id
+            })
+
+
+            await axios.post("/api/login", { login: "nanoid@nanoid.nanoiduser", password: "testtest" })
+        })
+
+        describe("takePoint", function () {
+
+            it("применяем к точке со статусом return", async function () {
+                response = await axios.post("/api/user/takePoint",{id: pointReturn.id})
+                expect(response.data.response).to.be.jsonSchema(getPointJson)
+                expect((await Shop.query().where({
+                    lng: 88,
+                    lat: 88,
+                    full_city_name: 88,
+                    moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                    user_id: user.id,
+                    parent_id: null
+                })).length).to.be.equal(1)
+            })
+
+            it("применяем к точке со статусом accept", async function () {
+                response = await axios.post("/api/user/takePoint",{id: pointAcceptModer.id})
+                expect((await Shop.query().where({
+                    lng: 66,
+                    lat: 66,
+                    full_city_name: 66,
+                    moder_status_id: await Moder_status.getIdByModerStatus("take"),
+                    user_id: user.id,
+                    parent_id: null
+                })).length).to.be.equal(1)
+            })
+
+            it("применяем к точке со статусом take", async function () {
+                response = await axios.post("/api/user/takePoint",{id: pointAcceptModer.id})
+                expect(response.data).to.be.deep.equal({ isError: true, response: 'this id not found' })
+            })
+        })
+
+        describe("returnPoint", function () {
+            it("применяем к точке со статусом take", async function () {
+                response = await axios.post("/api/user/takePoint",{id: pointReturn.id})
+                expect(response.data.response).to.be.jsonSchema(getPointJson)
+                expect((await Shop.query().where({
+                    lng: 88,
+                    lat: 88,
+                    full_city_name: 88,
+                    moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                    user_id: user.id,
+                    parent_id: null
+                })).length).to.be.equal(1)
+            })
+
+            it("применяем к точке со статусом accept", async function () {
+                response = await axios.post("/api/user/takePoint",{id: pointAcceptModer.id})
+                expect((await Shop.query().where({
+                    lng: 66,
+                    lat: 66,
+                    full_city_name: 66,
+                    moder_status_id: await Moder_status.getIdByModerStatus("take"),
+                    user_id: user.id,
+                    parent_id: null
+                })).length).to.be.equal(1)
+            })
+
+            it("применяем к точке со статусом take", async function () {
+                response = await axios.post("/api/user/takePoint",{id: pointAcceptModer.id})
+                expect(response.data).to.be.deep.equal({ isError: true, response: 'this id not found' })
+            })
         })
     })
 
@@ -272,9 +449,11 @@ describe("user", function () {
     })
 
     after(async function () {
-        await Shop.query().delete().whereIn("user_id", [user.id, moder.id])
+        await Shop.query().delete().whereIn("user_id", [user.id, moder.id, moderOther.id, userOther.id])
         await User.query().deleteById(user.id)
         await User.query().deleteById(moder.id)
+        await User.query().deleteById(userOther.id)
+        await User.query().deleteById(moderOther.id)
     })
 
 })
