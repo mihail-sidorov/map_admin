@@ -101,7 +101,13 @@ let Point = (props) => {
     return (
         <div className="point__container">
             {pointInform}
-            <div point-id={props.point.id} className="point list__item">   
+            <div point-id={props.point.id} className={`point list__item${(props.point.moder_status === 'take' || props.point.moder_status === 'accept') && !props.moderTabs ? ' point_return' : ''}`}>
+                {(props.point.moder_status === 'take' || props.point.moder_status === 'accept') && !props.moderTabs && (
+                    <button className="point__return-btn" onClick={() => {
+                        props.onReturnPoint(props.point.id, props.point.moder_status);
+                    }}></button>
+                )}
+
                 <PointProperties point={props.point} permission={props.permission}/>
 
                 {editAcceptBtn}

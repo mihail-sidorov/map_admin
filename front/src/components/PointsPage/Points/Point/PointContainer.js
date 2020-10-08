@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { showAddEditPointFormActionCreator, showRefusePointFormActionCreator, showDelPointFormActionCreator} from '../../../../redux/pointsPageReducer';
+import { showAddEditPointFormActionCreator, showRefusePointFormActionCreator, showDelPointFormActionCreator, returnPoint, delPointActionCreator, addTakePointActionCreator } from '../../../../redux/pointsPageReducer';
 import Point from './Point';
 
 let PointContainer = (id) => {
@@ -7,6 +7,7 @@ let PointContainer = (id) => {
         return {
             point: state.pointsPageState.shortPoints[id],
             moderTabsActive: state.pointsPageState.moderTabsActive,
+            moderTabs: state.pointsPageState.moderTabs,
         };
     }
 
@@ -20,6 +21,20 @@ let PointContainer = (id) => {
             },
             onShowRefusePointForm: (id) => {
                 dispatch(showRefusePointFormActionCreator(id));
+            },
+            onReturnPoint: (id, status) => {
+                returnPoint(id)
+                    .then((point) => {
+                        if (status === 'take') {
+                            dispatch(delPointActionCreator(point.id));
+                        }
+                        if (status === 'accept') {
+                            dispatch(addTakePointActionCreator(point));
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
             },
         };
     }

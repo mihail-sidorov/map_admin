@@ -228,6 +228,17 @@ export let takePoint = (id) => {
     });
 }
 
+export let returnPoint = (id) => {
+    return axios.post(`${serverName}/api/user/returnPoint`, {id: id}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response[0];
+        }
+        else {
+            throw 'Не удалось отдать точку!';
+        }
+    });
+}
+
 // Создание ActionCreator
 export let delPointActionCreator = (id) => {
     return {
