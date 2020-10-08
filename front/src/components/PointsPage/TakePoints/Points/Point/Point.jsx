@@ -1,12 +1,34 @@
 import React from 'react';
 
 let Point = (props) => {
+    let pointInform = [], moderStatus = '';
+    if (props.point.moder_status === 'moderated') moderStatus = 'На модерации';
+    if (props.point.moder_status === 'refuse') moderStatus = 'Отклонено';
+    if (props.point.moder_status === 'accept') moderStatus = 'Допущена к публикации';
+    if (props.point.moder_status === 'delete') moderStatus = 'На удалении';
+    if (props.point.moder_status === 'take') moderStatus = 'Ожидает подтверждение взятия';
+    if (props.point.moder_status === 'return') moderStatus = 'Ожидает подтверждение отдачи';
+
+    pointInform.push(
+        <div className="point__inform" key={1}>
+            <span className="point__isActive">{props.point.isActive ? 'Активна' : 'Не активна'}</span>&nbsp;/&nbsp;
+            <span className="point__moder-status">{moderStatus}</span>
+        </div>
+    );
+
+    let pointDescription = [];
+    if (props.point.description) {
+        pointDescription.push(
+            <div className="point__description" key={1}>
+                {props.point.description}
+            </div>
+        );
+    }
+
     return (
         <div className="point__container">
-            <div className="point__inform" key={1}>
-                <span className="point__isActive">Активна</span>&nbsp;/&nbsp;
-                <span className="point__moder-status">Допущена к публикации</span>
-            </div>
+            {pointInform}
+
             <div point-id={props.point.id} className="point list__item">
                 <span className="point__properties">
                     <span className="point__full-city-name">{props.point.full_city_name}</span>
@@ -21,9 +43,11 @@ let Point = (props) => {
                     <span className="point__site">{props.point.site}</span>
                 </span>
 
-                <div className="point__description">
-                    апавппа воаовоа воаровро ававраовра врарвоарва апавппа воаовоа воаровро ававраовра врарвоарва апавппа воаовоа воаровро ававраовра врарвоарва
-                </div>
+                <button className="point__take-button list__item-btn list__item-btn_take" onClick={() => {
+                    props.onTakePoint(props.point.id);
+                }}></button>
+
+                {pointDescription}
             </div>
         </div>
     );

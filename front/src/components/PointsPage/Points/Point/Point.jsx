@@ -49,10 +49,14 @@ let Point = (props) => {
         if (props.point.moder_status === 'refuse') moderStatus = 'Отклонено';
         if (props.point.moder_status === 'accept') moderStatus = 'Допущена к публикации';
         if (props.point.moder_status === 'delete') moderStatus = 'На удалении';
+        if (props.point.moder_status === 'take') moderStatus = 'Ожидает подтверждение взятия';
+        if (props.point.moder_status === 'return') moderStatus = 'Ожидает подтверждение отдачи';
     }
     else {
         if (props.point.moder_status === 'moderated') moderStatus = 'На утверждение';
         if (props.point.moder_status === 'delete') moderStatus = 'На удаление';
+        if (props.point.moder_status === 'take') moderStatus = 'На утверждение взятия';
+        if (props.point.moder_status === 'return') moderStatus = 'На утверждение отдачи';
     }
 
     pointInform.push(
@@ -86,14 +90,13 @@ let Point = (props) => {
     }
 
     let pointDescription = [];
-    //if (props.point.description) {
+    if (props.point.description) {
         pointDescription.push(
             <div className="point__description" key={1}>
                 {props.point.description}
-                gggggggggggg fgfffffffffffff gffffffffffffff fffffffffffffffffff fffffffffffff fffffffffffffffff
             </div>
         );
-    //}
+    }
 
     return (
         <div className="point__container">
