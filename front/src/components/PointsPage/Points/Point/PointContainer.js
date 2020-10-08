@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import {delPointActionCreator, showAddEditPointFormActionCreator, delPoint, refusePoint, showRefusePointFormActionCreator, showDelPointFormActionCreator} from '../../../../redux/pointsPageReducer';
+import { showAddEditPointFormActionCreator, showRefusePointFormActionCreator, showDelPointFormActionCreator} from '../../../../redux/pointsPageReducer';
 import Point from './Point';
 
 let PointContainer = (id) => {

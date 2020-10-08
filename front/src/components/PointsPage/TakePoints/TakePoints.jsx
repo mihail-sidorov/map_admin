@@ -1,10 +1,11 @@
 import React from 'react';
 import modalWindowHOC from '../../../HOC/modalWindowHOC';
+import PointsContainer from './Points/PointsContainer';
 
 let TakePoints = (props) => {
     return(
         <div className="take-points">
-            Взять точки
+            <PointsContainer />
         </div>
     );
 }

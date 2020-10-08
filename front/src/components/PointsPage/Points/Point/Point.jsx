@@ -86,14 +86,14 @@ let Point = (props) => {
     }
 
     let pointDescription = [];
-    if (props.point.description) {
+    //if (props.point.description) {
         pointDescription.push(
-            <div className="point__description">
+            <div className="point__description" key={1}>
                 {props.point.description}
-                араорп паолполапо палоалопл оооллыыщп опаплпоал алпалплаоп аплоалпрарвоар щыоалвыыжыжлаороролалво оыыд оддооыд ды раррарлф
+                gggggggggggg fgfffffffffffff gffffffffffffff fffffffffffffffffff fffffffffffff fffffffffffffffff
             </div>
         );
-    }
+    //}
 
     return (
         <div className="point__container">

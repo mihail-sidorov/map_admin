@@ -13,13 +13,15 @@ let modalWindowHOC = (Component, props, inProp, closeHandler, unmountOnExit, tit
                         closeHandler(null);
                     }
                 }}>
-                    <div className="modal-window__content">
-                        <div className="modal-window__close" onClick={() => {
-                            closeHandler(null);
-                        }}></div>
-                        <div className="modal-window__head">{title}</div>
-                        <div className="modal-window__body">
-                            <Component  {...props} />
+                    <div className="modal-window__content-wrapper">
+                        <div className="modal-window__content">
+                            <div className="modal-window__close" onClick={() => {
+                                closeHandler(null);
+                            }}></div>
+                            <div className="modal-window__head">{title}</div>
+                            <div className="modal-window__body">
+                                <Component  {...props} />
+                            </div>
                         </div>
                     </div>
                 </div>

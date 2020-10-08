@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM', SHOW_TAKE_POINTS = 'SHOW_TAKE_POINTS', CLOSE_TAKE_POINTS = 'CLOSE_TAKE_POINTS';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM', SHOW_TAKE_POINTS = 'SHOW_TAKE_POINTS', CLOSE_TAKE_POINTS = 'CLOSE_TAKE_POINTS', GET_POINTS_FREE = 'GET_POINTS_FREE';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -97,6 +97,17 @@ let initialState = {
     },
     takePoints: {
         open: false,
+        points: {},
+        shortPoints: {},
+        search: '',
+        pagination: {
+            count: 5,
+            currentPage: 1,
+            pages: 0,
+        },
+        addEditPointForm: {
+            newPoint: false,
+        }
     },
 };
 
@@ -191,6 +202,17 @@ export let acceptPoint = (id) => {
         }
         else {
             throw 'Не удалось подтвердить точку!';
+        }
+    });
+}
+
+export let getPointsFree = () => {
+    return axios.get(`${serverName}/api/user/getPointsFree`, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось получить свободные точки!';
         }
     });
 }
@@ -310,6 +332,11 @@ export let showTakePointsActionCreator = () => ({
 
 export let closeTakePointsActionCreator = () => ({
     type: CLOSE_TAKE_POINTS,
+})
+
+export let getPointsFreeActionCreator = (pointsArr) => ({
+    type: GET_POINTS_FREE,
+    pointsArr: pointsArr,
 })
 
 let pointsPageReducer = (state = initialState, action) => {
@@ -511,6 +538,23 @@ let pointsPageReducer = (state = initialState, action) => {
                     open: false,
                 },
             };
+        case GET_POINTS_FREE:
+            let pointsFree = {};
+            action.pointsArr.forEach((point) => {
+                pointsFree[point.id] = point;
+            });
+
+            newState = {...state};
+            newState.takePoints.points = pointsFree;
+            newState.takePoints.search = '';
+            newState.takePoints.pagination.currentPage = 1;
+
+            makeShortPointsResult = makeShortPoints(newState.takePoints);
+            newState.takePoints.shortPoints = makeShortPointsResult.shortPoints;
+            newState.takePoints.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.takePoints.pagination.pages = makeShortPointsResult.pages;
+
+            return newState;
         default:
             return state;
     }

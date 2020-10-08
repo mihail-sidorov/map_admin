@@ -1,0 +1,44 @@
+.take-points {
+
+    .point__container {
+
+        margin-bottom: 21px;
+
+        &:last-child {
+
+            margin-bottom: 0;
+        }
+
+        .point__inform {
+
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            color: #777777;
+        }
+
+        .point {
+
+            flex-wrap: wrap;
+
+            .point__properties {
+
+                width: 100%;
+                flex-shrink: 0;
+
+                >* {
+
+                    display: inline-block;
+                    margin-right: 20px;
+                    margin-bottom: 5px;
+                }
+            }
+
+            .point__description {
+
+                width: 100%;
+                flex-shrink: 0;
+                margin-top: 5px;
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import PointsClassComponent from './Points';
-import { showAddEditPointFormActionCreator, getPoints, getPointsActionCreator, showTakePointsActionCreator } from '../../../redux/pointsPageReducer';
+import { showAddEditPointFormActionCreator, getPoints, getPointsActionCreator, showTakePointsActionCreator, getPointsFree, getPointsFreeActionCreator } from '../../../redux/pointsPageReducer';
 
 let mapStateToProps = (state) => {
     return {
@@ -25,7 +25,15 @@ let mapDispatchToProps = (dispatch) => {
             });
         },
         onShowTakePoints: () => {
-            dispatch(showTakePointsActionCreator());
+            getPointsFree()
+                .then((pointsArr) => {
+                    console.log(pointsArr);
+                    dispatch(getPointsFreeActionCreator(pointsArr));
+                    dispatch(showTakePointsActionCreator());
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         },
     };
 }
