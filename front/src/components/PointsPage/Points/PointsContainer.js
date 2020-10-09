@@ -27,7 +27,6 @@ let mapDispatchToProps = (dispatch) => {
         onShowTakePoints: () => {
             getPointsFree()
                 .then((pointsArr) => {
-                    console.log(pointsArr);
                     dispatch(getPointsFreeActionCreator(pointsArr));
                     dispatch(showTakePointsActionCreator());
                 })

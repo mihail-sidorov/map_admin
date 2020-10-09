@@ -1,10 +1,12 @@
 import React from 'react';
 import modalWindowHOC from '../../../HOC/modalWindowHOC';
 import PointsContainer from './Points/PointsContainer';
+import SearchContainer from './Search/SearchContainer';
 
 let TakePoints = (props) => {
     return(
         <div className="take-points">
+            <SearchContainer />
             <PointsContainer />
         </div>
     );

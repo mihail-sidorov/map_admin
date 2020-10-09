@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM', SHOW_TAKE_POINTS = 'SHOW_TAKE_POINTS', CLOSE_TAKE_POINTS = 'CLOSE_TAKE_POINTS', GET_POINTS_FREE = 'GET_POINTS_FREE', ADD_TAKE_POINT = 'ADD_TAKE_POINT', SHOW_ACCEPT_POINT_FORM = 'SHOW_ACCEPT_POINT_FORM', CLOSE_ACCEPT_POINT_FORM = 'CLOSE_ACCEPT_POINT_FORM';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM', SHOW_TAKE_POINTS = 'SHOW_TAKE_POINTS', CLOSE_TAKE_POINTS = 'CLOSE_TAKE_POINTS', GET_POINTS_FREE = 'GET_POINTS_FREE', ADD_TAKE_POINT = 'ADD_TAKE_POINT', SHOW_ACCEPT_POINT_FORM = 'SHOW_ACCEPT_POINT_FORM', CLOSE_ACCEPT_POINT_FORM = 'CLOSE_ACCEPT_POINT_FORM', CHANGE_SEARCH_POINTS_FREE = 'CHANGE_SEARCH_POINTS_FREE';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -381,6 +381,11 @@ export let closeAcceptPointFormActionCreator = () => ({
     type: CLOSE_ACCEPT_POINT_FORM,
 })
 
+export let changeSearchPointsFreeActionCreator = (search) => ({
+    type: CHANGE_SEARCH_POINTS_FREE,
+    search: search,
+})
+
 let pointsPageReducer = (state = initialState, action) => {
     let newState, makeShortPointsResult;
 
@@ -631,6 +636,16 @@ let pointsPageReducer = (state = initialState, action) => {
                     open: false,
                 },
             };
+        case CHANGE_SEARCH_POINTS_FREE:
+            newState = {...state};
+            newState.takePoints.search = action.search;
+
+            makeShortPointsResult = makeShortPoints(newState.takePoints);
+            newState.takePoints.shortPoints = makeShortPointsResult.shortPoints;
+            newState.takePoints.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.takePoints.pagination.pages = makeShortPointsResult.pages;
+
+            return newState;
         default:
             return state;
     }
