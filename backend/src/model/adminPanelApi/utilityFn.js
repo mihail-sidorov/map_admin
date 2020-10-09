@@ -19,6 +19,12 @@ const apiYandex = require("../../../serverConfig").yandex.apiKey
  *  },
  *  "%moder_status1%": callback
  * }
+ * 
+ * Колбеки вызваются с параметрами (child, pointData), данные точки и ее потомка
+ * @return {*} результат функции before, если она что то вернет, то выполнение калбеков
+ * на ней прекратится.
+ * Если нет то вернет результат after если он не равен undifiend
+ * Если after не выдаст результата будут возвращены результаты  hasAcceptCopy или notHasAcceptCopy
  */
 async function startFnByModerStatus(pointId, moderStatusObject) {
     if (!moderStatusObject) throw "moderStatusObject must be not empty"

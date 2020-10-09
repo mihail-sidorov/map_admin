@@ -80,10 +80,7 @@
         ]
       },
       "moder_status": {
-        "type": "string",
-        "enum": [
-          "moderated"
-        ]
+        "type": "string"
       },
       "isActive": {
         "type": [

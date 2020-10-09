@@ -191,7 +191,7 @@ module.exports = function (app) {
 
     app.post("/api/user/returnPoint", checkAuth("user"), validReturnPoint, (req, res, next) => {
         modelPromiseToRes(
-            returnPoint(req.body.id, req.user)
+            returnPoint(req.body.id)
             , res, next)
     })
 

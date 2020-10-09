@@ -4,15 +4,9 @@ const Shop = require("../orm/shop")
 const Region = require("../orm/region")
 const { startFnByModerStatus } = require("./utilityFn")
 
-/**
- * Получение точек для модерации по id региона
- * @param {number} regionId id региона модератора
- * @return {} Возвращаем список точке в виде обьектов со свойствами точки в
- * массиве AAA
- */
 async function getPointsModer(regionId) {
     const select = [
-        "id",
+        "shops.id",
         "title",
         "apartment",
         "hours",
@@ -22,34 +16,13 @@ async function getPointsModer(regionId) {
         "full_city_name",
         "house",
         "street",
-        "isActive"]
-    const points = []
+        "isActive",
+        "moder_status"]
 
-    const regionUsers = await Region.query().findById(regionId)
-        .withGraphJoined("user.shop.moder_status", { "joinOperation": "innerJoin" })
-        .modifyGraph('user.shop', bulder => {
-            bulder.select(...select)
-        })
-        .modifyGraph('user.shop.moder_status', bulder => {
-            bulder.where("isModerated", 1)
-        })
-        .first()
-
-    if (regionUsers.length) {
-        throw "not found users in this region"
-    }
-
-    for (let regionUser of regionUsers.user) {
-        if (regionUser.shop[0] && regionUser.shop[0]) {
-            points.push(...regionUser.shop)
-        }
-    }
-
-    points.forEach(elem => {
-        elem.moder_status = elem.moder_status[0].moder_status
-    })
-
-    return (points)
+    return Shop.query()
+        .joinRelated("[user,moder_status]")
+        .where({ region_id: regionId, isModerated: 1 })
+        .select(...select)
 }
 
 async function setPointRefuse(pointId, description) {
@@ -58,13 +31,13 @@ async function setPointRefuse(pointId, description) {
     await startFnByModerStatus(pointId, {
         moderated: async () => await Shop.setStatus(pointId, "refuse"),
         delete: async () => await Shop.returnAcceptCopyToMaster(pointId),
-        other: () => {throw "fail"}
+        other: () => { throw "fail" }
     })
 
     return pointId
 }
 
-async function setPointAccept(pointId) {
+async function setPointAccept(pointId, user) {
     await startFnByModerStatus(pointId, {
         moderated: {
             notHasAcceptCopy: async () => await Shop.setStatus(pointId, "accept"),
@@ -77,7 +50,22 @@ async function setPointAccept(pointId) {
             hasAcceptCopy: async (child) => await Shop.delPoint(child.id),
             after: async () => await Shop.delPoint(pointId)
         },
-        other: () => {throw "fail"}
+        return: {
+            hasAcceptCopy: async (child) => {
+                await Shop.patchData(pointId, { user_id: user.id })
+                await Shop.setStatus(pointId, "accept")
+                await Shop.delPoint(child.id)
+            }
+        },
+        take: {
+            hasAcceptCopy: async (child) => {
+                await Shop.setStatus(pointId, "accept")
+                await Shop.delPoint(child.id)
+            }
+        },
+        other: () => {
+            throw "fail"
+        }
     })
 
     return pointId
@@ -92,7 +80,7 @@ async function editPointModer(pointId, point) {
             },
             hasAcceptCopy: async (child) => await Shop.delPoint(child.id),
         },
-        other: () => {throw "fail"}
+        other: () => { throw "fail" }
     })
 
     return pointId

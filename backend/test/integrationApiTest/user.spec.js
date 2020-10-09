@@ -213,7 +213,7 @@ describe("user", function () {
         })
     })
 
-    describe.only("takePoint and returnPoint", function () {
+    describe("takePoint and returnPoint", function () {
         let pointReturn, pointTake, pointAcceptUser, pointAcceptModer
         before(async () => {
             pointReturn = await Shop.query().insert({
@@ -283,6 +283,14 @@ describe("user", function () {
                     user_id: user.id,
                     parent_id: null
                 })).length).to.be.equal(1)
+
+                expect((await Shop.query().where({
+                    lng: 88,
+                    lat: 88,
+                    full_city_name: 88,
+                    moder_status_id: await Moder_status.getIdByModerStatus("return"),
+                    user_id: user.id
+                })).length).to.be.equal(0)
             })
 
             it("применяем к точке со статусом accept", async function () {
@@ -294,6 +302,15 @@ describe("user", function () {
                     moder_status_id: await Moder_status.getIdByModerStatus("take"),
                     user_id: user.id,
                     parent_id: null
+                })).length).to.be.equal(1)
+
+                expect((await Shop.query().where({
+                    lng: 66,
+                    lat: 66,
+                    full_city_name: 66,
+                    moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                    user_id: moder.id,
+                    parent_id: pointAcceptModer.id
                 })).length).to.be.equal(1)
             })
 
@@ -305,33 +322,62 @@ describe("user", function () {
 
         describe("returnPoint", function () {
             it("применяем к точке со статусом take", async function () {
-                response = await axios.post("/api/user/takePoint",{id: pointReturn.id})
+                response = await axios.post("/api/user/returnPoint",{id: pointTake.id})
                 expect(response.data.response).to.be.jsonSchema(getPointJson)
                 expect((await Shop.query().where({
-                    lng: 88,
-                    lat: 88,
-                    full_city_name: 88,
+                    lng: 99,
+                    lat: 99,
+                    full_city_name: 99,
                     moder_status_id: await Moder_status.getIdByModerStatus("accept"),
-                    user_id: user.id,
+                    user_id: moder.id,
                     parent_id: null
                 })).length).to.be.equal(1)
+
+                expect((await Shop.query().where({
+                    lng: 99,
+                    lat: 99,
+                    full_city_name: 99,
+                    moder_status_id: await Moder_status.getIdByModerStatus("take"),
+                    user_id: user.id
+                })).length).to.be.equal(0)
             })
 
             it("применяем к точке со статусом accept", async function () {
-                response = await axios.post("/api/user/takePoint",{id: pointAcceptModer.id})
+                response = await axios.post("/api/user/returnPoint",{id: pointAcceptUser.id})
+                expect(response.data.response).to.be.jsonSchema(getPointJson)
+
                 expect((await Shop.query().where({
-                    lng: 66,
-                    lat: 66,
-                    full_city_name: 66,
-                    moder_status_id: await Moder_status.getIdByModerStatus("take"),
+                    lng: 55,
+                    lat: 55,
+                    full_city_name: 55,
+                    moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                    user_id: user.id,
+                    parent_id: pointAcceptUser.id
+                })).length).to.be.equal(1)
+
+                expect((await Shop.query().where({
+                    id: pointAcceptUser.id,
+                    lng: 55,
+                    lat: 55,
+                    full_city_name: 55,
+                    moder_status_id: await Moder_status.getIdByModerStatus("return"),
                     user_id: user.id,
                     parent_id: null
                 })).length).to.be.equal(1)
+
+                expect((await Shop.query().where({
+                    lng: 55,
+                    lat: 55,
+                    full_city_name: 55,
+                    moder_status_id: await Moder_status.getIdByModerStatus("accept"),
+                    user_id: user.id,
+                    parent_id: null
+                })).length).to.be.equal(0)
             })
 
             it("применяем к точке со статусом take", async function () {
-                response = await axios.post("/api/user/takePoint",{id: pointAcceptModer.id})
-                expect(response.data).to.be.deep.equal({ isError: true, response: 'this id not found' })
+                response = await axios.post("/api/user/returnPoint",{id: pointAcceptUser.id})
+                expect(response.data).to.be.deep.equal({ isError: true, response: 'fail' })
             })
         })
     })
@@ -457,16 +503,3 @@ describe("user", function () {
     })
 
 })
-
-// describe("HTTP assertions", function () {
-//     it("should make HTTP assertions easy", function () {
-//       var response = chakram.get("http://localhost:3000/api/user/getPoints")
-//       expect(response).to.have.status(200)
-//       expect(response).to.have.header("content-type", "application/json")
-//       expect(response).not.to.be.encoded.with.gzip
-//       expect(response).to.comprise.of.json({
-//         args: { test: "chakram" }
-//       })
-//       return chakram.wait()
-//     })
-//   })

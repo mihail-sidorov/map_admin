@@ -39,20 +39,20 @@ async function returnPoint(pointId) {
     await startFnByModerStatus(pointId, {
         accept: {
             notHasAcceptCopy: async () => {
-                await Shop.createNewMasterWithStatus(pointId, "return")
-                return { delete: false, point: (await Shop.getPoint(pointId))[0] }
+                await Shop.createNewMasterWithStatus(pointId, "return")   
             }
         },
         take: {
             hasAcceptCopy: async () => {
                 await Shop.returnAcceptCopyToMaster(pointId)
-                return { delete: true }
             }
         },
         other: () => {
             throw "fail"
         }
-    })
+    }) 
+
+    return Shop.getPoint(pointId)
 }
 
 async function addPoint(user, point, force) {
@@ -140,6 +140,9 @@ async function editPoint(pointId, point, force) {
             //при удалении меняем только комментарии
             await Shop.patchData(pointId, { description: point.description })
             return Shop.getPoint(pointId)
+        },
+        "other": () => {
+            throw "fail"
         }
 
     })
