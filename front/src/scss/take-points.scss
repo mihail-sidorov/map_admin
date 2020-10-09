@@ -1,44 +1,57 @@
 .take-points {
 
-    .point__container {
+    .search {
 
-        margin-bottom: 21px;
+        margin-bottom: 50px;
+    }
 
-        &:last-child {
+    .points {
 
-            margin-bottom: 0;
-        }
+        .point__container {
 
-        .point__inform {
-
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            color: #777777;
-        }
-
-        .point {
-
-            flex-wrap: wrap;
-
-            .point__properties {
-
-                width: 100%;
-                flex-shrink: 0;
-
-                >* {
-
-                    display: inline-block;
-                    margin-right: 20px;
-                    margin-bottom: 5px;
+            margin-bottom: 21px;
+    
+            &:last-child {
+    
+                margin-bottom: 0;
+            }
+    
+            .point__inform {
+    
+                margin-bottom: 5px;
+                text-transform: uppercase;
+                color: #777777;
+            }
+    
+            .point {
+    
+                flex-wrap: wrap;
+    
+                .point__properties {
+    
+                    width: 100%;
+                    flex-shrink: 0;
+    
+                    >* {
+    
+                        display: inline-block;
+                        margin-right: 20px;
+                        margin-bottom: 5px;
+                    }
+                }
+    
+                .point__description {
+    
+                    width: 100%;
+                    flex-shrink: 0;
+                    margin-top: 5px;
                 }
             }
-
-            .point__description {
-
-                width: 100%;
-                flex-shrink: 0;
-                margin-top: 5px;
-            }
         }
+    }
+
+    .pagination {
+
+        margin-top: 20px;
     }
 }

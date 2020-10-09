@@ -1,5 +1,6 @@
 import React from 'react';
 import modalWindowHOC from '../../../HOC/modalWindowHOC';
+import PaginationContainer from './Pagination/PaginationContainer';
 import PointsContainer from './Points/PointsContainer';
 import SearchContainer from './Search/SearchContainer';
 
@@ -8,6 +9,7 @@ let TakePoints = (props) => {
         <div className="take-points">
             <SearchContainer />
             <PointsContainer />
+            <PaginationContainer />
         </div>
     );
 }
