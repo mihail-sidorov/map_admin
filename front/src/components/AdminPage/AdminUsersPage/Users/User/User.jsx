@@ -15,11 +15,11 @@ let User = (props) => {
             <button className="user__edit-btn list__item-btn list__item-btn_edit" onClick={() => {
                 props.onOpenEditUserForm(props.user.id);
             }}></button>
-            {props.user.permission !== 'admin' && (
+            {/* {props.user.permission !== 'admin' && (
                 <button className="user__login-as-btn" onClick={() => {
                     props.onLoginAs(props.user.id);
                 }}>Войти под</button>
-            )}
+            )} */}
         </div>
     );
 }
