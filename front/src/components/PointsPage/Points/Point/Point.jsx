@@ -98,6 +98,15 @@ let Point = (props) => {
         );
     }
 
+    let acceptPointBtn = [];
+    if (props.permission === 'moder' && (props.point.moder_status === 'take' || props.point.moder_status === 'return')) {
+        acceptPointBtn.push(
+            <button className="point__accept-button list__item-btn_accept list__item-btn list__item-btn_2" key={1} onClick={() => {
+                props.onShowAcceptPointForm(props.point.id, props.point.moder_status);
+            }}></button>
+        );
+    }
+
     return (
         <div className="point__container">
             {pointInform}
@@ -110,6 +119,8 @@ let Point = (props) => {
 
                 <PointProperties point={props.point} permission={props.permission}/>
 
+                {acceptPointBtn}
+                
                 {editAcceptBtn}
 
                 {delPointBtn}

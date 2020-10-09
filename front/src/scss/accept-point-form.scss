@@ -1,0 +1,18 @@
+.accept-point-form {
+
+    .accept-point-form__text {
+
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .accept-point-form__btns {
+
+        text-align: center;
+
+        &>*:first-child {
+
+            margin-right: 13px;
+        }
+    }
+}

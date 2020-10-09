@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM', SHOW_TAKE_POINTS = 'SHOW_TAKE_POINTS', CLOSE_TAKE_POINTS = 'CLOSE_TAKE_POINTS', GET_POINTS_FREE = 'GET_POINTS_FREE', ADD_TAKE_POINT = 'ADD_TAKE_POINT';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM', SHOW_TAKE_POINTS = 'SHOW_TAKE_POINTS', CLOSE_TAKE_POINTS = 'CLOSE_TAKE_POINTS', GET_POINTS_FREE = 'GET_POINTS_FREE', ADD_TAKE_POINT = 'ADD_TAKE_POINT', SHOW_ACCEPT_POINT_FORM = 'SHOW_ACCEPT_POINT_FORM', CLOSE_ACCEPT_POINT_FORM = 'CLOSE_ACCEPT_POINT_FORM';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -109,6 +109,11 @@ let initialState = {
             newPoint: false,
         }
     },
+    acceptPointForm: {
+        open: false,
+        id: null,
+        status: null,
+    },
 };
 
 // Запросы к API
@@ -201,7 +206,7 @@ export let acceptPoint = (id) => {
             return response.data.response;
         }
         else {
-            throw 'Не удалось подтвердить точку!';
+            throw 'Не удалось утвердить точку!';
         }
     });
 }
@@ -364,6 +369,16 @@ export let getPointsFreeActionCreator = (pointsArr) => ({
 export let addTakePointActionCreator = (point) => ({
     type: ADD_TAKE_POINT,
     point: point,
+})
+
+export let showAcceptPointFormActionCreator = (id, status) => ({
+    type: SHOW_ACCEPT_POINT_FORM,
+    id: id,
+    status: status,
+})
+
+export let closeAcceptPointFormActionCreator = () => ({
+    type: CLOSE_ACCEPT_POINT_FORM,
 })
 
 let pointsPageReducer = (state = initialState, action) => {
@@ -599,6 +614,23 @@ let pointsPageReducer = (state = initialState, action) => {
             newState.takePoints.pagination.pages = makeShortPointsResult.pages;
 
             return newState;
+        case SHOW_ACCEPT_POINT_FORM:
+            return {
+                ...state,
+                acceptPointForm: {
+                    open: true,
+                    id: action.id,
+                    status: action.status,
+                },
+            };
+        case CLOSE_ACCEPT_POINT_FORM:
+            return {
+                ...state,
+                acceptPointForm: {
+                    ...state.acceptPointForm,
+                    open: false,
+                },
+            };
         default:
             return state;
     }

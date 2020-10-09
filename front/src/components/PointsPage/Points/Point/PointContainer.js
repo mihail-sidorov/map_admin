@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { showAddEditPointFormActionCreator, showRefusePointFormActionCreator, showDelPointFormActionCreator, returnPoint, delPointActionCreator, addTakePointActionCreator } from '../../../../redux/pointsPageReducer';
+import { showAddEditPointFormActionCreator, showRefusePointFormActionCreator, showDelPointFormActionCreator, returnPoint, delPointActionCreator, addTakePointActionCreator, showAcceptPointFormActionCreator } from '../../../../redux/pointsPageReducer';
 import Point from './Point';
 
 let PointContainer = (id) => {
@@ -35,6 +35,9 @@ let PointContainer = (id) => {
                     .catch((error) => {
                         console.log(error);
                     });
+            },
+            onShowAcceptPointForm: (id, status) => {
+                dispatch(showAcceptPointFormActionCreator(id, status));
             },
         };
     }
