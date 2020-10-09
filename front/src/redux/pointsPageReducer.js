@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import serverName from '../serverName';
 
-const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM';
+const DEL_POINT = 'DEL_POINT', CHANGE_PAGE = 'CHANGE_PAGE', CHANGE_SEARCH = 'CHANGE_SEARCH', SHOW_ADD_EDIT_POINT_FORM = 'SHOW_ADD_EDIT_POINT_FORM', ADD_POINT = 'ADD_POINT', EDIT_POINT = 'EDIT_POINT', GET_POINTS = 'GET_POINTS', ADD_DUPLICATE = 'ADD_DUPLICATE', CANSEL_DUPLICATE = 'CANSEL_DUPLICATE', RESET_PAGINATION_POINTS = 'RESET_PAGINATION_POINTS', RESET_POINTS = 'RESET_POINTS', RESET_SEARCH_POINTS = 'RESET_SEARCH_POINTS', SET_MODER_TABS = 'SET_MODER_TABS', RESET_MODER_TABS = 'RESET_MODER_TABS', SET_MODER_TABS_ACTIVE = 'SET_MODER_TABS_ACTIVE', SHOW_REFUSE_POINT_FORM = 'SHOW_REFUSE_POINT_FORM', CLOSE_REFUSE_POINT_FORM = 'CLOSE_REFUSE_POINT_FORM', SHOW_DEL_POINT_FORM = 'SHOW_DEL_POINT_FORM', CLOSE_DEL_POINT_FORM = 'CLOSE_DEL_POINT_FORM', SHOW_TAKE_POINTS = 'SHOW_TAKE_POINTS', CLOSE_TAKE_POINTS = 'CLOSE_TAKE_POINTS', GET_POINTS_FREE = 'GET_POINTS_FREE', ADD_TAKE_POINT = 'ADD_TAKE_POINT', SHOW_ACCEPT_POINT_FORM = 'SHOW_ACCEPT_POINT_FORM', CLOSE_ACCEPT_POINT_FORM = 'CLOSE_ACCEPT_POINT_FORM', CHANGE_SEARCH_POINTS_FREE = 'CHANGE_SEARCH_POINTS_FREE', CHANGE_PAGE_TAKE_POINTS = 'CHANGE_PAGE_TAKE_POINTS';
 
 let makeShortPoints = (state) => {
     let searchPoints = {}, shortPoints = {};
@@ -95,6 +95,25 @@ let initialState = {
         id: null,
         permission: null,
     },
+    takePoints: {
+        open: false,
+        points: {},
+        shortPoints: {},
+        search: '',
+        pagination: {
+            count: 5,
+            currentPage: 1,
+            pages: 0,
+        },
+        addEditPointForm: {
+            newPoint: false,
+        }
+    },
+    acceptPointForm: {
+        open: false,
+        id: null,
+        status: null,
+    },
 };
 
 // Запросы к API
@@ -187,7 +206,40 @@ export let acceptPoint = (id) => {
             return response.data.response;
         }
         else {
-            throw 'Не удалось подтвердить точку!';
+            throw 'Не удалось утвердить точку!';
+        }
+    });
+}
+
+export let getPointsFree = () => {
+    return axios.get(`${serverName}/api/user/getPointsFree`, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response;
+        }
+        else {
+            throw 'Не удалось получить свободные точки!';
+        }
+    });
+}
+
+export let takePoint = (id) => {
+    return axios.post(`${serverName}/api/user/takePoint`, {id: id}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response[0];
+        }
+        else {
+            throw 'Не удалось взять точку!';
+        }
+    });
+}
+
+export let returnPoint = (id) => {
+    return axios.post(`${serverName}/api/user/returnPoint`, {id: id}, {withCredentials: true}).then((response) => {
+        if (!response.data.isError) {
+            return response.data.response[0];
+        }
+        else {
+            throw 'Не удалось отдать точку!';
         }
     });
 }
@@ -299,6 +351,44 @@ export let showDelPointFormActionCreator = (id, permission) => ({
 
 export let closeDelPointFormActionCreator = () => ({
     type: CLOSE_DEL_POINT_FORM,
+})
+
+export let showTakePointsActionCreator = () => ({
+    type: SHOW_TAKE_POINTS,
+})
+
+export let closeTakePointsActionCreator = () => ({
+    type: CLOSE_TAKE_POINTS,
+})
+
+export let getPointsFreeActionCreator = (pointsArr) => ({
+    type: GET_POINTS_FREE,
+    pointsArr: pointsArr,
+})
+
+export let addTakePointActionCreator = (point) => ({
+    type: ADD_TAKE_POINT,
+    point: point,
+})
+
+export let showAcceptPointFormActionCreator = (id, status) => ({
+    type: SHOW_ACCEPT_POINT_FORM,
+    id: id,
+    status: status,
+})
+
+export let closeAcceptPointFormActionCreator = () => ({
+    type: CLOSE_ACCEPT_POINT_FORM,
+})
+
+export let changeSearchPointsFreeActionCreator = (search) => ({
+    type: CHANGE_SEARCH_POINTS_FREE,
+    search: search,
+})
+
+export let changePageTakePointsActionCreator = (page) => ({
+    type: CHANGE_PAGE_TAKE_POINTS,
+    page: page,
 })
 
 let pointsPageReducer = (state = initialState, action) => {
@@ -484,6 +574,94 @@ let pointsPageReducer = (state = initialState, action) => {
                     permission: null,
                 },
             };
+        case SHOW_TAKE_POINTS:
+            return {
+                ...state,
+                takePoints: {
+                    ...state.takePoints,
+                    open: true,
+                },
+            };
+        case CLOSE_TAKE_POINTS:
+            return {
+                ...state,
+                takePoints: {
+                    ...state.takePoints,
+                    open: false,
+                },
+            };
+        case GET_POINTS_FREE:
+            let pointsFree = {};
+            action.pointsArr.forEach((point) => {
+                pointsFree[point.id] = point;
+            });
+
+            newState = {...state};
+            newState.takePoints.points = pointsFree;
+            newState.takePoints.search = '';
+            newState.takePoints.pagination.currentPage = 1;
+
+            makeShortPointsResult = makeShortPoints(newState.takePoints);
+            newState.takePoints.shortPoints = makeShortPointsResult.shortPoints;
+            newState.takePoints.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.takePoints.pagination.pages = makeShortPointsResult.pages;
+
+            return newState;
+        case ADD_TAKE_POINT:
+            newState = {...state};
+            newState.points[action.point.id] = action.point;
+
+            makeShortPointsResult = makeShortPoints(newState);
+            newState.shortPoints = makeShortPointsResult.shortPoints;
+            newState.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.pagination.pages = makeShortPointsResult.pages;
+
+            delete newState.takePoints.points[action.point.id];
+
+            makeShortPointsResult = makeShortPoints(newState.takePoints);
+            newState.takePoints.shortPoints = makeShortPointsResult.shortPoints;
+            newState.takePoints.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.takePoints.pagination.pages = makeShortPointsResult.pages;
+
+            return newState;
+        case SHOW_ACCEPT_POINT_FORM:
+            return {
+                ...state,
+                acceptPointForm: {
+                    open: true,
+                    id: action.id,
+                    status: action.status,
+                },
+            };
+        case CLOSE_ACCEPT_POINT_FORM:
+            return {
+                ...state,
+                acceptPointForm: {
+                    ...state.acceptPointForm,
+                    open: false,
+                },
+            };
+        case CHANGE_SEARCH_POINTS_FREE:
+            newState = {...state};
+            newState.takePoints.search = action.search;
+            newState.takePoints.pagination.currentPage = 1;
+
+            makeShortPointsResult = makeShortPoints(newState.takePoints);
+            newState.takePoints.shortPoints = makeShortPointsResult.shortPoints;
+            newState.takePoints.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.takePoints.pagination.pages = makeShortPointsResult.pages;
+
+            return newState;
+        case CHANGE_PAGE_TAKE_POINTS:
+            newState = {...state};
+            newState.takePoints.pagination.currentPage = action.page;
+
+            makeShortPointsResult = makeShortPoints(newState.takePoints);
+            newState.takePoints.shortPoints = makeShortPointsResult.shortPoints;
+            newState.takePoints.pagination.currentPage = makeShortPointsResult.currentPage;
+            newState.takePoints.pagination.pages = makeShortPointsResult.pages;
+
+            return newState;
         default:
             return state;
     }

@@ -49,10 +49,14 @@ let Point = (props) => {
         if (props.point.moder_status === 'refuse') moderStatus = 'Отклонено';
         if (props.point.moder_status === 'accept') moderStatus = 'Допущена к публикации';
         if (props.point.moder_status === 'delete') moderStatus = 'На удалении';
+        if (props.point.moder_status === 'take') moderStatus = 'Ожидает подтверждение взятия';
+        if (props.point.moder_status === 'return') moderStatus = 'Ожидает подтверждение отдачи';
     }
     else {
         if (props.point.moder_status === 'moderated') moderStatus = 'На утверждение';
         if (props.point.moder_status === 'delete') moderStatus = 'На удаление';
+        if (props.point.moder_status === 'take') moderStatus = 'На утверждение взятия';
+        if (props.point.moder_status === 'return') moderStatus = 'На утверждение отдачи';
     }
 
     pointInform.push(
@@ -88,19 +92,35 @@ let Point = (props) => {
     let pointDescription = [];
     if (props.point.description) {
         pointDescription.push(
-            <div className="point__description">
+            <div className="point__description" key={1}>
                 {props.point.description}
-                араорп паолполапо палоалопл оооллыыщп опаплпоал алпалплаоп аплоалпрарвоар щыоалвыыжыжлаороролалво оыыд оддооыд ды раррарлф
             </div>
+        );
+    }
+
+    let acceptPointBtn = [];
+    if (props.permission === 'moder' && (props.point.moder_status === 'take' || props.point.moder_status === 'return')) {
+        acceptPointBtn.push(
+            <button className="point__accept-button list__item-btn_accept list__item-btn list__item-btn_2" key={1} onClick={() => {
+                props.onShowAcceptPointForm(props.point.id, props.point.moder_status);
+            }}></button>
         );
     }
 
     return (
         <div className="point__container">
             {pointInform}
-            <div point-id={props.point.id} className="point list__item">   
+            <div point-id={props.point.id} className={`point list__item${(props.point.moder_status === 'take' || props.point.moder_status === 'accept') && !props.moderTabs ? ' point_return' : ''}`}>
+                {(props.point.moder_status === 'take' || props.point.moder_status === 'accept') && !props.moderTabs && (
+                    <button className="point__return-btn" onClick={() => {
+                        props.onReturnPoint(props.point.id, props.point.moder_status);
+                    }}></button>
+                )}
+
                 <PointProperties point={props.point} permission={props.permission}/>
 
+                {acceptPointBtn}
+                
                 {editAcceptBtn}
 
                 {delPointBtn}

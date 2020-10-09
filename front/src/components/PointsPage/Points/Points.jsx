@@ -21,9 +21,20 @@ let Points = (props) => {
         );
     }
 
+    let takePointBtn = [];
+    if (props.permission === 'user' && !props.moderTabs) {
+        takePointBtn.push(
+            <button className="points__take-point-btn btn" onClick={() => {
+                props.onShowTakePoints();
+            }} key={1}>Взять точки</button>
+        );
+    }
+
     return (
         <div className="points list">
             {addPointBtn}
+
+            {takePointBtn}
             
             {pointsArr}
         </div>
