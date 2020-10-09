@@ -80,7 +80,7 @@ let initialState = {
     },
     search: '',
     pagination: {
-        count: 5,
+        count: 10,
         currentPage: 1,
         pages: 0,
     },

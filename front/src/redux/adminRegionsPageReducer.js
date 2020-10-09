@@ -63,7 +63,7 @@ let initialState = {
     shortRegions: {},
     search: '',
     pagination: {
-        count: 1,
+        count: 10,
         currentPage: 1,
         pages: 0,
     },
