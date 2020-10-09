@@ -1,12 +1,20 @@
 'use strict'
 const express = require("express")
 const session = require("express-session")
-const FileStore = require("session-file-store")(session)
+const KnexSessionStore = require('connect-session-knex')(session)
 const { passportModule } = require("./passport")
 const cors = require('cors')
 const sessionConf = require("../../serverConfig").session
 const corsConf = require("../../serverConfig").cors
 const helmet = require("helmet")
+const dbConfig = require("../../serverConfig").db
+const Knex = require('knex')
+
+const knex = Knex(dbConfig)
+const store = new KnexSessionStore({
+    knex,
+    tablename: 'sessions'
+})
 
 module.exports = function (app) {
 
@@ -18,7 +26,7 @@ module.exports = function (app) {
     app.use(
         session({
             secret: sessionConf.secret,
-            store: new FileStore,
+            store,
             cookie: {
                 secure: sessionConf.secure,
                 path: '/',

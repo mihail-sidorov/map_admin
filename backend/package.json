@@ -24,6 +24,7 @@
     "ajv": "^6.12.5",
     "ajv-keywords": "^3.5.2",
     "bcrypt": "^5.0.0",
+    "connect-session-knex": "^2.0.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
@@ -38,7 +39,6 @@
     "objection-password": "^3.0.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "session-file-store": "^1.4.0",
     "yup": "^0.29.3"
   },
   "devDependencies": {

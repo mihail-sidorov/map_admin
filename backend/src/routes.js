@@ -154,11 +154,11 @@ module.exports = function (app) {
 
     app.post("/api/moder/setPointAccept", checkAuth("moder"), validSetPointAccept, (req, res, next) => {
         modelPromiseToRes(
-            setPointAccept(+req.body.id)
+            setPointAccept(+req.body.id, req.user)
             , res, next)
     })
 
-    app.post("/api/moder/editPoint/:id", checkAuth("moder"), validEditPointModer, async (req, res, next) => {
+    app.post("/api/moder/editPoint/:id", checkAuth("moder"), validEditPointModer, (req, res, next) => {
 
 
         modelPromiseToRes(
