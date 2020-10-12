@@ -55,14 +55,16 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
         (
             !callback
             ||
-            !(
-                callback.after
-                ||
-                callback.before
-                ||
-                (isHasChild && callback.hasAcceptCopy)
-                ||
-                (!isHasChild && callback.notHasAcceptCopy)
+            (
+                !callback.after
+                &&
+                !callback.before
+                &&
+                !(isHasChild && callback.hasAcceptCopy)
+                &&
+                !(!isHasChild && callback.notHasAcceptCopy)
+                &&
+                typeof callback !== "function"
             )
         )
         &&

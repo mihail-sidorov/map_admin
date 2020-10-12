@@ -26,8 +26,10 @@ const User = require("./model/orm/user")
 module.exports = function (app) {
 
     //Интерфейс авторизации
-    app.post("/api/login", validLogin, passport.authenticate('local'), function (req, res, next) {
-        req.session.adminId = undefined
+    app.post("/api/login", validLogin, (req, res, next) => {
+        req.session.regenerate(() => { })
+        next()
+    }, passport.authenticate('local'), function (req, res, next) {
         res.json(jsonResPattern("OK"))
     })
 

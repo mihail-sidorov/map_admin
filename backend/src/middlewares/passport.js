@@ -9,8 +9,11 @@ exports.passportModule = function (app) {
         done(null, user.id)
     })
 
-    passport.deserializeUser(function (id, done) {
-        getUserById(id).then(user => done(null, user))
+    passport.deserializeUser(async function (id, done) {
+        getUserById(id).then(user => {
+            if (!user) user = null
+            return done(null, user)
+        })
     })
 
     passport.use(new LocalStrategy(

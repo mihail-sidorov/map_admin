@@ -29,8 +29,13 @@ async function setPointRefuse(pointId, description) {
     if (!description) description = null
 
     await startFnByModerStatus(pointId, {
-        moderated: async () => await Shop.setStatus(pointId, "refuse"),
+        moderated: async () => {
+            await Shop.patchData(pointId, {description})
+            await Shop.setStatus(pointId, "refuse")
+        },
         delete: async () => await Shop.returnAcceptCopyToMaster(pointId),
+        take: async () => await Shop.returnAcceptCopyToMaster(pointId),
+        return: async () => await Shop.returnAcceptCopyToMaster(pointId),
         other: () => { throw "fail" }
     })
 

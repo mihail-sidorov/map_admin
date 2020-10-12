@@ -7,16 +7,6 @@
     "test": "mocha test/integrationApiTest",
     "docs": "cd docs && npx redoc-cli bundle ../openApi/reference/mapAdmin.v1.yaml && npx jsdoc ../src/ -r -d ./"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "moduleFileExtensions": [
-      "js"
-    ],
-    "transform": {},
-    "modulePathIgnorePatterns": [
-      "./node_modules/.*"
-    ]
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",

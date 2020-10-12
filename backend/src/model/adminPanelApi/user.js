@@ -86,7 +86,10 @@ async function getPoints(user) {
 async function delPoint(pointId) {
     return await startFnByModerStatus(pointId, {
         "moderated, refuse": {
-            "notHasAcceptCopy": async () => await Shop.delPoint(pointId),
+            "notHasAcceptCopy": async () => {
+                await Shop.delPoint(pointId)
+                return { delete: true}
+            },
             "hasAcceptCopy": async () => {
                 await Shop.returnAcceptCopyToMaster(pointId)
                 await Shop.createNewMasterWithStatus(pointId, "delete")
@@ -96,7 +99,7 @@ async function delPoint(pointId) {
         "delete": () => { throw "point already has delete status" },
         "accept": async () => {
             await Shop.createNewMasterWithStatus(pointId, "delete")
-            return { delete: false }
+            return { delete: false, point: (await Shop.getPoint(pointId))[0] }
         }
     })
 }

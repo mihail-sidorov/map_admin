@@ -1,5 +1,6 @@
 const _ = require("lodash")
 const chai = require('chai')
+const fp = require('lodash/fp')
 const { nanoid } = require('nanoid')
 chai.use(require('chai-json-schema-ajv'))
 const expect = chai.expect
@@ -11,12 +12,13 @@ axiosCookieJarSupport(axios)
 
 const getPointJson = require("../../openApi/models/res/getPointsUser.json")
 const dublicateJson = require("../../openApi/models/res/duplicate.json")
-const { addUser } = require('../../src/model/adminPanelApi/admin')
+const { addUser, addRegion } = require('../../src/model/adminPanelApi/admin')
 const Moder_status = require('../../src/model/orm/moder_status')
 const Region = require('../../src/model/orm/region')
 const Shop = require('../../src/model/orm/shop')
 const User = require('../../src/model/orm/user')
 const Permission = require("../../src/model/orm/permission")
+const { createPoint } = require("./testhelper")
 
 axios.defaults.baseURL = "http://127.0.0.1:3000"
 axios.defaults.withCredentials = true
@@ -25,73 +27,35 @@ axios.defaults.jar = cookieJar
 
 
 describe("user", function () {
-
-    let getPoints, user, moder, insertPoints, userOther, moderOther, insertPointsOther
+    let getPoints, user, moder, region, userOther, moderOther
+    const costomReduce = fp.partial(fp.reduce, [fp, 0])
+    const amountStatus = fp.overArgs(costomReduce, [
+        moder_status => (sum, elem) => {
+            return elem.moder_status == moder_status ? sum + 1 : sum
+        }
+    ])
     before(async function () {
+        region = await addRegion("nanoid")
+        regionOther = await addRegion("nanoidOther")
+        user = (await addUser("nanoid@nanoid.nanoiduser", "testtest", await Permission.getIdByPermission("user"), region[0].id))[0]
+        moder = (await addUser("nanoid@nanoid.nanoidmoder", "testtest", await Permission.getIdByPermission("moder"), region[0].id))[0]
+        userOther = (await addUser("nanoid@nanoid.nanoiduserOther", "testtest", await Permission.getIdByPermission("user"), regionOther[0].id))[0]
+        moderOther = (await addUser("nanoid@nanoid.nanoidmoderOther", "testtest", await Permission.getIdByPermission("moder"), regionOther[0].id))[0]
 
-        user = (await addUser("nanoid@nanoid.nanoiduser", "testtest", await Permission.getIdByPermission("user"), (await Region.query().first()).id))[0]
-        moder = (await addUser("nanoid@nanoid.nanoidmoder", "testtest", await Permission.getIdByPermission("moder"), (await Region.query().first()).id))[0]
-        userOther = (await addUser("nanoid@nanoid.nanoiduserOther", "testtest", await Permission.getIdByPermission("user"), (await Region.query())[1].id))[0]
-        moderOther = (await addUser("nanoid@nanoid.nanoidmoderOther", "testtest", await Permission.getIdByPermission("moder"), (await Region.query())[1].id))[0]
-        insertPoints = _.map(new Array(5), (elem, key) => {
-            return {
-                title: key,
-                lng: key,
-                lat: key,
-                apartment: key,
-                hours: key,
-                phone: key,
-                site: key,
-                description: key,
-                isActive: key,
-                full_city_name: key
-            }
-        })
+        for (let key of [user.id, moder.id, userOther.id, moderOther.id]) {
+            await createPoint(key, "accept", false)
+            await createPoint(key, "moderated", false)
+            await createPoint(key, "refuse", false)
 
-        const acceptStatusId = await Moder_status.getIdByModerStatus("accept")
-        const moderatedStatusId = await Moder_status.getIdByModerStatus("moderated")
-        insertPoints[0].moder_status_id = acceptStatusId
-        insertPoints[0].user_id = user.id
-
-        insertPoints[1].moder_status_id = moderatedStatusId
-        insertPoints[1].user_id = user.id
-
-        insertPoints[2].moder_status_id = await Moder_status.getIdByModerStatus("delete")
-        insertPoints[2].user_id = user.id
-
-        insertPoints[3].moder_status_id = await Moder_status.getIdByModerStatus("refuse")
-        insertPoints[3].user_id = user.id
-
-        insertPoints[4].moder_status_id = acceptStatusId
-        insertPoints[4].user_id = moder.id
-
-        insertPointsOther = _.cloneDeep(insertPoints)
-        insertPointsOther[0].user_id = userOther.id
-        insertPointsOther[1].user_id = userOther.id
-        insertPointsOther[2].user_id = userOther.id
-        insertPointsOther[3].user_id = userOther.id
-        insertPointsOther[4].user_id = moderOther.id
-
-
-        for (let key = 0; key < insertPoints.length; key++) {
-            await Shop.query().insert(insertPoints[key])
-            await Shop.query().insert(insertPointsOther[key])
+            await createPoint(key, "moderated", true)
+            await createPoint(key, "refuse", true)
+            await createPoint(key, "delete", true)
         }
 
-        insertPoints[0].moder_status_id = insertPointsOther[0].moder_status_id = moderatedStatusId
-        insertPoints[4].moder_status_id = insertPointsOther[4].moder_status_id = moderatedStatusId
-
-        for (let key = 0; key < insertPoints.length; key++) {
-            let point = await Shop.query().insert(insertPoints[key])
-            insertPoints[key].moder_status_id = acceptStatusId
-            insertPoints[key].parent_id = point.id
-            await Shop.query().insert(insertPoints[key])
-
-            point = await Shop.query().insert(insertPointsOther[key])
-            insertPointsOther[key].moder_status_id = acceptStatusId
-            insertPointsOther[key].parent_id = point.id
-            await Shop.query().insert(insertPointsOther[key])
-        }
+        await createPoint(user.id, "return", true)
+        await createPoint(userOther.id, "return", true)
+        await createPoint(user.id, { status: "take", id: moder.id }, true)
+        await createPoint(userOther.id, { status: "take", id: moderOther.id }, true)
     })
 
     describe("getPoints", function () {
@@ -110,10 +74,7 @@ describe("user", function () {
             })
 
             it("Amount accept point", async function () {
-                const sum = _.reduce(getPoints.data.response, (sum, elem) => {
-                    return elem.moder_status == "accept" ? sum + 1 : sum
-                }, 0)
-                expect(sum).to.be.equal(1)
+                expect(amountStatus("accept")(getPoints.data.response)).to.be.equal(1)
             })
         })
 
@@ -128,14 +89,11 @@ describe("user", function () {
             })
 
             it("Amount point", async function () {
-                expect(getPoints.data.response.length).to.be.equal(10)
+                expect(getPoints.data.response.length).to.be.equal(14)
             })
 
             it("Amount accept point", async function () {
-                const sum = _.reduce(getPoints.data.response, (sum, elem) => {
-                    return elem.moder_status == "accept" ? sum + 1 : sum
-                }, 0)
-                expect(sum).to.be.equal(2)
+                expect(amountStatus("accept")(getPoints.data.response)).to.be.equal(2)
             })
         })
     })
@@ -187,21 +145,15 @@ describe("user", function () {
         })
 
         it("Amount point", async function () {
-            expect(getPointsFree.data.response.length).to.be.equal(2)
+            expect(getPointsFree.data.response.length).to.be.equal(3)
         })
 
         it("Amount accept point", async function () {
-            const sum = _.reduce(getPointsFree.data.response, (sum, elem) => {
-                return elem.moder_status === "accept" ? sum + 1 : sum
-            }, 0)
-            expect(sum).to.be.equal(1)
+            expect(amountStatus("accept")(getPointsFree.data.response)).to.be.equal(1)
         })
 
         it("Amount return point", async function () {
-            const sum = _.reduce(getPointsFree.data.response, (sum, elem) => {
-                return elem.moder_status === "return" ? sum + 1 : sum
-            }, 0)
-            expect(sum).to.be.equal(1)
+            expect(amountStatus("return")(getPointsFree.data.response)).to.be.equal(2)
         })
 
         after(async () => {
@@ -273,7 +225,7 @@ describe("user", function () {
         describe("takePoint", function () {
 
             it("применяем к точке со статусом return", async function () {
-                response = await axios.post("/api/user/takePoint",{id: pointReturn.id})
+                response = await axios.post("/api/user/takePoint", { id: pointReturn.id })
                 expect(response.data.response).to.be.jsonSchema(getPointJson)
                 expect((await Shop.query().where({
                     lng: 88,
@@ -294,7 +246,7 @@ describe("user", function () {
             })
 
             it("применяем к точке со статусом accept", async function () {
-                response = await axios.post("/api/user/takePoint",{id: pointAcceptModer.id})
+                response = await axios.post("/api/user/takePoint", { id: pointAcceptModer.id })
                 expect((await Shop.query().where({
                     lng: 66,
                     lat: 66,
@@ -315,14 +267,14 @@ describe("user", function () {
             })
 
             it("применяем к точке со статусом take", async function () {
-                response = await axios.post("/api/user/takePoint",{id: pointAcceptModer.id})
+                response = await axios.post("/api/user/takePoint", { id: pointAcceptModer.id })
                 expect(response.data).to.be.deep.equal({ isError: true, response: 'this id not found' })
             })
         })
 
         describe("returnPoint", function () {
             it("применяем к точке со статусом take", async function () {
-                response = await axios.post("/api/user/returnPoint",{id: pointTake.id})
+                response = await axios.post("/api/user/returnPoint", { id: pointTake.id })
                 expect(response.data.response).to.be.jsonSchema(getPointJson)
                 expect((await Shop.query().where({
                     lng: 99,
@@ -343,7 +295,7 @@ describe("user", function () {
             })
 
             it("применяем к точке со статусом accept", async function () {
-                response = await axios.post("/api/user/returnPoint",{id: pointAcceptUser.id})
+                response = await axios.post("/api/user/returnPoint", { id: pointAcceptUser.id })
                 expect(response.data.response).to.be.jsonSchema(getPointJson)
 
                 expect((await Shop.query().where({
@@ -376,7 +328,7 @@ describe("user", function () {
             })
 
             it("применяем к точке со статусом take", async function () {
-                response = await axios.post("/api/user/returnPoint",{id: pointAcceptUser.id})
+                response = await axios.post("/api/user/returnPoint", { id: pointAcceptUser.id })
                 expect(response.data).to.be.deep.equal({ isError: true, response: 'fail' })
             })
         })
@@ -494,12 +446,44 @@ describe("user", function () {
         })
     })
 
+    describe.only("delPoint",function() {
+
+        before(async function () {
+            await axios.post("/api/login", { login: "nanoid@nanoid.nanoidmoder", password: "testtest" })
+        })
+
+        describe("Точки без копии", function() {
+            it("accept", async function() {
+                const point = await createPoint(user.id,"accept", false)
+                const response = await axios.post("/api/user/delPoint",{id: point.id})
+                console.log(response.data)
+                expect(response.data.isError).to.equal(false)
+                expect(response.data.response.delete).to.equal(false)
+                expect(response.data.response.point).to.deep.equal(point)
+            })
+        })
+    })
+
+    describe("editPoint", function () {
+        describe("Тестирование редактирование точек с разными статусами", function () {
+            describe("Точка не имеет подтвержденую копию/новая точка", function () {
+
+            })
+
+            describe("Точка имеет подтвержденную копию", function () {
+
+            })
+        })
+    })
+
     after(async function () {
         await Shop.query().delete().whereIn("user_id", [user.id, moder.id, moderOther.id, userOther.id])
         await User.query().deleteById(user.id)
         await User.query().deleteById(moder.id)
         await User.query().deleteById(userOther.id)
         await User.query().deleteById(moderOther.id)
+        await Region.query().deleteById(region[0].id)
+        await Region.query().deleteById(regionOther[0].id)
     })
 
 })
