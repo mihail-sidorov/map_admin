@@ -14,7 +14,7 @@ async function getPointsFree(user) {
         .select(...getPointSelect)
 }
 
-async function takePoint(pointId, user) { 
+async function takePoint(pointId, user) {
     await startFnByModerStatus(pointId, {
         accept: {
             notHasAcceptCopy: async () => {
@@ -39,7 +39,7 @@ async function returnPoint(pointId) {
     await startFnByModerStatus(pointId, {
         accept: {
             notHasAcceptCopy: async () => {
-                await Shop.createNewMasterWithStatus(pointId, "return")   
+                await Shop.createNewMasterWithStatus(pointId, "return")
             }
         },
         take: {
@@ -50,7 +50,7 @@ async function returnPoint(pointId) {
         other: () => {
             throw "fail"
         }
-    }) 
+    })
 
     return Shop.getPoint(pointId)
 }
@@ -88,7 +88,7 @@ async function delPoint(pointId) {
         "moderated, refuse": {
             "notHasAcceptCopy": async () => {
                 await Shop.delPoint(pointId)
-                return { delete: true}
+                return { delete: true }
             },
             "hasAcceptCopy": async () => {
                 await Shop.returnAcceptCopyToMaster(pointId)
@@ -97,9 +97,14 @@ async function delPoint(pointId) {
             }
         },
         "delete": () => { throw "point already has delete status" },
-        "accept": async () => {
-            await Shop.createNewMasterWithStatus(pointId, "delete")
-            return { delete: false, point: (await Shop.getPoint(pointId))[0] }
+        "accept": {
+            "notHasAcceptCopy": async () => {
+                await Shop.createNewMasterWithStatus(pointId, "delete")
+                return { delete: false, point: (await Shop.getPoint(pointId))[0] }
+            }
+        },
+        other: () => {
+            throw "fail"
         }
     })
 }

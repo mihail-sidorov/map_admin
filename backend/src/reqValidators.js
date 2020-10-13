@@ -19,7 +19,7 @@ const Region = require("./model/orm/region")
 
 const yup = require('yup')
 const Ajv = require('ajv')
-const { checkTimeStamp, getGeoData, throwDuplicate } = require("./model/adminPanelApi/utilityFn")
+const { checkTimeStamp, getGeoData, checkDuplicate } = require("./model/adminPanelApi/utilityFn")
 const Shop = require("./model/orm/shop")
 const { getPointsFree } = require("./model/adminPanelApi/user")
 const { getPointsModer } = require("./model/adminPanelApi/moder")
@@ -152,7 +152,7 @@ module.exports.validDelPoint = validConstructor(pointIdJson, undefined, hasPermi
 
 module.exports.validAddPoint = validConstructor(addPointJson, undefined, async (req) => {
     await getGeoData(req.body)
-    await throwDuplicate(req.body)
+    if (!req.body.force) await checkDuplicate(req.body)
 })
 
 module.exports.validTakePoint = validConstructor(pointIdJson, undefined, async (req) => {
@@ -181,7 +181,7 @@ module.exports.validEditPointUser = validConstructor(editPointUserJson, undefine
         delete (req.body.lat)
     } else {
         await getGeoData(req.body)
-        await throwDuplicate(req.body, pointId)
+        if (!req.body.force) await checkDuplicate(req.body, pointId)
     }
 
     if (!req.body.description) delete (req.body.description)

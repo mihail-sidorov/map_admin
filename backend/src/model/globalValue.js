@@ -16,3 +16,16 @@ exports.getPointSelect = [
     "moder_status",
     "email"
 ]
+
+exports.duplicateSelect = [
+    "full_city_name",
+    "street",
+    "house",
+    "title",
+    "lng",
+    "lat",
+    "apartment",
+    "hours",
+    "phone",
+    "site",
+    "email"]

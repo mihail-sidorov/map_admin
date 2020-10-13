@@ -12,6 +12,7 @@ axiosCookieJarSupport(axios)
 
 const getPointJson = require("../../openApi/models/res/getPointsUser.json")
 const dublicateJson = require("../../openApi/models/res/duplicate.json")
+const delPointJson = require("../../openApi/models/res/delPoint.json")
 const { addUser, addRegion } = require('../../src/model/adminPanelApi/admin')
 const Moder_status = require('../../src/model/orm/moder_status')
 const Region = require('../../src/model/orm/region')
@@ -402,6 +403,26 @@ describe("user", function () {
                 expect(pointDB.duplicateGroup).to.not.be.null
             })
 
+            it("Тест группы дубликатов", async function () {
+                const data = {
+                    lng: 54.410003,
+                    lat: 24.019367,
+                    title: "title",
+                    apartment: "apartment",
+                    hours: "hours",
+                    phone: "phone",
+                    site: "site",
+                    description: "description",
+                    isActive: false
+                }
+
+                const point = (await axios.post("/api/user/addPoint", data)).data
+                expect(point.response).to.be.jsonSchema(dublicateJson)
+                expect(point.isError).to.be.equal(true)
+                console.log(point.response.duplicate.points)
+                expect(point.response.duplicate.points).to.deep.to.lengthOf(2)
+            })
+
         })
 
         describe("moder", async function () {
@@ -435,45 +456,345 @@ describe("user", function () {
     })
 
     describe("editPoint", function () {
-        describe("Тестирование редактирование точек с разными статусами", function () {
-            describe("Точка не имеет подтвержденую копию/новая точка", function () {
-
-            })
-
-            describe("Точка имеет подтвержденную копию", function () {
-
-            })
-        })
-    })
-
-    describe.only("delPoint",function() {
 
         before(async function () {
             await axios.post("/api/login", { login: "nanoid@nanoid.nanoidmoder", password: "testtest" })
         })
 
-        describe("Точки без копии", function() {
-            it("accept", async function() {
-                const point = await createPoint(user.id,"accept", false)
-                const response = await axios.post("/api/user/delPoint",{id: point.id})
-                console.log(response.data)
-                expect(response.data.isError).to.equal(false)
-                expect(response.data.response.delete).to.equal(false)
-                expect(response.data.response.point).to.deep.equal(point)
-            })
-        })
-    })
-
-    describe("editPoint", function () {
         describe("Тестирование редактирование точек с разными статусами", function () {
             describe("Точка не имеет подтвержденую копию/новая точка", function () {
 
+                it("accept", async function () {
+                    const point = await createPoint(user.id, "accept", false)
+                    const editData = {
+                        lng: 53.530696,
+                        lat: 28.177563,
+                        title: nanoid(),
+                        apartment: nanoid(),
+                        hours: nanoid(),
+                        phone: nanoid(),
+                        site: nanoid(),
+                        description: nanoid(),
+                        force: false,
+                        isActive: 0,
+                        timeStamp: point.timeStamp
+                    }
+                    const response = await axios.post("/api/user/editPoint/" + point.id, editData)
+                    delete (editData.force)
+                    delete (editData.timeStamp)
+                    editData.moder_status = "moderated"
+                    expect(response.data.response[0]).to.include(editData)
+                    expect(response.data.response).to.jsonSchema(getPointJson)
+                    expect(await Shop.query().where({ "title": point.title, parent_id: point.id })).lengthOf(1)
+                    expect(await Shop.query().where("title", editData.title)).lengthOf(1)
+                    await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+                })
+
+                it("moderated", async function () {
+                    const point = await createPoint(user.id, "moderated", false)
+                    const editData = {
+                        lng: 53.530696,
+                        lat: 28.177563,
+                        title: nanoid(),
+                        apartment: nanoid(),
+                        hours: nanoid(),
+                        phone: nanoid(),
+                        site: nanoid(),
+                        description: nanoid(),
+                        force: false,
+                        isActive: 0,
+                        timeStamp: point.timeStamp
+                    }
+                    const response = await axios.post("/api/user/editPoint/" + point.id, editData)
+                    delete (editData.force)
+                    delete (editData.timeStamp)
+                    editData.moder_status = "moderated"
+                    expect(response.data.response[0]).to.include(editData)
+                    expect(response.data.response).to.jsonSchema(getPointJson)
+                    expect(await Shop.query().where({ "title": point.title, parent_id: point.id })).lengthOf(0)
+                    expect(await Shop.query().where("title", editData.title)).lengthOf(1)
+                    await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+                })
+
+                it("refuse", async function () {
+                    const point = await createPoint(user.id, "refuse", false)
+                    const editData = {
+                        lng: 53.530696,
+                        lat: 28.177563,
+                        title: nanoid(),
+                        apartment: nanoid(),
+                        hours: nanoid(),
+                        phone: nanoid(),
+                        site: nanoid(),
+                        description: nanoid(),
+                        force: false,
+                        isActive: 0,
+                        timeStamp: point.timeStamp
+                    }
+                    const response = await axios.post("/api/user/editPoint/" + point.id, editData)
+                    delete (editData.force)
+                    delete (editData.timeStamp)
+                    editData.moder_status = "moderated"
+                    expect(response.data.response[0]).to.include(editData)
+                    expect(response.data.response).to.jsonSchema(getPointJson)
+                    expect(await Shop.query().where({ "title": point.title, parent_id: point.id })).lengthOf(0)
+                    expect(await Shop.query().where("title", editData.title)).lengthOf(1)
+                    await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+                })
             })
 
             describe("Точка имеет подтвержденную копию", function () {
+                it("moderated", async function () {
+                    const point = await createPoint(user.id, "moderated", true)
+                    const editData = {
+                        lng: 53.530696,
+                        lat: 28.177563,
+                        title: nanoid(),
+                        apartment: nanoid(),
+                        hours: nanoid(),
+                        phone: nanoid(),
+                        site: nanoid(),
+                        description: nanoid(),
+                        force: false,
+                        isActive: 0,
+                        timeStamp: point.timeStamp
+                    }
+                    const response = await axios.post("/api/user/editPoint/" + point.id, editData)
+                    delete (editData.force)
+                    delete (editData.timeStamp)
+                    editData.moder_status = "moderated"
+                    expect(response.data.response[0]).to.include(editData)
+                    expect(response.data.response).to.jsonSchema(getPointJson)
+                    expect(await Shop.query().where({ "title": point.title, parent_id: point.id })).lengthOf(1)
+                    expect(await Shop.query().where({ "title": point.title, parent_id: null })).lengthOf(0)
+                    expect(await Shop.query().where("title", editData.title)).lengthOf(1)
+                    await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+                })
 
+                it("refuse", async function () {
+                    const point = await createPoint(user.id, "refuse", true)
+                    const editData = {
+                        lng: 53.530696,
+                        lat: 28.177563,
+                        title: nanoid(),
+                        apartment: nanoid(),
+                        hours: nanoid(),
+                        phone: nanoid(),
+                        site: nanoid(),
+                        description: nanoid(),
+                        force: false,
+                        isActive: 0,
+                        timeStamp: point.timeStamp
+                    }
+                    const response = await axios.post("/api/user/editPoint/" + point.id, editData)
+                    delete (editData.force)
+                    delete (editData.timeStamp)
+                    editData.moder_status = "moderated"
+                    expect(response.data.response[0]).to.include(editData)
+                    expect(response.data.response).to.jsonSchema(getPointJson)
+                    expect(await Shop.query().where({ "title": point.title, parent_id: point.id })).lengthOf(1)
+                    expect(await Shop.query().where({ "title": point.title, parent_id: null })).lengthOf(0)
+                    expect(await Shop.query().where("title", editData.title)).lengthOf(1)
+                    await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+                })
+
+                it("delete", async function () {
+                    const point = await createPoint(user.id, "delete", true)
+                    const editData = {
+                        lng: 53.530696,
+                        lat: 28.177563,
+                        title: nanoid(),
+                        apartment: nanoid(),
+                        hours: nanoid(),
+                        phone: nanoid(),
+                        site: nanoid(),
+                        description: nanoid(),
+                        force: false,
+                        isActive: 0,
+                        timeStamp: point.timeStamp
+                    }
+                    const response = await axios.post("/api/user/editPoint/" + point.id, editData)
+                    expect(response.data.response[0]).to.include({ description: editData.description })
+                    delete (editData.force)
+                    delete (editData.timeStamp)
+                    delete (editData.description)
+                    editData.moder_status = "moderated"
+                    expect(response.data.response[0]).to.not.include(editData)
+                    expect(response.data.response).to.jsonSchema(getPointJson)
+                    expect(await Shop.query().where({ "title": point.title, parent_id: point.id })).lengthOf(1)
+                    await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+                })
+            })
+
+        })
+
+        describe("Тест исключений", function () {
+            it("редактирование точки return", async function () {
+                const point = await createPoint(user.id, "return", true)
+                const editData = {
+                    lng: 53.530696,
+                    lat: 28.177563,
+                    title: nanoid(),
+                    apartment: nanoid(),
+                    hours: nanoid(),
+                    phone: nanoid(),
+                    site: nanoid(),
+                    description: nanoid(),
+                    force: false,
+                    isActive: 0,
+                    timeStamp: point.timeStamp
+                }
+                const response = await axios.post("/api/user/editPoint/" + point.id, editData)
+                expect(response.data.response).to.equal("fail")
+                await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+            })
+
+            it("редактирование точки take", async function () {
+                const point = await createPoint(user.id, { status: "take", id: moder.id }, true)
+                const editData = {
+                    lng: 53.530696,
+                    lat: 28.177563,
+                    title: nanoid(),
+                    apartment: nanoid(),
+                    hours: nanoid(),
+                    phone: nanoid(),
+                    site: nanoid(),
+                    description: nanoid(),
+                    force: false,
+                    isActive: 0,
+                    timeStamp: point.timeStamp
+                }
+                const response = await axios.post("/api/user/editPoint/" + point.id, editData)
+                expect(response.data.response).to.equal("fail")
+                await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
             })
         })
+
+        describe.only("тест дубликатов", function () {
+            it("проверка дубликата точки самой с сабой(не должно быть дибликата)", async function () {
+                const point = await createPoint(user.id, "moderated", true, { lng: 56.650943, lat: 23.724066 })
+                const response = await axios.post("/api/user/editPoint/" + point.id, { lng: 56.650943, lat: 23.724066, timeStamp: point.timeStamp })
+                expect(response.data.response).to.jsonSchema(getPointJson)
+                await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+            })
+
+            it("Создание дупликата", async function () {
+                const point = await createPoint(user.id, "moderated", true, { lng: 56.650943, lat: 23.724066 })
+                //console.log(await Shop.query().where("title", point.title))
+                const pointDup = await createPoint(user.id, "moderated", true)
+                //console.log(await Shop.query().where("title", pointDup.title))
+                const response = await axios.post("/api/user/editPoint/" + pointDup.id, { lng: 56.650943, lat: 23.724066, timeStamp: pointDup.timeStamp })
+                //console.log(response.data.response.duplicate.points)
+                expect(response.data.response.duplicate.points).to.lengthOf(1)
+                expect(response.data.response).to.jsonSchema(dublicateJson)
+                await Shop.query().delete().where({ id: point.id }).orWhere({ parent_id: point.id })
+            })
+
+        })
+    })
+
+    describe("delPoint", function () {
+
+        before(async function () {
+            await axios.post("/api/login", { login: "nanoid@nanoid.nanoidmoder", password: "testtest" })
+        })
+
+        describe("Точки без копии", function () {
+            describe("accept", function () {
+                let point, response
+
+                before(async function () {
+                    point = await createPoint(user.id, "accept", false)
+                    response = await axios.post("/api/user/delPoint", { id: point.id })
+                })
+
+                it("Json matching", function () {
+                    expect(response.data.response).to.jsonSchema(delPointJson)
+                })
+
+                it("Проверка поведения", async function () {
+                    point.moder_status_id = await Moder_status.getIdByModerStatus("delete")
+                    expect(response.data.isError).to.equal(false)
+                    expect(response.data.response.delete).to.equal(false)
+                    expect(await Shop.query().findById(point.id)).to.deep.include(point)
+                    delete (point.user_id)
+                    delete (point.moder_status_id)
+                    expect(response.data.response.point).to.deep.include(point)
+                })
+
+            })
+
+
+            it("moderated", async function () {
+                const point = await createPoint(user.id, "moderated", false)
+                const response = await axios.post("/api/user/delPoint", { id: point.id })
+
+                expect(response.data.isError).to.equal(false)
+                expect(response.data.response.delete).to.equal(true)
+                expect(response.data.response.point).to.undefined
+                expect(await Shop.query().where("title", point.title)).to.be.empty
+            })
+
+            it("refuse", async function () {
+                const point = await createPoint(user.id, "refuse", false)
+                const response = await axios.post("/api/user/delPoint", { id: point.id })
+
+                expect(response.data.isError).to.equal(false)
+                expect(response.data.response.delete).to.equal(true)
+                expect(response.data.response.point).to.undefined
+                expect(await Shop.query().where("title", point.title)).to.be.empty
+            })
+        })
+
+        describe("Точки с копией", function () {
+            describe("moderated", function () {
+                let point, response
+
+                before(async function () {
+                    point = await createPoint(user.id, "moderated", true)
+                    response = await axios.post("/api/user/delPoint", { id: point.id })
+                })
+
+                it("Json matching", function () {
+                    expect(response.data.response).to.jsonSchema(delPointJson)
+                })
+
+                it("Проверка поведения", async function () {
+                    point.moder_status_id = await Moder_status.getIdByModerStatus("delete")
+                    expect(response.data.isError).to.equal(false)
+                    expect(response.data.response.delete).to.equal(false)
+                    expect(await Shop.query().findById(point.id)).to.deep.include(point)
+                    delete (point.user_id)
+                    delete (point.moder_status_id)
+                    expect(response.data.response.point).to.deep.include(point)
+                })
+
+            })
+
+            describe("refuse", function () {
+                let point, response
+
+                before(async function () {
+                    point = await createPoint(user.id, "refuse", true)
+                    response = await axios.post("/api/user/delPoint", { id: point.id })
+                })
+
+                it("Json matching", function () {
+                    expect(response.data.response).to.jsonSchema(delPointJson)
+                })
+
+                it("Проверка поведения", async function () {
+                    point.moder_status_id = await Moder_status.getIdByModerStatus("delete")
+                    expect(response.data.isError).to.equal(false)
+                    expect(response.data.response.delete).to.equal(false)
+                    expect(await Shop.query().findById(point.id)).to.deep.include(point)
+                    delete (point.user_id)
+                    delete (point.moder_status_id)
+                    expect(response.data.response.point).to.deep.include(point)
+                })
+            })
+        })
+
     })
 
     after(async function () {

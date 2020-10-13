@@ -3,8 +3,9 @@ const Shop = require("../orm/shop")
 const fetch = require('node-fetch')
 const Moder_status = require("../orm/moder_status")
 const { nanoid } = require("nanoid")
-const Region = require("../orm/region")
+const { duplicateSelect } = require("../globalValue")
 const apiYandex = require("../../../serverConfig").yandex.apiKey
+const fp = require("lodash/fp")
 
 /**
  * Функция исполняет колбеки при различных статусах точки(moder_status)
@@ -86,7 +87,7 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
     if (typeof callback.before === "function" && (result = callback.before(child, pointData))) {
         return result
     }
- 
+
     if (isHasChild) {
         result = await run(callback.hasAcceptCopy)
     } else {
@@ -95,12 +96,19 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
 
     const returnAfter = await run(callback.after)
 
-    return returnAfter ? returnAfter: result
+    return returnAfter ? returnAfter : result
 }
 
-async function throwDuplicate(point, pointId) {
-    const points = await getDuplicate(point, pointId)
-    if (points && !point.force) {
+async function checkDuplicate(point, pointId) {
+
+    //console.log((await getDupGroup(await getDupCoord(point))))
+    const points = fp.flow(
+        fp.filter(x => (x.id !== pointId) && (x.parent_id !== pointId)),
+        fp.map(fp.omit(['id', 'parent_id']))
+    )(await getDupGroup(await getDupCoord(point)))
+
+    fp.filter()
+    if (points.length) {
         throw {
             "outputAsIs": true,
             "duplicate": {
@@ -120,47 +128,48 @@ async function throwDuplicate(point, pointId) {
                 }
             }
         }
-    } else if (!points && point.force) {
-        delete (point.force)
     }
 }
 
-async function getDuplicate(point, pointId) {
+async function getDupCoord(point) {
+
     const pointAccuratyMeter = 200
     const pointAccuratyDegrees = 0.00000900900900900901 * pointAccuratyMeter
-    const select = ["shops.id", "full_city_name", "street", "house", "title", "lng", "lat", "apartment", "hours", "phone", "site", "email"]
-    const dupCoord = await Shop.query().select(...select, "duplicateGroup").joinRelated("user")
+    const dupCoord = await Shop.query().select(...duplicateSelect, "duplicateGroup", "shops.id", "parent_id")
+        .joinRelated("user")
         .whereBetween("lat", [+point.lat - pointAccuratyDegrees, +point.lat + pointAccuratyDegrees])
         .andWhereBetween("lng", [+point.lng - pointAccuratyDegrees, +point.lng + pointAccuratyDegrees])
-        .skipUndefined().andWhereNot("shops.id", pointId)
 
-    if (!dupCoord[0]) {
-        return false
-    }
-    let dupIds
-    const dupGroup = dupCoord.map((value) => {
-        return value.duplicateGroup
-    })
-    //выбираем только уникальные и непустые значения из массива групп
-    const dupGroupUnique = dupGroup.filter((v, i, a) => (v != null && a.indexOf(v) === i))
+    //console.log(dupCoord)
+    return dupCoord
+}
 
-    if (dupGroupUnique.length) {
-        dupIds = dupCoord.map((value) => {
-            return value.id
-        })
-    } else {
-        dupCoord.forEach((value) => {
-            value.duplicateGroup = undefined
-        })
-        return dupCoord
-    }
+async function getDupGroup(points) {
+    //console.log(points)
+    return fp.cond([
+        [fp.isEmpty, fp.stubFalse],
+        [fp.stubTrue, fp.flow(
+            fp.map('duplicateGroup'),
+            fp.compact,
+            fp.cond([
+                [fp.isEmpty, () => points],
+                [fp.stubTrue, fp.flow(
+                    fp.uniq,
+                    (uniqGroup) => {return Shop.query()
+                        .select(...duplicateSelect, "shops.id", "parent_id")
+                        .joinRelated("user")
+                        .whereIn("duplicateGroup", uniqGroup)
+                        .then(
+                            fp.flowRight(
+                                fp.values,
+                                fp.merge(fp.keyBy("id", points)),
+                                fp.keyBy("id")
+                            ))}
+                )]
+            ])
+        )]
+    ])(points)
 
-    return await Shop.query()
-        .select(...select)
-        .joinRelated("user")
-        .whereIn("shops.id", dupIds)
-        .orWhereIn("duplicateGroup", dupGroup)
-        .skipUndefined().andWhereNot("shops.id", pointId)
 }
 
 async function markDuplicate(pointId, point, force) {
@@ -171,12 +180,10 @@ async function markDuplicate(pointId, point, force) {
     if (!force) {
         return await Shop.query().findById(pointId).patch({ "duplicateGroup": null })
     }
-    const duplicate = await getDuplicate(point)
-    const dupIds = duplicate.map((elem) => {
-        return elem.id
-    })
 
-    if (dupIds.length == 1) {
+    const dupIds = fp.map("id")(await getDupGroup(await getDupCoord(point)))
+
+    if (dupIds.length === 1) {
         return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": null })
     } else if (dupIds.length > 1) {
         return await Shop.query().findByIds(dupIds).patch({ "duplicateGroup": nanoid() })
@@ -224,7 +231,9 @@ function getGeoData(point) { //должен содержать поля lat, lng
 }
 
 exports.checkTimeStamp = checkTimeStamp
-exports.throwDuplicate = throwDuplicate
+exports.checkDuplicate = checkDuplicate
 exports.markDuplicate = markDuplicate
 exports.getGeoData = getGeoData
 exports.startFnByModerStatus = startFnByModerStatus
+
+exports.getDupGroup = getDupGroup
