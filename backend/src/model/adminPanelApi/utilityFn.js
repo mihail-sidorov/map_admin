@@ -102,15 +102,29 @@ async function startFnByModerStatus(pointId, moderStatusObject) {
 async function checkDuplicate(point, pointId) {
 
     //console.log((await getDupGroup(await getDupCoord(point))))
-    const points = fp.flow(
-        fp.filter(x => (x.id !== pointId) && (x.parent_id !== pointId)),
-        fp.map(fp.omit(['id', 'parent_id']))
-    )(await getDupGroup(await getDupCoord(point)))
+    let points = fp.filter(x => (x.id !== pointId) && (x.parent_id !== pointId))
+        (await getDupGroup(await getDupCoord(point)))
 
-    fp.filter()
+    const ids = fp.map('id', points)
+
+    points = fp.flow(
+        fp.filter(x => {
+            if (!x.parent_id) return true
+            fp.flow(
+                fp.indexOf(x.parent_id),
+                fp.cond([
+                    [fp.isEqual(-1), fp.stubTrue],
+                    [fp.stubTrue, fp.stubFalse]
+                ])
+            )(ids)
+        }),
+        fp.map(fp.omit(['id', 'parent_id', 'duplicateGroup']))
+    )(points)
+
+
+
     if (points.length) {
         throw {
-            "outputAsIs": true,
             "duplicate": {
                 "points": points,
                 "point": {
@@ -155,16 +169,18 @@ async function getDupGroup(points) {
                 [fp.isEmpty, () => points],
                 [fp.stubTrue, fp.flow(
                     fp.uniq,
-                    (uniqGroup) => {return Shop.query()
-                        .select(...duplicateSelect, "shops.id", "parent_id")
-                        .joinRelated("user")
-                        .whereIn("duplicateGroup", uniqGroup)
-                        .then(
-                            fp.flowRight(
-                                fp.values,
-                                fp.merge(fp.keyBy("id", points)),
-                                fp.keyBy("id")
-                            ))}
+                    (uniqGroup) => {
+                        return Shop.query()
+                            .select(...duplicateSelect, "shops.id", "parent_id")
+                            .joinRelated("user")
+                            .whereIn("duplicateGroup", uniqGroup)
+                            .then(
+                                fp.flowRight(
+                                    fp.values,
+                                    fp.merge(fp.keyBy("id", points)),
+                                    fp.keyBy("id")
+                                ))
+                    }
                 )]
             ])
         )]
@@ -235,5 +251,3 @@ exports.checkDuplicate = checkDuplicate
 exports.markDuplicate = markDuplicate
 exports.getGeoData = getGeoData
 exports.startFnByModerStatus = startFnByModerStatus
-
-exports.getDupGroup = getDupGroup

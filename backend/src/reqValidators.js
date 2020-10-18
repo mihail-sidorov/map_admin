@@ -80,6 +80,8 @@ async function hasPointInGetPointsModer(req) {
     throw "point id not found"
 }
 
+module.exports.validDelUser = validConstructor(pointIdJson)
+
 module.exports.validAddUser = validConstructor(addUserJson, {
     email: yup.string().test(
         'email',

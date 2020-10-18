@@ -106,7 +106,7 @@ describe("Интерфейс модератора", () => {
             delete (point.moder_status_id)
             point.description = "test"
             expect(response.data.response).to.equal(point.id)
-            expect(await Shop.query().findById(point.id)).to.include(point)
+            expect(await Shop.query().findById(point.id)).to.include(fp.omit("timeStamp")(point))
         })
 
         describe("Тестируем исключения", function () {
@@ -153,7 +153,7 @@ describe("Интерфейс модератора", () => {
                 expect(response.data.response).to.equal(point.id)
 
                 expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
-                expect(await Shop.query().findById(point.id)).to.include(point)
+                expect(await Shop.query().findById(point.id)).to.deep.include(fp.omit("timeStamp")(point))
             })
         })
 
@@ -171,7 +171,7 @@ describe("Интерфейс модератора", () => {
                     parent_id: point.id
                 })).length).to.equal(1)
 
-                expect(await Shop.query().findById(point.id)).to.include(point)
+                expect(await Shop.query().findById(point.id)).to.deep.include(point)
             })
 
             it("delete point", async function () {
@@ -181,7 +181,7 @@ describe("Интерфейс модератора", () => {
                 point.parent_id = null
                 expect(response.data.response).to.equal(point.id)
                 expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
-                expect(await Shop.query().findById(point.id)).to.include(point)
+                expect(await Shop.query().findById(point.id)).to.deep.include(point)
             })
 
             it("take point", async function () {
@@ -192,7 +192,7 @@ describe("Интерфейс модератора", () => {
 
                 expect(response.data.response).to.equal(point.id)
                 expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
-                expect(await Shop.query().findById(point.id)).to.include(point)
+                expect(await Shop.query().findById(point.id)).to.deep.include(point)
             })
 
             it("return point", async function () {
@@ -202,7 +202,7 @@ describe("Интерфейс модератора", () => {
 
                 expect(response.data.response).to.equal(point.id)
                 expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
-                expect(await Shop.query().findById(point.id)).to.include(point)
+                expect(await Shop.query().findById(point.id)).to.deep.include(point)
             })
         })
     })
@@ -264,7 +264,7 @@ describe("Интерфейс модератора", () => {
 
                 expect(response.data.response).to.equal(point.id)
                 expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
-                expect(await Shop.query().findById(point.id)).to.include(point)
+                expect(await Shop.query().findById(point.id)).to.deep.include(point)
             })
         })
 
@@ -287,7 +287,7 @@ describe("Интерфейс модератора", () => {
 
                 expect(response.data.response).to.equal(point.id)
                 expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
-                expect(await Shop.query().findById(point.id)).to.include(point)
+                expect(await Shop.query().findById(point.id)).to.deep.include(point)
             })
         })
 
@@ -299,7 +299,7 @@ describe("Интерфейс модератора", () => {
 
             expect(response.data.response).to.equal(point.id)
             expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
-            expect(await Shop.query().findById(point.id)).to.include(point)
+            expect(await Shop.query().findById(point.id)).to.deep.include(point)
         })
     })
 
@@ -322,7 +322,7 @@ describe("Интерфейс модератора", () => {
             expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
             expect(response.data.response).to.equal(point.id)
 
-            expect(await Shop.query().findById(point.id)).to.include(point)
+            expect(await Shop.query().findById(point.id)).to.deep.include(fp.omit("timeStamp")(point))
         })
 
 
@@ -344,7 +344,10 @@ describe("Интерфейс модератора", () => {
             expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
             expect(response.data.response).to.equal(point.id)
 
-            expect(await Shop.query().findById(point.id)).to.include(point)
+            expect(await Shop.query().findById(point.id)).to.deep.include(
+                fp.omit("timeStamp")
+                    (fp.pick(fp.keys(response.data.response.point))(point))
+            )
         })
     })
 

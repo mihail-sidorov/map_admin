@@ -369,7 +369,7 @@ paths:
                   isError:
                     type: boolean
                   response:
-                    $ref: ../models/getPointsModer.v1.json
+                    $ref: ../models/res/getPointsModer.json
               examples:
                 Пример:
                   value:
@@ -641,7 +641,7 @@ paths:
                   isError:
                     type: boolean
                   response:
-                    type: string
+                    $ref: ../models/res/delPoint.json
                 required:
                   - isError
                   - response
@@ -661,7 +661,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: ../models/req/delPoint.json
+              $ref: ../models/req/pointId.json
         description: Отправляем id точки
     parameters: []
   '/api/moder/editPoint/{id}':
@@ -955,7 +955,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../models/res/getRegions.json
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    description: id точки в случае успеха
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/res/getRegions.json
+                required:
+                  - isError
+                  - response
               examples:
                 Успех:
                   value:
@@ -988,7 +999,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../models/res/getRegions.json
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    description: id точки в случае успеха
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/res/getRegions.json
+                required:
+                  - isError
+                  - response
               examples:
                 Успех:
                   value:
@@ -1016,7 +1038,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../models/res/getRegions.json
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    description: id точки в случае успеха
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/res/getRegions.json
+                required:
+                  - isError
+                  - response
               examples:
                 Успех:
                   value:
@@ -1037,3 +1070,82 @@ paths:
         description: Принимает название региона
       description: Добавление нового региона
     parameters: []
+  /api/user/getPointsFree:
+    get:
+      summary: Получение точек модератора
+      tags:
+        - user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              application/json: null
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    description: id точки в случае успеха
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/res/getPointsUser.json
+                required:
+                  - isError
+                  - response
+      operationId: get-api-user-getPointsFree
+      description: 'Получение точек модератора, которые в последствии можно будет взять функцией, takePoint. Получает только точки со статусом accept и return'
+  /api/user/takePoint:
+    post:
+      summary: Взять точку модератора под свой аккаунт
+      tags:
+        - user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/res/getPointsUser.json
+                required:
+                  - isError
+                  - response
+      operationId: get-api-user-takePoint
+      description: Действует только на точки которые выдает getPointsFree
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ../models/req/pointId.json
+  /api/user/returnPoint:
+    post:
+      summary: Возвращение точки модератору
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isError:
+                    type: boolean
+                  response:
+                    oneOf:
+                      - type: string
+                      - $ref: ../models/res/getPointsUser.json
+                required:
+                  - isError
+                  - response
+      operationId: get-api-user-returnPoint
+      description: 'Возвращает точку обратно модератору, действует только на accept и take поинт'

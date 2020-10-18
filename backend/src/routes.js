@@ -3,7 +3,7 @@ const passport = require("passport")
 const { jsonResPattern, modelPromiseToRes } = require("./stdResponseFn")
 const { checkAuth } = require("./middlewares/passport")
 const { delPoint, addPoint, getPoints, editPoint, getPointsFree, takePoint, returnPoint } = require("./model/adminPanelApi/user")
-const { addUser, editUser, getUsers, getPermission, getRegions, editRegion, addRegion } = require("./model/adminPanelApi/admin")
+const { addUser, editUser, getUsers, getPermission, getRegions, editRegion, addRegion, delUser } = require("./model/adminPanelApi/admin")
 const { setPointAccept, getPointsModer, setPointRefuse, editPointModer } = require("./model/adminPanelApi/moder")
 const yup = require('yup')
 const {
@@ -20,7 +20,8 @@ const {
     validEditPointUser,
     validSetPointAccept,
     validTakePoint,
-    validReturnPoint } = require("./reqValidators")
+    validReturnPoint, 
+    validDelUser} = require("./reqValidators")
 const User = require("./model/orm/user")
 
 module.exports = function (app) {
@@ -70,6 +71,12 @@ module.exports = function (app) {
                 req.body.password,
                 +req.body.permission_id,
                 req.body.region_id),
+            res, next)
+    })
+
+    app.post("/api/admin/delUser", checkAuth("admin"), validDelUser, (req, res, next) => {
+        modelPromiseToRes(
+            delUser(+req.body.id),
             res, next)
     })
 

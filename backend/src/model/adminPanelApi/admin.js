@@ -2,6 +2,7 @@
 const User = require("../orm/user")
 const Permission = require("../orm/permission")
 const Region = require("../orm/region")
+const Shop = require("../orm/shop")
 
 /** @module model/adminPanelApi/admin */
 
@@ -92,14 +93,22 @@ async function editRegion(regionId, region) {
 /**
  * Возвращает данные всех прав из базы данных
  * @return {} ответ вида [{"id": 1, "permission": "admin"}]
- * @see AAA
  */
 function getPermission() {
     return Permission.query()
 }
 
-// function delUser(id) {
-//     User.query().delete().findById(id)
+// async function delUser(id) {
+//     return await User.transaction(async trx => {
+//         const region_id = (await User.query(trx).findById(id)).region_id
+//         const moder = await User.query(trx)
+//             .joinRelated("permission")
+//             .where({ region_id, permission: "moder" })
+//             .select("users.id").first()
+//         await Shop.query(trx).where({ user_id: id }).patch({ user_id: moder.id })
+//         await User.query(trx).deleteById(id)
+//         return id
+//     })
 // }
 
 exports.editRegion = editRegion
@@ -109,3 +118,4 @@ exports.editUser = editUser
 exports.addUser = addUser
 exports.getUsers = getUsers
 exports.getPermission = getPermission
+// exports.delUser = delUser

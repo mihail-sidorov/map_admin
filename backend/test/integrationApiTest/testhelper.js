@@ -1,8 +1,7 @@
-const fp = require("lodash/fp");
-const { nanoid } = require("nanoid");
-const Moder_status = require("../../src/model/orm/moder_status");
-const Shop = require("../../src/model/orm/shop");
-const User = require("../../src/model/orm/user");
+const fp = require("lodash/fp")
+const { nanoid } = require("nanoid")
+const Moder_status = require("../../src/model/orm/moder_status")
+const Shop = require("../../src/model/orm/shop")
 
 async function createPoint(userId, status, isHasСhild, dataOriginal) {
     let point
@@ -40,7 +39,6 @@ async function createPoint(userId, status, isHasСhild, dataOriginal) {
             point = await Shop.query().insertAndFetch(data)
         }
     }
-
     return point
 }
 
