@@ -3,3 +3,5 @@ sessions
 /serverConfig.js
 /package-lock.json
 /src/tmp
+/log
+/src/log
