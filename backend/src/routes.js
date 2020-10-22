@@ -74,11 +74,11 @@ module.exports = function (app) {
             res, next)
     })
 
-    // app.post("/api/admin/delUser", checkAuth("admin"), validDelUser, (req, res, next) => {
-    //     modelPromiseToRes(
-    //         delUser(+req.body.id),
-    //         res, next)
-    // })
+    app.post("/api/admin/delUser", checkAuth("admin"), validDelUser, (req, res, next) => {
+        modelPromiseToRes(
+            delUser(+req.body.id),
+            res, next)
+    })
 
     app.post("/api/admin/editUser", checkAuth("admin"), validEditUser, (req, res, next) => {
         modelPromiseToRes(
