@@ -19,10 +19,8 @@ let mapDispatchToProps = (dispatch) => {
 
             let point = null;
 
-            if (!values.apartment) values.apartment = '';
-
             if (permission === 'user') {
-                if (values.lng && values.lat && values.title && values.hours && values.phone && values.site) {
+                if (values.lng && values.lat) {
                     if (!values.description) values.description = '';
                     if (!values.isActive) values.isActive = false;
                     point = values;
@@ -44,7 +42,7 @@ let mapDispatchToProps = (dispatch) => {
             }
 
             if (permission === 'moder') {
-                if (values.full_city_name && values.street && values.house && values.title && values.hours && values.phone && values.site) {
+                if (values.full_city_name && values.street && values.house) {
                     point = values;
                 }
             }
