@@ -317,6 +317,7 @@ describe("Интерфейс модератора", () => {
             point.phone = "1"
             point.site = "1"
             point.isActive = 1
+            point.isGeneralPartner = 1
 
             let response = await axios.post("/api/moder/editPoint/" + point.id, point)
             expect((await Shop.query().where({ title: point.title })).length).to.equal(1)
@@ -339,6 +340,7 @@ describe("Интерфейс модератора", () => {
             point.phone = "1"
             point.site = "1"
             point.isActive = 1
+            point.isGeneralPartner = 1
 
             let response = await axios.post("/api/moder/editPoint/" + point.id, point)
             expect((await Shop.query().where({ title: point.title })).length).to.equal(1)

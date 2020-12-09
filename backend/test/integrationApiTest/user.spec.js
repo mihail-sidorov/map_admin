@@ -353,7 +353,8 @@ describe("user", function () {
                     phone: "phone",
                     site: "site",
                     description: "description",
-                    isActive: false
+                    isActive: false,
+                    isGeneralPartner: "1"
                 }
                 const point = (await axios.post("/api/user/addPoint", data)).data.response
                 const getPoints = (await axios.get("/api/user/getPoints")).data.response
@@ -478,6 +479,7 @@ describe("user", function () {
                         description: nanoid(),
                         force: false,
                         isActive: 0,
+                        isGeneralPartner: 1,
                         timeStamp: point.timeStamp
                     }
                     const response = await axios.post("/api/user/editPoint/" + point.id, editData)
@@ -504,6 +506,7 @@ describe("user", function () {
                         description: nanoid(),
                         force: false,
                         isActive: 0,
+                        isGeneralPartner: 0,
                         timeStamp: point.timeStamp
                     }
                     const response = await axios.post("/api/user/editPoint/" + point.id, editData)
@@ -530,6 +533,7 @@ describe("user", function () {
                         description: nanoid(),
                         force: false,
                         isActive: 0,
+                        isGeneralPartner: 0,
                         timeStamp: point.timeStamp
                     }
                     const response = await axios.post("/api/user/editPoint/" + point.id, editData)
@@ -558,6 +562,7 @@ describe("user", function () {
                         description: nanoid(),
                         force: false,
                         isActive: 0,
+                        isGeneralPartner: 1,
                         timeStamp: point.timeStamp
                     }
                     const response = await axios.post("/api/user/editPoint/" + point.id, editData)
@@ -585,6 +590,7 @@ describe("user", function () {
                         description: nanoid(),
                         force: false,
                         isActive: 0,
+                        isGeneralPartner: 1,
                         timeStamp: point.timeStamp
                     }
                     const response = await axios.post("/api/user/editPoint/" + point.id, editData)
@@ -612,6 +618,7 @@ describe("user", function () {
                         description: nanoid(),
                         force: false,
                         isActive: 0,
+                        isGeneralPartner: 1,
                         timeStamp: point.timeStamp
                     }
                     const response = await axios.post("/api/user/editPoint/" + point.id, editData)
@@ -643,6 +650,7 @@ describe("user", function () {
                     description: nanoid(),
                     force: false,
                     isActive: 0,
+                    isGeneralPartner: 1,
                     timeStamp: point.timeStamp
                 }
                 const response = await axios.post("/api/user/editPoint/" + point.id, editData)
@@ -663,6 +671,7 @@ describe("user", function () {
                     description: nanoid(),
                     force: false,
                     isActive: 0,
+                    isGeneralPartner: 1,
                     timeStamp: point.timeStamp
                 }
                 const response = await axios.post("/api/user/editPoint/" + point.id, editData)

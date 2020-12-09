@@ -17,7 +17,8 @@ async function getPointsModer(regionId) {
         "house",
         "street",
         "isActive",
-        "moder_status"]
+        "moder_status",
+        "isGeneralPartner"]
 
     return Shop.query()
         .joinRelated("[user,moder_status]")
