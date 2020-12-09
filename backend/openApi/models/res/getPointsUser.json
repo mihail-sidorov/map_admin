@@ -80,6 +80,12 @@
       "email": {
         "type": "string",
         "format": "email"
+      },
+      "isGeneralPartner": {
+        "type": [
+          "integer",
+          "boolean"
+        ]
       }
     },
     "required": [
@@ -98,7 +104,8 @@
       "description",
       "timeStamp",
       "moder_status",
-      "email"
+      "email",
+      "isGeneralPartner"
     ]
   }
 }

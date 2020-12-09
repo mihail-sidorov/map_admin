@@ -14,7 +14,8 @@ exports.getPointSelect = [
     "description",
     "timeStamp",
     "moder_status",
-    "email"
+    "email",
+    "isGeneralPartner"
 ]
 
 exports.duplicateSelect = [

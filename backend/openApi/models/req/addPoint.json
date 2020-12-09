@@ -39,6 +39,12 @@
         "integer"
       ],
       "default": 1
+    },
+    "isGeneralPartner": {
+      "type": [
+        "boolean",
+        "integer"
+      ]
     }
   },
   "required": [

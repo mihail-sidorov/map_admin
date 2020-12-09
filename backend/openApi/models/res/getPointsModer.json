@@ -87,6 +87,12 @@
           "boolean",
           "integer"
         ]
+      },
+      "isGeneralPartner": {
+        "type": [
+          "integer",
+          "boolean"
+        ]
       }
     },
     "required": [
@@ -101,7 +107,8 @@
       "house",
       "street",
       "moder_status",
-      "isActive"
+      "isActive",
+      "isGeneralPartner"
     ]
   }
 }

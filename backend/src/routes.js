@@ -168,8 +168,6 @@ module.exports = function (app) {
     })
 
     app.post("/api/moder/editPoint/:id", checkAuth("moder"), validEditPointModer, (req, res, next) => {
-
-
         modelPromiseToRes(
             editPointModer(+req.params.id, {
                 street: req.body.street,
@@ -180,7 +178,8 @@ module.exports = function (app) {
                 hours: req.body.hours,
                 phone: req.body.phone,
                 site: req.body.site,
-                isActive: Boolean(req.body.isActive)
+                isActive: Boolean(req.body.isActive),
+                isGeneralPartner: Boolean(req.body.isGeneralPartner)
             },
                 req.body.force)
             , res, next)
@@ -232,6 +231,7 @@ module.exports = function (app) {
                 site: req.body.site,
                 description: req.body.description,
                 isActive: Boolean(req.body.isActive),
+                isGeneralPartner: Boolean(req.body.isGeneralPartner),
             },
                 Boolean(req.body.force))
             , res, next)
@@ -249,6 +249,7 @@ module.exports = function (app) {
                 site: req.body.site,
                 description: req.body.description,
                 isActive: Boolean(req.body.isActive),
+                isGeneralPartner: Boolean(req.body.isGeneralPartner)
             }, Boolean(req.body.force))
             , res, next)
     })

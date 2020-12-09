@@ -43,6 +43,12 @@
     "timeStamp": {
       "type": "string",
       "format": "date-time"
+    },
+    "isGeneralPartner": {
+      "type": [
+        "boolean",
+        "integer"
+      ]
     }
   },
   "required": [

@@ -32,6 +32,12 @@
         "boolean",
         "integer"
       ]
+    },
+    "isGeneralPartner": {
+      "type": [
+        "integer",
+        "boolean"
+      ]
     }
   }
 }
