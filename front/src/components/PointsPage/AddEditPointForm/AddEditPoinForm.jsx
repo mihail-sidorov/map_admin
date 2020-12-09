@@ -9,10 +9,10 @@ let Form = (props) => {
         formFields.push(
             <div className="add-edit-point-form__form-fields form__fields" key={1}>
                 <div className="add-edit-point-form__form-lng form__field">
-                    <label><Field name={'lng'} type={'text'} component={'input'} placeholder={'Координаты долгота'} /></label>
+                    <label><Field name={'lng'} type={'text'} component={'input'} placeholder={'Координаты широта'} /></label>
                 </div>
                 <div className="add-edit-point-form__form-lat form__field">
-                    <label><Field name={'lat'} type={'text'} component={'input'} placeholder={'Координаты широта'} /></label>
+                    <label><Field name={'lat'} type={'text'} component={'input'} placeholder={'Координаты долгота'} /></label>
                 </div>
                 <div className="add-edit-point-form__form-apartment form__field">
                     <label><Field name={'apartment'} type={'text'} component={'input'} placeholder={'Этаж / Кабинет / Здание'} /></label>
@@ -34,6 +34,9 @@ let Form = (props) => {
                 </div>
                 <div className="add-edit-point-form__form-isActive form__field">
                     <Field id="add-edit-point-form__form-isActive" name={'isActive'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isActive">Активна</label>
+                </div>
+                <div className="add-edit-point-form__form-isGeneralPartner form__field">
+                    <Field id="add-edit-point-form__form-isGeneralPartner" name={'isGeneralPartner'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isGeneralPartner">Генеральный партнер</label>
                 </div>
             </div>
         );
@@ -67,6 +70,9 @@ let Form = (props) => {
                 </div>
                 <div className="add-edit-point-form__form-isActive form__field">
                     <Field id="add-edit-point-form__form-isActive" name={'isActive'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isActive">Активна</label>
+                </div>
+                <div className="add-edit-point-form__form-isGeneralPartner form__field">
+                    <Field id="add-edit-point-form__form-isGeneralPartner" name={'isGeneralPartner'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isGeneralPartner">Генеральный партнер</label>
                 </div>
             </div>
         );
