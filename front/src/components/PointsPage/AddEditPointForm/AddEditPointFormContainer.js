@@ -21,9 +21,14 @@ let mapDispatchToProps = (dispatch) => {
 
             if (permission === 'user') {
                 if (values.lng && values.lat) {
-                    if (!values.description) values.description = '';
-                    if (!values.isActive) values.isActive = false;
-                    point = values;
+                    if (String(values.lng).match(/^[0-9]+\.[0-9]{4,}$/) && String(values.lat).match(/^[0-9]+\.[0-9]{4,}$/)) {
+                        if (!values.description) values.description = '';
+                        if (!values.isActive) values.isActive = false;
+                        point = values;
+                    }
+                    else {
+                        alert('У координат должно быть от 4 и более цифр после точки!');
+                    }
                 }
                 if (action === 'add' && point) {
                     addPoint(point)
