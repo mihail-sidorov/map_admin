@@ -38,6 +38,12 @@ let Form = (props) => {
                 <div className="add-edit-point-form__form-isGeneralPartner form__field">
                     <Field id="add-edit-point-form__form-isGeneralPartner" name={'isGeneralPartner'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isGeneralPartner">Генеральный партнер</label>
                 </div>
+                <div className="add-edit-point-form__form-isKarmy form__field">
+                    <Field id="add-edit-point-form__form-isKarmy" name={'is_karmy'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isKarmy">Karmy</label>
+                </div>
+                <div className="add-edit-point-form__form-isMeattime form__field">
+                    <Field id="add-edit-point-form__form-isMeattime" name={'is_meattime'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isMeattime">Meat Time</label>
+                </div>
             </div>
         );
     }
@@ -73,6 +79,12 @@ let Form = (props) => {
                 </div>
                 <div className="add-edit-point-form__form-isGeneralPartner form__field">
                     <Field id="add-edit-point-form__form-isGeneralPartner" name={'isGeneralPartner'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isGeneralPartner">Генеральный партнер</label>
+                </div>
+                <div className="add-edit-point-form__form-isKarmy form__field">
+                    <Field id="add-edit-point-form__form-isKarmy" name={'is_karmy'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isKarmy">Karmy</label>
+                </div>
+                <div className="add-edit-point-form__form-isMeattime form__field">
+                    <Field id="add-edit-point-form__form-isMeattime" name={'is_meattime'} type={'checkbox'} component={'input'} /><label htmlFor="add-edit-point-form__form-isMeattime">Meat Time</label>
                 </div>
             </div>
         );
